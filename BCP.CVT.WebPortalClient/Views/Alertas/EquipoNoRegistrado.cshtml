@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.Title1 = "Equipos no registradas en el catálogo";
+    ViewBag.Title2 = "Gobierno: Alertas y notificaciones";
+    ViewBag.Title3 = ViewBag.Title1;
+}
+
+<style>
+
+
+    .fondoRojo {
+        background-color: #E33D01 !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoNaranja {
+        background-color: #FF7F0D !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoAmarillo {
+        background-color: #FFDD5B !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoVerdeLeve {
+        background-color: #91C337 !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoVerdeFuerte {
+        background-color: #22A71C !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoCeleste {
+        background-color: #bfd9eb !important;
+        color: #000000 !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoBlanco {
+        text-align: center;
+        width: 10%;
+    }
+
+    .opciones-formatter {
+        display: flex;
+    }
+
+    .tec {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div id="SearchContainer" class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row gutter-xs form-group ">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusTecNoReg" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Ip o Nombre del Equipo ... ">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusTecNoReg" class="btn btn-primary btn-width-custom" onclick="buscarTecNoReg()">Buscar</button>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Origen: </h5>
+                                    <select id="cbFilTipEq" name="cbFilTipEq" class="form-control">
+                                        <option value="0">-- Todos --</option>
+                                        <option value="1">Qualys</option>
+                                        <option value="2">Guardicore</option>
+                                        @*<option value="3">SNOW</option>
+                                        <option value="4">Equipos manuales</option>*@
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Motivo: </h5>
+                                    <select id="cbFilEq" name="cbFilEq" class="form-control">
+                                        <option value="0">-- Todos --</option>
+                                        <option value="1">Equipo no existe</option>
+                                        <option value="2">Equipo inactivo</option>
+                                        <option value="3">Equipo cargado manualmente</option>
+                                    </select>
+                                </div>
+                            </div>
+							<div class="col-xs-3 col-md-3">
+								<h5>Estado: </h5>
+								<select id="cbFilFlagAprobado" name="cbFilFlagAprobado" class="form-control">
+									<option value="-1">-- Todos --</option>
+									<option value="">Pendiente</option>
+									<option value="1">Aprobado</option>
+									<option value="0">Rechazado</option>
+								</select>
+							</div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div id="AsocContainer" class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarRegistros()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">            
+            <div class="card-body">
+                <table id="tblTecNoReg" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Equipos no registrados</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="5%">#</th>
+                            <th data-formatter="opcionesFormatter" data-valign="middle" data-align="center">Acción</th>
+                            <th data-field="IPEquipo" data-halign="center" data-valign="middle" data-align="left" data-width="20%" data-sortable="true" data-sort-name="Aplicacion">IP del Equipo</th>
+                            <th data-field="NombreEquipo" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="TipoEquipo">Nombre del equipo</th>
+                            <th data-field="OrigenToString" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="Total">Origen</th>
+                            <th data-field="MotivoToString" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="FechaFinSoporte">Motivo</th>
+                            <th data-field="SistemaOperativo" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="FechaFinSoporte">Sistema operativo</th>
+                            <th data-field="FechaRegistroToString" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="FechaFinSoporteExtendido">Fecha de registro</th>
+                            <th data-field="FlagAprobadoStr" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="FlagAprobado">Estado</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const origenQualys = @((int)BCP.CVT.Cross.OrigenEquipoNoRegistrado.Qualys);
+</script>
+<script src="~/app/Alertas/equipoNoRegistrada.js?v=1.0.0"></script>

@@ -1,0 +1,572 @@
+﻿@model dynamic
+@using BCP.CVT.WebPortalClient.Models;
+@{
+    Usuario_Storage eUsuario = (Usuario_Storage)Session["Usuario"];
+    UsuarioCurrent user = MetodosUtiles.getCurrentUser();
+    string eusername = eUsuario == null ? "" : eUsuario.UsuarioBCP_Dto.Name;
+    string fechaactualizacion = eUsuario == null ? "" : eUsuario.FechaActualizacion;
+    int perfil = user == null ? 2 :user.PerfilId;
+}
+@{
+    ViewBag.Title1 = "Site de Gestión de tecnologías y obsolescencia";
+}
+<script>
+    var ID_USUARIO = '@ViewData.Eval("UsuarioId")';
+    var USERNAME_USUARIO = '@ViewData.Eval("UserName")';
+    var PERMISOID_USUARIO = '@ViewData.Eval("PermisoId")';
+</script>
+
+<style>
+    .card {
+        border-radius: 4px;
+    }
+
+    .p-x {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .fw-l {
+        font-weight: 300 !important;
+    }
+
+    .bg-info {
+        background-color: #1976d2;
+        border-color: #1976d2;
+        color: #fff;
+    }
+
+    .bg-danger {
+        background-color: #e64a19;
+        border-color: #e64a19;
+        color: #fff;
+    }
+
+    .bg-primary {
+        background-color: #f7a033 !important;
+        border-color: #f7a033 !important;
+        color: #fff;
+    }
+
+    .card-home {
+        background-color: #fff;
+        border: 1px solid #f1f1f1;
+        border-radius: 4px;
+        display: block;
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .p-a-lg {
+        padding: 30px !important;
+    }
+
+    .text-primary {
+        color: #f7a033;
+    }
+
+    .row {
+        margin-bottom: 0px !important;
+    }
+
+    .card-header {
+        border-top-right-radius: 3px;
+        border-top-left-radius: 3px;
+        border-bottom: 1px solid #f1f1f1;
+        padding: 10px 15px;
+        position: relative;
+    }
+
+    .card-body {
+        padding: 15px;
+        position: relative;
+    }
+
+    .timeline {
+        display: table;
+        width: 100%;
+        padding-left: 0px;
+        margin-bottom: 0px;
+    }
+
+    .timeline-item {
+        border-collapse: collapse;
+        display: table-row;
+    }
+
+    .timeline-segment {
+        background-color: transparent;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 1' fill='%23e6eef1'%3E%3Cpath d='M0 0h4v1H0z'/%3E%3C/svg%3E");
+        background-position: center bottom;
+        background-repeat: repeat-y;
+        -webkit-background-size: 4px 1px;
+        background-size: 4px 1px;
+        display: table-cell;
+        padding-bottom: 15px;
+        text-align: center;
+        vertical-align: top;
+        white-space: nowrap;
+        width: 1%;
+    }
+
+    .timeline-content {
+        display: table-cell;
+        padding-bottom: 15px;
+        padding-left: 15px;
+        vertical-align: middle;
+        width: 99%;
+    }
+
+    .timeline-media {
+        background-color: #e6eef1;
+        border-color: #e6eef1;
+        border-style: solid;
+        border-width: 3px;
+        -webkit-box-sizing: content-box;
+        box-sizing: content-box;
+        display: inline-block;
+    }
+
+    .sq-24 {
+        display: inline-block;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        text-align: center;
+        width: 24px;
+    }
+
+    .card-img {
+        border-radius: 3px;
+    }
+
+    .overlay {
+        display: block;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .bg-info-a75 {
+        background-color: rgba(25, 118, 210, 0.75);
+        border-color: #1976d2;
+        color: #fff;
+    }
+
+    .overlay-content {
+        bottom: 0px;
+        color: #fff;
+        display: block;
+        left: 0px;
+        overflow: hidden;
+        padding: 15px;
+        position: absolute;
+        right: 0px;
+        top: 0px;
+    }
+
+    .fh {
+        display: table;
+        height: 100%;
+        width: 100%;
+    }
+
+    .fh-m {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+    .icon-works {
+        display: inline-block;
+        font-family: icon-works;
+        font-size: inherit;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1;
+        text-align: center;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .sq-96 {
+        display: inline-block;
+        font-size: 48px;
+        height: 96px;
+        line-height: 96px;
+        text-align: center;
+        width: 96px;
+    }
+
+    .list-inline {
+        padding-left: 0px;
+        list-style: none;
+        margin-left: -5px;
+    }
+
+    .carousel {
+        position: relative;
+    }
+
+    .carousel-inner {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .bg-gray-a75 {
+        background-color: rgba(125, 125, 142, 0.75);
+        border-color: #7d7d8e;
+        color: #fff;
+    }
+
+    .caption {
+        background-color: white;
+        color: #f7a033;
+    }
+
+    .bg-orange {
+        background-color: #ffedd6;
+    }
+</style>
+
+@if (perfil == 0)
+{
+    <div class="row gutter-xs">
+        <h1>
+            No cuentas con acceso al sitio
+        </h1>
+        <p>
+            Si requieres alguna información o consulta urgente, contactate a este buzón: gestion_configuracion@bcp.com.pe.
+        </p>
+        <p>
+            Gracias,
+        </p>
+    </div>
+}
+else
+{
+    <div class="row gutter-xs">
+        <div class="col-xs-6 col-md-4">
+            <div class="card bg-warning no-border">
+                <div class="card-values">
+                    <div class="p-x">
+                        <small>Tecnologías estándar</small>
+                        <h3 class="card-title fw-l"><span id="spanTecnologias"></span></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-4">
+            <div class="card bg-danger no-border">
+                <div class="card-values">
+                    <div class="p-x">
+                        <small>Equipos gestionados</small>
+                        <h3 class="card-title fw-l"><span id="spanEquipos"></span></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-6 col-md-4">
+            <div class="card bg-primary no-border">
+                <div class="card-values">
+                    <div class="p-x">
+                        <small>Aplicaciones vigentes</small>
+                        <h3 class="card-title fw-l"><span id="spanAplicaciones"></span></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-md-12">
+            <div class="card card-home">
+                <div class="card-body p-a-lg">
+                    <div class="clear">
+                        <p class="card-text">
+                            <span class="truncate">
+                                Hola @eusername, bienvenido al Site de Gestión de tecnologías y obsolescencia. Esta es una plataforma donde podrás consultar información sobre el estado de la <br />
+                                obsolescencia de las tecnologías, aplicaciones y equipos del banco, además de poder gestionar los componentes tecnológicos que configuran una aplicación. <br /><br />
+                                Accede a través de los enlaces rápidos a las secciones de uso frecuente o navega por las diversas opciones del menu que tienes habilitado para tu perfil.
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row gutter-xs divTecnologiasPorVencer" style="display:none;">
+        <div class="col-md-12">
+            <div class="card card-home">
+                <div class="card-body p-a-lg">
+                    <div class="clear">
+                        <table id="tblTecnologiasPorVencer" data-locale="es-SP" class="table table-striped table-nowrap dataTable" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true" data-row-style="rowStyle" style="font-size:11px !important;">
+                            <caption class="caption">
+                                <span id="title-table">Tecnologías por vencer en N meses</span>
+                                @*<div class="pull-right" style="display: inline;">
+                                        <a class="btn btn-primary" onclick="ExportarTecnologiasRelacionadas()">
+                                            <span class="count-text">Exportar</span>
+                                        </a>
+                                    </div>*@
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="8%">Dominio</th>
+                                    <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Subdominio</th>
+                                    <th data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Clave</th>
+                                    <th data-field="FechaFinStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaFin" data-width="10%">Fecha fin</th>
+                                    <th data-field="TotalAplicaciones" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TotalAplicaciones" data-width="10%">Nro. aplicaciones <br /> impactadas</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row gutter-xs">
+        <div class="col-md-4">
+            <div class="card card-home">
+                <div class="card-img overlay">
+                    <div class="overlay-image">
+                        <img class="img-responsive" alt="Paris, France" src="/images/obsolescence.jpg">
+                    </div>
+                    <div class="overlay-content bg-info-a75">
+                        <div class="fh text-center">
+                            <div class="fh-m">
+                                <div class="card-body">
+                                    <h3 class="card-title">@fechaactualizacion</h3>
+                                    <p class="card-text">Fecha de actualización </p>
+                                </div>
+                                <div class="card-icon">
+                                    <span class="icon-works sq-96">v</span>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">La fecha de actualización considera la sincronización exitosa de equipos y sus tecnologías, aplicaciones y sus relaciones.</p>
+                                </div>
+                                <ul class="list-inline"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-home">
+                <div class="card-header">
+                    <strong>Accesos directos</strong>
+                </div>
+                <div class="card-body">
+                    <div class="card-search">
+                        <div class="card-search-results">
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-segment">
+                                        <div class="timeline-divider"></div>
+                                    </div>
+                                    <div class="timeline-content"></div>
+                                </div>
+                                @if (perfil != 10 && perfil != 6 && perfil != 13 && perfil != 14)
+                                {
+                                    if (perfil != 3 && perfil != 4 && perfil != 7 && perfil != 8 && perfil != 11)
+                                    {
+                                        <div class="timeline-item">
+                                            <div class="timeline-segment">
+                                                <div class="timeline-media bg-primary circle sq-24">
+                                                    <div class="icon icon-check"></div>
+                                                </div>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <div class="timeline-row">
+                                                    <a href="@Url.Content("~/Relacion/Tecnologia")">Relaciones</a>
+                                                </div>
+                                                <div class="timeline-row">
+                                                    <p>
+                                                        <small>Configura y visualiza las relaciones de aplicación, equipo y tecnología.</small>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div class="timeline-item">
+                                        <div class="timeline-segment">
+                                            <div class="timeline-media bg-primary circle sq-24">
+                                                <div class="icon icon-check"></div>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <div class="timeline-row">
+                                                <a href="@Url.Content("~/Vista/Equipos")">Vista por equipos</a>
+                                            </div>
+                                            <div class="timeline-row">
+                                                <p>
+                                                    <small>Revisa la relación de los equipos gestionados en la plataforma, incluyendo las tecnologías instaladas que pueda poseer.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-segment">
+                                            <div class="timeline-media bg-primary circle sq-24">
+                                                <div class="icon icon-check"></div>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <div class="timeline-row">
+                                                <a href="@Url.Content("~/Vista/Relaciones")">Vista por relaciones</a>
+                                            </div>
+                                            <div class="timeline-row">
+                                                <p>
+                                                    <small>Revisa la lista de los equipos y aplicaciones relacionadas gestionados en la plataforma, puediendo acceder incluso a la configuración de cada equipo.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-segment">
+                                            <div class="timeline-media bg-primary circle sq-24">
+                                                <div class="icon icon-check"></div>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <div class="timeline-row">
+                                                <a href="@Url.Content("~/Vista/Ventana")">Ventana de mantenimiento</a>
+                                            </div>
+                                            <div class="timeline-row">
+                                                <p>
+                                                    <small>Consulta la ventana de mantenimiento de los equipos por cada ambiente configurado.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else if (perfil == 6 || perfil == 13 || perfil == 14)
+                                {
+                                    <div class="timeline-item">
+                                        <div class="timeline-segment">
+                                            <div class="timeline-media bg-primary circle sq-24">
+                                                <div class="icon icon-check"></div>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <div class="timeline-row">
+                                                <a href="@Url.Content("~/Dashboard/GerenciaDivisionArquitectos")">Dashboard de aplicaciones</a>
+                                            </div>
+                                            <div class="timeline-row">
+                                                <p>
+                                                    <small>Muestra indicadores sobre la obsolescencia de las aplicaciones.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="timeline-item">
+                                        <div class="timeline-segment">
+                                            <div class="timeline-media bg-primary circle sq-24">
+                                                <div class="icon icon-check"></div>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <div class="timeline-row">
+                                                <a href="@Url.Content("~/Indicadores/GerencialEquipos")">Indicadores a nivel de equipos</a>
+                                            </div>
+                                            <div class="timeline-row">
+                                                <p>
+                                                    <small>Muestra indicadores sobre la obsolescencia de las tecnologías instaladas en los equipos registrados en la plataforma.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-segment">
+                                            <div class="timeline-media bg-primary circle sq-24">
+                                                <div class="icon icon-check"></div>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <div class="timeline-row">
+                                                <a href="@Url.Content("~/Indicadores/GerencialTecnologias")">Indicador a nivel de tecnologías</a>
+                                            </div>
+                                            <div class="timeline-row">
+                                                <p>
+                                                    <small>Muestra indicadores sobre la obsolescencia de las tecnologías registradas en la plataforma.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-segment">
+                                            <div class="timeline-media bg-primary circle sq-24">
+                                                <div class="icon icon-check"></div>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <div class="timeline-row">
+                                                <a href="@Url.Content("~/Indicadores/GerencialAplicaciones")">Indicador a nivel de aplicaciones</a>
+                                            </div>
+                                            <div class="timeline-row">
+                                                <p>
+                                                    <small>Muestra indicadores sobre la obsolescencia de las aplicaciones y las tecnologías que usan.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-home">
+                <div class="overlay">
+                    <div class="overlay-image" style="height:362px;">
+                        <div class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner" role="listbox">
+                                <div class="item active">
+                                    <img alt="Mensaje" src="/images/1.png">
+                                </div>
+                                <div class="item">
+                                    <img alt="Mensaje" src="/images/2.png">
+                                </div>
+                                <div class="item">
+                                    <img alt="Mensaje" src="/images/3.png">
+                                </div>
+                                <div class="item">
+                                    <img alt="Mensaje" src="/images/4.png">
+                                </div>
+                                <div class="item">
+                                    <img alt="Mensaje" src="/images/5.png">
+                                </div>
+                                <div class="item">
+                                    <img alt="Mensaje" src="/images/6.png">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overlay-content bg-gray-a75">
+                        <h2 class="card-title">
+                            Documentos de ayuda
+                        </h2>
+                        <p class="card-divider"></p>
+                        <p>Puedes encontrar archivos digitales de ayuda y soporte, que podrán agilizar la resolución de las dudas o consultas que puedas tener sobre el uso de esta plataforma.</p>
+                        <ul class="list-inline">
+                            <li><a href="@Url.Content("~/Vista/Ayuda")">Ver documentos</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+<script src="~/app/index.js?v=2.0.0"></script>

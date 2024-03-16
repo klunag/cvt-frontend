@@ -1,0 +1,185 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Distribución de aplicaciones BCP por infraestructura y obsolescencia";
+    ViewBag.Title2 = "Reportes";
+    ViewBag.Title3 = "Distribución de aplicaciones BCP por infraestructura y obsolescencia";
+}
+
+<style>
+    .opcionesStyle {
+        width: 500px;
+    }
+
+    .fondoAzul {
+        background-color: #013A81 !important;
+        color: #ffffff !important;
+        font-weight: bold;
+    }
+
+    .centerBold {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .fondoGris {
+        background-color: #CCCCCC !important;
+        color: #013A81 !important;
+    }
+
+    .fondoBlanco {
+        background-color: #F2F2F2 !important;
+        color: #013A81 !important;
+    }
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <div class="panel-group" id="accordion-filtro" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default" style="overflow: inherit;">
+                    <a class="panel-heading" role="tab" id="heading-filtro" data-toggle="collapse" data-parent="#accordion-filtro" href="#collapse-filtro" aria-expanded="true" aria-controls="collapse-filtro" style="display: flex">
+                        <h4 class="panel-title">Filtro de búsqueda</h4>
+                    </a>
+                    <div id="collapse-filtro" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro">
+                        <div class="panel-body">
+                            <div class="card-search-box">
+                                <form action="javascript:void(0);">
+                                    <div class="row gutter-xs" style="margin-bottom: 0;">
+
+                                        @*<div class="col-xs-1 col-md-1">
+                                                <h5>Gerencia: </h5>
+                                            </div>
+                                            <div class="col-xs-3 col-md-3">
+                                                <div class="text-left" data-toggle="match-height" style="width:200%;">
+                                                    <select id="cbFiltroGerencia" class="form-control"></select>
+                                                </div>
+                                            </div>*@
+                                        <div class="col-xs-12 col-md-6 col-sm-6 containerFiltro">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Gerencia: </h5>
+                                                <select id="cbFiltroGerencia" class="form-control"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-md-6 col-sm-6 containerFiltro">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Capa Funcional: </h5>
+                                                <select id="cbFiltroCapaFuncional" class="form-control"></select>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="RefrescarListado()" style="width: 140px;">
+        <span class="icon icon-search"></span>
+        <span class="count-text">Buscar</span>
+    </a>
+    <div class="btn-group">
+        <a class="btn btn-primary" href="javascript: void(0)" onclick="ExaportarReporteInfraestructura();">
+            <span class="icon icon-list"></span>
+            <span class="count-text">Exportar</span>
+        </a>
+    </div>
+</div>
+
+<!--INFRAESTRUCTURA-->
+<div class="row gutter-xs" style="margin-top:20px;">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistroApps" class="table table-striped table-nowrap table-bordered" cellspacing="0" width="100%" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Registros configurados</span>
+                    </caption>
+                    <thead>
+                        <tr style="text-align:center; vertical-align:middle;">
+                            <th data-field="CapaFuncional" data-halign="center" data-valign="middle" data-align="center" rowspan="3" class="fondoAzul">Capa Funcional</th>
+                            <th colspan="9" class="fondoGris" data-halign="center" data-valign="middle" data-align="center">Apps vigentes</th>
+                            <th class="fondoBlanco" data-halign="center" data-valign="middle" data-align="center">Apps en desarrollo</th>
+                        </tr>
+                        <tr style="text-align:center; vertical-align:middle;">
+                            <th data-formatter="linkFormatterTotal" data-events="operateEvents" data-field="TotalVigentes" data-halign="center" data-valign="middle" data-align="center" rowspan="2" style="width:8%;" class="fondoGris">Total de apps</th>
+                            <th data-formatter="linkFormatterInfraestructuraTotal" data-events="operateEvents" data-field="AppsOnPremise" data-halign="center" data-valign="middle" data-align="center" rowspan="2" style="width:8%;">Apps en on-premise</th>
+                            <th data-formatter="linkFormatterInfraestructuraTotal" data-events="operateEvents" data-field="AppsOnCloud" data-halign="center" data-valign="middle" data-align="center" rowspan="2" style="width:8%;">Apps en cloud</th>
+                            <th colspan="2">Apps con obsolescencia</th>
+                            <th colspan="2">Apps desarrolladas (in-house)</th>
+                            <th colspan="2">Apps en paquetes</th>
+                            <th data-formatter="linkFormatterTotal" data-events="operateEvents" data-field="TotalEnDesarrollo" data-halign="center" data-valign="middle" data-align="center" class="fondoBlanco" rowspan="2">Total de apps</th>
+                        </tr>
+                        <tr style="text-align:center; vertical-align:middle;">
+                            <th data-formatter="linkFormatterObsOnPremise" data-field="AppsObsolescenciaOnPremise" data-halign="center" data-valign="middle" data-align="center">On-premise</th>
+                            <th data-formatter="linkFormatterObsOnCloud" data-field="AppsObsolescenciaOnCloud" data-halign="center" data-valign="middle" data-align="center">Cloud</th>
+                            <th data-formatter="linkFormatterDesaOnPremise" data-field="AppsDesarrolladasOnPremise" data-halign="center" data-valign="middle" data-align="center">On-premise</th>
+                            <th data-formatter="linkFormatterDesaOnCloud" data-field="AppsDesarrolladasOnCloud" data-halign="center" data-valign="middle" data-align="center">Cloud</th>
+                            <th data-formatter="linkFormatterPaqOnPremise" data-field="AppsPaquetesOnPremise" data-halign="center" data-valign="middle" data-align="center">On-premise</th>
+                            <th data-formatter="linkFormatterPaqOnCloud" data-field="AppsPaquetesOnCloud" data-halign="center" data-valign="middle" data-align="center">Cloud</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+        <p>
+            <strong>Consideraciones</strong><br />
+            - No se consideran las aplicaciones no vigentes <br />
+        </p>
+    </div>
+</div>
+
+<div id="mdDetalleAplicacion" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Detalle de aplicaciones</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formDetalleAplicacion">
+                    @*<div class="form-group">
+                            <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="exportarEquivalenciasGeneral()">
+                                <span class="icon icon-external-link"></span>
+                                <span class="count-text">Exportar</span>
+                            </a>
+                        </div>*@
+                    <div class="form-group">
+                        <table id="tblDetalleAplicacion" data-locale="es-SP" class="table" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%">Código APT</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Nombre</th>
+                                    <th data-field="EstadoAplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Estado de aplicación</th>
+                                    <th data-field="CapaFuncional" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="20%">Capa Funcional</th>
+                                    @*<th data-field="ClasificacionTecnica" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="20%">Clasificación técnica</th>*@
+                                    @*<th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Tipo activo información</th>
+                                        <th data-field="GerenciaCentral" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Gerencia</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/reporteInfraestructura.js"></script>

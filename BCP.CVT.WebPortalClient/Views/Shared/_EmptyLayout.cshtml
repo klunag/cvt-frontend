@@ -1,0 +1,488 @@
+﻿@using BCP.CVT.WebPortalClient.Models
+@using BCP.CVT.Cross
+@using System.Configuration;
+
+@{
+    bool moduloPAPP = false;
+    bool moduloSolicitante = false;
+
+    UsuarioCurrent user = MetodosUtiles.getCurrentUser();
+    Usuario_Storage eUsuario = (Usuario_Storage)Session["Usuario"];
+    string eusername = eUsuario == null ? "" : eUsuario.UsuarioBCP_Dto.Name;
+
+    if (Session["PAPP.Activar"] != null)
+    {
+        moduloPAPP = (bool)Session["PAPP.Activar"];
+    }
+
+    if (Session["PAPP.Solicitante"] != null)
+    {
+        moduloSolicitante = (bool)Session["PAPP.Solicitante"];
+    }
+
+    int bandejaPortafolio = 0;
+
+    if (eUsuario != null)
+    {
+        bandejaPortafolio = eUsuario.UsuarioBCP_Dto.Bandeja;
+    }
+}
+
+
+<!DOCTYPE html>
+<html lang="es-ES">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/png" href="~/favicon.ico" />
+
+    <!--Bootstrap 4.3.1-->
+    <link href="~/content/fontawesome.css" rel="stylesheet" />
+    <link href="~/content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/content/site.css" rel="stylesheet" />
+    <link href="~/content/stylesheet.css" rel="stylesheet" />
+    <link href="~/content/select2.min.css" rel="stylesheet" />
+    <link href="~/content/metismenu.min.css" rel="stylesheet" />
+    <link href="~/content/jquery-jvectormap-2.0.3.css" rel="stylesheet" />
+    <link href="~/Content/toastr.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
+    <title>Web del Portafolio de Aplicaciones BCP</title>
+
+    <style>
+        /*ui-menu ui-widget ui-widget-content ui-autocomplete ui-front*/
+        /*ui-menu-item*/
+        /*ui-menu-item-wrapper*/
+        ul.ui-autocomplete {
+            z-index: 1100;
+        }
+
+        .my-error-class {
+            color: #dc3545;
+            font-weight: bold !important;
+            font-size: 12px;
+        }
+
+        .my-valid-class {
+        }
+    </style>
+
+    <!-- Bootstrap table -->
+    @Styles.Render("~/Content/bootstrap-table.min.css")
+    <!-- Bootstrap toggle -->
+    @Styles.Render("~/Content/bootstrap-toggle.min.css")
+    <!-- Bootstrap datetimepicker -->
+    @Styles.Render("~/Content/bootstrap-datetimepicker.min.css")
+    <!-- jQuery -->
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    @Scripts.Render("~/Scripts/bootstrap-table.min.js")
+    @Scripts.Render("~/Scripts/bootstrap-toggle.min.js")
+    @Scripts.Render("~/Scripts/jwt-decode.js")
+    @Scripts.Render("~/Scripts/util.js")
+
+    <!-- Moment -->
+    @Scripts.Render("~/Scripts/moment.min.js")
+    @Scripts.Render("~/Scripts/moment-with-locales.min.js")
+
+    <script src="~/app/common.js?v=3.2.1"></script>
+    <script>
+        var URL_LOGIN_SERVER = '@Url.Content("~/Login")';
+        var URL_API = "@BCP.CVT.Cross.Utilitarios.URL_API";
+        var REGISTRO_PAGINACION = "10";
+        var OPCIONES_PAGINACION = "[10,20,30]";
+
+        var REGISTRO_PAGINACION_ALT = "30";
+        var OPCIONES_PAGINACION_ALT = "[30,60,90]";
+
+        var USUARIO = getCache(NAME_CACHE_USUARIO);
+
+        var URL_PREGUNTA = '@Url.Content("~/Alertas/Ayuda")';
+        var URL_CATALOGO_APP = '@Url.Content("~/Configuracion/CatalogoAplicacion")';
+        var URL_BANDEJA_APP = '@Url.Content("~/Configuracion/BandejaAprobacionSolicitud")';
+        const URL_BANDEJA_CREACION_APP = '@Url.Content("~/Configuracion/SolicitudCreacionAplicacion")';
+        const URL_BANDEJA_MODIFICACION_APP = '@Url.Content("~/Configuracion/SolicitudModificacionAplicacion")';
+
+        const URL_BANDEJA_APP_APROBADOR = '@Url.Content("~/Configuracion/BandejaAprobacionEstandar")';
+
+        const url = window.location.href;
+        if ('@eusername' == "" || USUARIO == null)
+            LoginUsuario(false, url);
+
+        if (USUARIO !== null)
+            GuardarVisitaSite(USUARIO);
+
+    </script>
+</head>
+
+<body class="layout layout-header-fixed">
+    <div class="layout-header">
+        <div class="navbar navbar-default">
+            <div class="navbar-header">
+                <a class="navbar-brand navbar-brand-center" href="/">
+                    <img class="navbar-brand-logo" src="~/images/logo-bcp.svg" alt="">
+                </a>
+                <button class="navbar-toggler visible-xs-block collapsed" type="button" data-toggle="collapse" data-target="#sidenav">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="bars">
+                        <span class="bar-line bar-line-1 out"></span>
+                        <span class="bar-line bar-line-2 out"></span>
+                        <span class="bar-line bar-line-3 out"></span>
+                    </span>
+                    <span class="bars bars-x">
+                        <span class="bar-line bar-line-4"></span>
+                        <span class="bar-line bar-line-5"></span>
+                    </span>
+                </button>
+                <button class="navbar-toggler visible-xs-block collapsed" type="button" data-toggle="collapse" data-target="#navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="arrow-up"></span>
+                    <span class="ellipsis ellipsis-vertical">
+                        <img class="ellipsis-object" width="32" height="32" src="/images/user.png" alt="Usuario">
+                    </span>
+                </button>
+            </div>
+            <div class="navbar-toggleable">
+                <nav id="navbar" class="navbar-collapse collapse">
+                    <button class="sidenav-toggler hidden-xs" title="Colapsar menu ( [ )" aria-expanded="true" type="button">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="bars">
+                            <span class="bar-line bar-line-1 out"></span>
+                            <span class="bar-line bar-line-2 out"></span>
+                            <span class="bar-line bar-line-3 out"></span>
+                            <span class="bar-line bar-line-4 in"></span>
+                            <span class="bar-line bar-line-5 in"></span>
+                            <span class="bar-line bar-line-6 in"></span>
+                        </span>
+                    </button>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="visible-xs-block">
+                            <h4 class="navbar-text text-center">Hola, usuario</h4>
+                        </li>
+                        <li class="dropdown hidden-xs">
+                            <button class="navbar-account-btn" data-toggle="dropdown" aria-haspopup="true">
+                                <img class="circle" width="36" height="36" src="/images/user.png" alt="">
+                                <text id="lblUserName">
+                                    @eusername
+                                </text>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="javascript: void(0)" onclick="LoginUsuario()">@eusername</a></li>
+                                <li><a href="@Url.Content("~/logout")">Cerrar Sesión</a></li>
+                            </ul>
+                        </li>
+                        <li class="visible-xs-block">
+                            <a href="#">
+                                <span class="icon icon-power-off icon-lg icon-fw"></span>
+                                Salir
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="title-bar">
+                        <h1 class="title-bar-title">
+                            <span class="d-ib">@ViewBag.Title1</span>
+                        </h1>
+                        <p class="title-bar-description">
+                            @if (!string.IsNullOrEmpty(ViewBag.Title2) && !string.IsNullOrEmpty(ViewBag.Title3))
+                            {
+                                <small>@ViewBag.Title2</small><small> > @ViewBag.Title3</small>
+                            }
+                        </p>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="layout-main">
+        <div class="layout-sidebar">
+            <div class="layout-sidebar-backdrop"></div>
+            <div class="layout-sidebar-body">
+                <nav id="sidenav" class="sidenav-collapse collapse">
+                    <ul class="sidenav level-1">
+                        @if (user != null)
+                        {
+                            if (user.PerfilesPAP.Contains("PAPP_Administrador")
+                                || user.PerfilesPAP.Contains("PAPP_ArquitectoTI")
+                                || user.PerfilesPAP.Contains("PAPP_ArquitectoNegocio")
+                                || user.PerfilesPAP.Contains("PAPP_DevSecOps")
+                                || user.PerfilesPAP.Contains("PAPP_GobiernoUserIT")
+                                || user.PerfilesPAP.Contains("PAPP_AIO")
+                                || user.PerfilesPAP.Contains("E195_Administrador"))
+                            {
+                                <li class="sidenav-item has-subnav active">
+                                    <a href="#" aria-haspopup="true">
+                                        <span class="sidenav-icon icon icon-briefcase "></span>
+                                        <span class="sidenav-label">Gestión de aplicaciones</span>
+                                    </a>
+                                    <ul class="sidenav level-2 collapse">
+                                        <li class="sidenav-heading">Gestión de aplicaciones</li>
+                                        <li class="sidenav-item has-subnav active">
+                                            <a href="#" aria-haspopup="true">Creación</a>
+                                            <ul class="sidenav level-3 collapse">
+                                                <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/Nuevo")">Nueva aplicación</a></li>
+                                                <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/Bandeja")">Bandeja de Solicitudes de creación</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="sidenav-item has-subnav active">
+                                            <a href="#" aria-haspopup="true">Modificación</a>
+                                            <ul class="sidenav level-3 collapse">
+                                                <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/BandejaAplicaciones")">Modificación de Aplicaciones</a></li>
+                                                <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/BandejaModificacionAplicaciones")">Bandeja de Solicitudes de Modificación</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="sidenav-item has-subnav active">
+                                            <a href="#" aria-haspopup="true">Eliminación</a>
+                                            <ul class="sidenav level-3 collapse">
+                                                <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/EliminacionAplicaciones")">Eliminación de Aplicaciones</a></li>
+                                                <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/BandejaEliminacionAplicaciones")">Bandeja de Solicitudes de Eliminación</a></li>
+                                                <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/ReversionEliminacionAplicaciones")">Reactivación de Aplicaciones Eliminadas</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            else
+                            {
+                                if (moduloSolicitante)
+                                {
+                                    if (user.PerfilesPAP.Contains("PAPP_Solicitante"))
+                                    {
+                                        <li class="sidenav-item has-subnav active">
+                                            <a href="#" aria-haspopup="true">
+                                                <span class="sidenav-icon icon icon-briefcase "></span>
+                                                <span class="sidenav-label">Gestión de aplicaciones</span>
+                                            </a>
+                                            <ul class="sidenav level-2 collapse">
+                                                <li class="sidenav-heading">Gestión de aplicaciones</li>
+                                                <li class="sidenav-item has-subnav active">
+                                                    <a href="#" aria-haspopup="true">Creación</a>
+                                                    <ul class="sidenav level-3 collapse">
+                                                        <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/Nuevo")">Nueva aplicación</a></li>
+                                                        <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/Bandeja")">Bandeja de Solicitudes de creación</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li class="sidenav-item has-subnav active">
+                                                    <a href="#" aria-haspopup="true">Modificación</a>
+                                                    <ul class="sidenav level-3 collapse">
+                                                        <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/BandejaAplicaciones")">Modificación de Aplicaciones</a></li>
+                                                        <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/BandejaModificacionAplicaciones")">Bandeja de Solicitudes de Modificación</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li class="sidenav-item has-subnav active">
+                                                    <a href="#" aria-haspopup="true">Eliminación</a>
+                                                    <ul class="sidenav level-3 collapse">
+                                                        <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/EliminacionAplicaciones")">Eliminación de Aplicaciones</a></li>
+                                                        <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/BandejaEliminacionAplicaciones")">Bandeja de Solicitudes de Eliminación</a></li>
+                                                        <li><a href="@Url.Content("~/RegistroPortafolioAplicaciones/ReversionEliminacionAplicaciones")">Reactivación de Aplicaciones Eliminadas</a></li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+                                }
+                            }
+
+                            if (user.PerfilesPAP.Contains("PAPP_Administrador")
+                                || user.PerfilesPAP.Contains("PAPP_ArquitectoTI")
+                                || user.PerfilesPAP.Contains("PAPP_ArquitectoNegocio")
+                                || user.PerfilesPAP.Contains("PAPP_DevSecOps")
+                                || user.PerfilesPAP.Contains("PAPP_GobiernoUserIT")
+                                || user.PerfilesPAP.Contains("PAPP_AIO")
+                                || user.PerfilesPAP.Contains("PAPP_Solicitante")
+                                || bandejaPortafolio == (int)ERoles.Administrador
+                                )
+                            {
+                                <li class="sidenav-item has-subnav active">
+                                    <a href="#" aria-haspopup="true">
+                                        <span class="sidenav-icon icon icon-server "></span>
+                                        <span class="sidenav-label">Flujo de aprobación</span>
+                                    </a>
+                                    <ul class="sidenav level-2 collapse">
+                                        @*<li class="sidenav-heading">Flujo de aprobación</li>*@
+                                        <li><a href="@Url.Content("~/BandejaPortafolioAplicaciones/Solicitudes")">Solicitudes asignadas</a></li>
+                                        @if (user.PerfilesPAP.Contains("PAPP_GobiernoUserIT")
+                                                   || user.PerfilesPAP.Contains("PAPP_Administrador")
+                                                   || bandejaPortafolio == (int)ERoles.Administrador
+                                                   || bandejaPortafolio == (int)ERoles.GobiernoUserIT)
+                                        {
+                                            <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/CatalogoAplicacionesUserIT")">Actualización de Aplicaciones UserIT</a></li>
+                                        }
+                                    </ul>
+
+
+                                </li>
+                                <li class="sidenav-item has-subnav active">
+                                    <a href="#" aria-haspopup="true">
+                                        <span class="sidenav-icon icon icon-book "></span>
+                                        <span class="sidenav-label">Consultas al portafolio</span>
+                                    </a>
+                                    <ul class="sidenav level-2 collapse">
+                                        <li class="sidenav-heading">Consultas al portafolio</li>
+                                        <li><a href="@Url.Content("~/ConsultasPortafolioAplicaciones/Consultas")">Envíanos una consulta</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+
+                        @if (user != null)
+                        {
+                            if (user.PerfilesPAP.Contains("PAPP_Administrador") || bandejaPortafolio == (int)ERoles.Administrador)
+                            {
+                                <li class="sidenav-item has-subnav active">
+                                    <a href="#" aria-haspopup="true">
+                                        <span class="sidenav-icon icon icon-cogs "></span>
+                                        <span class="sidenav-label">Gestión de Portafolio</span>
+                                    </a>
+                                    <ul class="sidenav level-2 collapse">
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/CreacionAplicaciones")">Creación de aplicaciones</a></li>
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/BandejaAprobacionSolicitud")">Modificación de aplicaciones</a></li>
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/AprobacionCambioEstado")">Eliminación de aplicaciones</a></li>
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/BandejaReversionEliminacion")">Reactivación de aplicaciones eliminadas</a></li>
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/CatalogoAplicacion")">Catálogo de aplicaciones</a></li>
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/ActualizacionHistoricaPortafolio")">Actualización Histórica</a></li>
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/Backups")">Backups</a></li>
+                                        <li><a href="@Url.Content("~/ConsultasPortafolioAplicaciones/RespuestaConsultas")">Respuestas a consultas</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="sidenav-item has-subnav active">
+                                    <a href="#" aria-haspopup="true">
+                                        <span class="sidenav-icon icon icon-database "></span>
+                                        <span class="sidenav-label">Configuración de Portafolio</span>
+                                    </a>
+                                    <ul class="sidenav level-2 collapse">
+                                        <li class="sidenav-heading">Configuración de Portafolio</li>
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/TipoNotificacionesPortafolio")">Notificaciones</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/ParametroAplicacion")">Parámetros de configuración</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/RolesGestion")">Roles de Gestión</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/Portafolio")">Tipo de Activo de Información</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/GestionadoPor")">Gestionado Por</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/AreaBian")">Area - Dominio BIAN y TOBE</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/JefaturaAti")">Jefatura de Arquitecto Evaluador</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/Gerencia")">Gerencia/División/Area y Unidad</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/ClasificacionTecnica")">Clasificación y subclasificación técnica</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/ColumnaAplicacionData")">Gestión de campos de aplicación</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/TipoPCI")">Tipo de PCI DSS</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/GrupoTicketRemedy")">Grupo Ticket Remedy</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/CodigoReservado")">Código Reservado</a></li>
+                                        <li><a href="@Url.Content("~/ConfiguracionPortafolioAplicaciones/CodigoReutilizado")">Código a Reutilizar</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="sidenav-item has-subnav active">
+                                    <a href="#" aria-haspopup="true">
+                                        <span class="sidenav-icon icon icon-archive"></span>
+                                        <span class="sidenav-label">Bitácora</span>
+                                    </a>
+                                    <ul class="sidenav level-2 collapse">
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/Bitacora")">Bitácora de eventos</a></li>
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/FormatosRegistro")">Formatos de registro</a></li>
+                                        <li><a href="@Url.Content("~/GestionPortafolioAplicaciones/AplicacionesDesestimadas")">Aplicaciones desestimadas</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="sidenav-item has-subnav active">
+                                    <a href="#" aria-haspopup="true">
+                                        <span class="sidenav-icon icon icon-tachometer "></span>
+                                        <span class="sidenav-label">Reportes portafolio</span>
+                                    </a>
+                                    <ul class="sidenav level-2 collapse">
+                                        <li class="sidenav-heading">Reportes</li>
+                                        <li><a href="@Url.Content("~/ReportesPortafolio/ReporteEstado")">Reporte de estado de portafolio según unidades</a></li>
+                                        <li><a href="@Url.Content("~/ReportesPortafolio/ReporteVariacion")">Reporte de variación del portafolio</a></li>
+                                        <li><a href="@Url.Content("~/ReportesPortafolio/ReportePedidos")">Reporte de pedidos a la gestión del portafolio</a></li>
+                                        <li><a href="@Url.Content("~/ReportesPortafolio/ReporteCampos")">Reporte por campo específico</a></li>
+                                        <li><a href="@Url.Content("~/ReportesPortafolio/ReporteCambiosBajarResponsableGDH")">Reporte de Cambios Bajas Responsables GDH</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+
+                        @if (moduloPAPP)
+                        {
+                            <li class="sidenav-item has-subnav active">
+                                <a href="@Url.Content("~/portafolioaplicaciones/ListadoAplicaciones")" aria-haspopup="true">
+                                    <span class="sidenav-icon icon icon-book "></span>
+                                    <span class="sidenav-label">Portafolio de aplicaciones</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="sidenav-item has-subnav active">
+                                <a href="@Url.Content("~/portafolioaplicaciones/Listado")" aria-haspopup="true">
+                                    <span class="sidenav-icon icon icon-book "></span>
+                                    <span class="sidenav-label">Portafolio de aplicaciones</span>
+                                </a>
+                            </li>
+                        }
+
+                        <li class="sidenav-item has-subnav active">
+                            <a href="#" aria-haspopup="true">
+                                <span class="sidenav-icon icon icon-tachometer "></span>
+                                <span class="sidenav-label">Reportes</span>
+                            </a>
+                            <ul class="sidenav level-2 collapse">
+                                <li class="sidenav-heading">Reportes</li>
+                                <li><a href="@Url.Content("~/portafolioaplicaciones/ReporteInfraestructura")">Aplicaciones por infraestructura</a></li>
+                                <li><a href="@Url.Content("~/portafolioaplicaciones/ReporteBIAN")">Aplicaciones por Área BIAN</a></li>
+                                <li><a href="@Url.Content("~/portafolioaplicaciones/Instancias")">Instancias servidores</a></li>
+                                <li><a href="@Url.Content("~/portafolioaplicaciones/Familias")">Productos servidores</a></li>
+                                <li><a href="@Url.Content("~/portafolioaplicaciones/AplicacionTecnologia")">Aplicaciones tecnologías</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="layout-content">
+            <div class="layout-content-body">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/Scripts/jqueryUI/jquery-ui.min.js"></script>
+    <script src="~/scripts/fontawesome.min.js"></script>
+
+    <script src="~/scripts/peity.min.js"></script>
+    <script src="~/scripts/jquery.matchheight-min.js"></script>
+    <script src="~/scripts/metismenu.min.js"></script>
+    <script src="~/scripts/jquery.slimscroll.min.js"></script>
+    <script src="~/scripts/select2.min.js"></script>
+    <script src="~/scripts/jquery-jvectormap-2.0.3.min.js"></script>
+    <script src="~/scripts/js/application.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/bootbox.min.js")
+    @Scripts.Render("~/Scripts/bootbox.locales.min.js")
+    @Scripts.Render("~/Scripts/bootbox.all.js")
+
+    @Scripts.Render("~/Scripts/locale/bootstrap-table-es-SP.min.js")
+
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+
+    <script src="~/Scripts/bootstrap.js"></script>
+    @RenderSection("scripts", required: false)
+
+    <script src="~/app/home.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            if (!window.console) window.console = {};
+            var methods = ["log", "debug", "warn", "info", "dir", "dirxml", "trace", "profile"];
+            for (var i = 0; i < methods.length; i++) {
+                console[methods[i]] = function () { };
+            }
+
+            MethodValidarSinEspacios();
+
+            activeMenu();
+        });
+
+    </script>
+</body>
+</html>
+

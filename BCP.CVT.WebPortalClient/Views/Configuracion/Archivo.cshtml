@@ -1,0 +1,117 @@
+﻿@{
+    ViewBag.Title1 = "Gestión de archivos";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Gestión de archivos";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusRegistro" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Busqueda de archivos por nombre...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusRegistro" class="btn btn-primary btn-width-custom" onclick="buscarRegistros()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="irSubirArchivos()">
+        <span class="icon icon-upload"></span>
+        <span class="count-text">Subir archivos</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            @*<div class="card-header">
+                <strong>Archivos registrados en la plataforma</strong>
+            </div>*@
+            <div class="card-body">
+                <table id="tblArchivos" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        Archivos registrados en la plataforma
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="NombreRef" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                            <th data-field="DescripcionRef" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Descripción</th>
+                            <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre archivo</th>
+                            <th data-field="TablaProcedenciaStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="TablaProcedenciaId">Procedencia</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                            <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>
+                            @*<th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Subir archivos -->
+<div id="mdImportar" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Subir archivos</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formImportar">
+                    <div class="form-group">
+                        <label class="control-label">Nombre: </label>
+                        <input id="txtNombreFl" class="form-control" type="text" name="txtNombreFl" maxlength="150">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Descripción: </label>
+                        <textarea id="txtDesFl" name="txtDesFl" rows="5" class="form-control" maxlength="1000"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            Archivo:
+                            @*<span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="La aplicación carga los registros que se encuentren en la primera hoja del archivo MS Excel."></span>*@
+                        </label>
+                        <div class="input-group">
+                            <input id="hdArchivoId" name="hdArchivoId" class="form-control" type="hidden" value="">
+                            <input id="txtArchivo" name="txtArchivo" class="form-control" type="text" value="Ningún archivo seleccionado" readonly>
+                            <span class="input-group-btn">
+                                <label class="btn btn-primary file-upload-btn">
+                                    <input id="flArchivo" class="file-upload-input inputfile" type="file" name="flArchivo">
+                                    <span class="glyphicon glyphicon-folder-open"></span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnReg" class="btn btn-primary" type="button" data-loading-text="Procesando...">Subir</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Subir archivos -->
+
+
+<script src="~/app/archivo.js?v=1.0.1"></script>

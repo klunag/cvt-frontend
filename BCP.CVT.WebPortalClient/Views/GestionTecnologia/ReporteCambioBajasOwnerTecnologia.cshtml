@@ -1,0 +1,190 @@
+﻿﻿@using BCP.CVT.Cross
+@{
+    ViewBag.Title1 = "Reporte de Cambios/Bajas Owner Tecnología";
+    ViewBag.Title2 = "Reportes Tecnología";
+    ViewBag.Title3 = "Reporte de Cambios/Bajas Owner Tecnología";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .nombreDom {
+        min-width: 180px;
+    }
+
+    .nombreTec {
+        min-width: 280px;
+    }
+
+    .opcTecnologia {
+        min-width: 150px;
+    }
+
+    .accesoDirecto {
+        min-width: 200px;
+    }
+
+    .tecnologia-label {
+        padding: 0px;
+    }
+
+    .tec {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .tooltip {
+        z-index: 2000 !important;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .multiselect-native-select .btn-group {
+        max-width: 100%;
+    }
+
+    .etiquetaAzul {
+        color: #012d74;
+    }
+
+    .subrayado {
+        text-decoration: underline;
+    }
+</style>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <div class="panel-group" id="accordion-filtro" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default" style="overflow: inherit;">
+                    <a class="panel-heading" role="tab" id="heading-filtro" data-toggle="collapse" data-parent="#accordion-filtro" href="#collapse-filtro" aria-expanded="true" aria-controls="collapse-filtro" style="display: flex">
+                        <h4 class="panel-title">Filtro de búsqueda</h4>
+                    </a>
+                    <div id="collapse-filtro" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro">
+                        <div class="panel-body">
+                            <div class="card-search-box">
+                                <form action="javascript:void(0);">
+                                    <div class="row gutter-xs" style="margin-bottom: 0;">
+                                        @*<div class="col-md-12 col-xs-12 col-sm-12">
+                                                <div class="input-with-icon searchContainer">
+                                                    <input id="txtBusTec" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre o descripción de la tecnología...">
+                                                    <input type="hidden" id="hdnBusTec" name="hdnBusTec" />
+                                                    <span class="icon icon-search input-icon"></span>
+                                                </div>
+                                            </div>*@
+                                        <div class="col-xs-3 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Dominio: </h5>
+                                                <select id="cbFilDom" name="cbFilDom" class="form-control" multiple="multiple"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Subdominio: </h5>
+                                                <select id="cbFilSub" name="cbFilSub" class="form-control" multiple="multiple"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Código de producto: </h5>
+                                                <div class="input-with-icon">
+                                                    <input id="txtFilCodigo" name="txtFilCodigo" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Código de producto">
+                                                    <span class="icon icon-search input-icon"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Producto: </h5>
+                                                <div class="input-with-icon searchProductoContainer">
+                                                    <input id="txtProductoBusTec" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre del producto...">
+                                                    <input type="hidden" id="hdnProductoBusTec" name="hdnProductoBusTec" />
+                                                    <span class="icon icon-search input-icon"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Tribu/Coe/Unidad Organizacional (Owner): </h5>
+                                                <div class="input-with-icon ownerTribuContainer">
+                                                    <input id="txtFilTribuCoeStr" name="txtFilTribuCoeStr" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Tribu/Coe/Unidad Organizacional">
+                                                    <input id="hdFilTribuCoeId" name="hdFilResponsableTribuId" type="hidden">
+                                                    <span class="icon icon-search input-icon"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Squad/Equipo (Squad): </h5>
+                                                <select id="cbSquadIdSearch" name="cbSquadIdSearch" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-6">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Estado de Resolución: </h5>
+                                                <select id="cbFiltroResolucionCambio" name="cbFiltroResolucionCambio" class="form-control" multiple="multiple"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+
+    <button id="btnBusTec" class="btn btn-primary btn-width-custom" onclick="buscarTec()">
+        <span class="icon icon-search"></span>
+        <span class="count-text">Buscar</span>
+    </button>
+    <button id="btnRepTec" class="btn btn-primary btn-width-custom" onclick="exportarCambioBajasOwnersTec()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </button>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tbl-tec" data-toggle="table" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        Registros de Tecnologías
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="20" data-width-unit="px">#</th>
+                            <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Dominio</th>
+                            <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Subdominio</th>
+                            <th data-field="CodigoProducto" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Código de<br />Producto</th>
+                            <th data-field="ProductoNombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Nombre de<br />Producto</th>
+                            <th data-field="TribuCoeStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Tribu/Coe/Unidad<br />Actual(SIGA)</th>
+                            <th data-field="ResponsableTribuCoeStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Responsable de<br />Tribu/Coe/Unidad<br />Actual(SIGA)</th>
+                            <th data-field="SquadStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Squad/Equipo<br />Actual(SIGA)</th>
+                            <th data-field="ResponsableSquadStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Responsable<br />Squad/Equipo<br />Actual(SIGA)</th>
+                            <th data-field="TribuCoeStrAnterior" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Tribu/Coe/Unidad<br />Anterior</th>
+                            <th data-field="ResponsableTribuCoeStrAnterior" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Responsable de<br />Tribu/Coe/Unidad<br />Anterior</th>
+                            <th data-field="SquadStrAnterior" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Squad/Equipo<br />Anterior</th>
+                            <th data-field="ResponsableSquadStrAnterior" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Responsable<br />Squad/Equipo<br />Anterior</th>
+                            <th data-field="TipoCambioSquad" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Tipo de:<br />Cambio o Baja Squad</th>
+                            <th data-field="EstadoResolucion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Estado de Resolución:<br />Baja o Cambio</th>
+                        </tr>
+                    </thead>
+                </table>
+                <input type="hidden" name="hdEditFrom" id="hdEditFrom" value="" />
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/app/Tecnologia/reporteCambioBajasOwnerTecnologia2.js"></script>

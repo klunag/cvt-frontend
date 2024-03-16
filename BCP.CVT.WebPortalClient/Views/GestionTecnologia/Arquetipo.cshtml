@@ -1,0 +1,206 @@
+﻿@{
+    ViewBag.Title1 = "Gestión de Arquetipos";
+    ViewBag.Title2 = "Gestión de las Tecnologías";
+    ViewBag.Title3 = "Arquetipos";
+}
+
+<style>
+    .width-des {
+        min-width: 300px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusArq" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre o descripción del arquetipo...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusArq" class="btn btn-primary btn-width-custom" onclick="BuscarArquetipo()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddArquetipo()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de Arquetipos</strong>
+            </div>
+            <div class="card-body">
+                <table id="tbl-arquetipos" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="EntornoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%" data-sort-name="EntornoId">Entorno</th>
+                            <th data-field="TipoArquetipoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%" data-sort-name="TipoArquetipoId">Tipo arquetipo</th>
+                            <th data-field="Codigo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Código</th>
+                            <th data-formatter="linkFormatterName" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Nombre</th>
+                            <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%" class="width-des">Descripción</th>
+                            <th data-formatter="linkFormatterTec" data-field="NumTecAsociadas" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NumTecAsociadas" data-width="20%"># Tecnologías</th>
+                            <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hFilArq" id="hFilArq" value="" />
+</div>
+
+<!--Modal Add or Edit (Arquetipo)-->
+<div id="MdAddOrEditArq" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormArq"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditArq">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="control-label">Entorno: </label>
+                                <select id="cbEntorno" name="cbEntorno" class="form-control"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="control-label">Tipo de arquetipo: </label>
+                                <select id="cbTipo" name="cbTipo" class="form-control"></select>
+                            </div>
+                        </div>                                     
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Código: </label>
+                        <input id="txtCodArq" class="form-control" type="text" name="txtCodArq">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Nombre: </label>
+                        <input id="txtNomArq" class="form-control" type="text" name="txtNomArq">
+                        <input type="hidden" name="hIdArq" id="hIdArq" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Descripción: </label>
+                        <textarea id="txtDesArq" class="form-control" rows="4" name="txtDesArq" maxlength="1000"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Diagrama de arquetipo:</label>
+                        <div class="input-group">
+                            <input id="hdArchivoId" name="hdArchivoId" class="form-control" type="text" value="0" style="display:none">
+                            <input id="txtNomDiagArq" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                            <span class="input-group-btn">
+                                <label class="btn btn-primary file-upload-btn">
+                                    <input id="flDiagArq" class="file-upload-input inputfile" type="file" name="flDiagArq">
+                                    <span class="glyphicon glyphicon-folder-open"></span>
+                                </label>
+                            </span>
+                            <a id="btnDescargarFile" class="btn btn-success" href="javascript:DescargarArchivo()" title="Descargar archivo">
+                                <span class="glyphicon glyphicon-download-alt"></span>
+                            </a>
+                            <a id="btnEliminarFile" class="btn btn-danger" href="javascript:EliminarArchivo()" title="Eliminar archivo">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Es automatizado?
+                        </label>
+                        <div class="input-group" id="divFlagAutomatizado">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Activo?
+                        </label>
+                        <div class="input-group" id="divActivo">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegArq" class="btn btn-primary" onclick="GuardarAddOrEditArquetipo()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit (Arquetipo)-->
+
+<!--Modal Tecnologias Asociadas (Arquetipo)-->
+<div id="MdTecByArq" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Agregar tecnologías al arquetipo</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTecByArq">
+                    <div class="form-group">
+                        <label class="control-label">Tecnología: </label>
+                        <div class="form-group ui-widget nomTecContainer">
+                            <input id="txtNomTecByArq" name="txtNomTecByArq" class="form-control ui-autocomplete-input" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <table id="tbl-TecByArq" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="TecId" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Dominio</th>
+                                    <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Subdominio</th>
+                                    <th data-field="Familia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Familia">Familia</th>
+                                    <th data-field="Tecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Tecnología</th>
+                                    <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="ActivoDetalle">Estado</th>
+                                    <th data-formatter="formatOpcTecByArq" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <input type="text" id="msjValidTbl" name="msjValidTbl" class="form-control" style="display:none;" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegTecByArq" type="button" class="btn btn-primary" onclick="guardarTecByArq()" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hdTecnologiaId" id="hdTecnologiaId" value="0" />
+</div>
+<!--Modal Tecnologias Asociadas (Arquetipo)-->
+
+<script src="~/app/arquetipo.js"></script>

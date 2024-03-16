@@ -1,0 +1,502 @@
+﻿@{
+    ViewBag.Title1 = "Indicadores CVT";
+    ViewBag.Title2 = "Indicadores gerenciales";
+    ViewBag.Title3 = "Indicadores CVT";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<style>
+    #reportEvolucion {
+        width: 100%;
+        height: 400px;
+    }
+    #reportPie {
+        width: 100%;
+        height: 400px;
+    }
+
+    #reportPieSoBd {
+        width: 100%;
+        height: 300px;
+    }
+
+    #reportPieSo {
+        width: 100%;
+        height: 300px;
+    }
+
+    #reportPieBd {
+        width: 100%;
+        height: 300px;
+    }
+
+    .div-report, .div-report2, .div-report-detallado {
+        display: none;
+    }   
+
+    .label{
+        font-size: 15px !important;
+    }
+
+    #reportPie_0 {
+        width: 100%;
+        height: 400px;
+    }
+
+    .media {
+        margin-top: 15px;
+    }
+
+    .media, .media-body {
+        zoom: 1;
+        overflow: hidden;
+    }
+
+    :first-child.media {
+        margin-top: 0px;
+    }
+
+    .list-group-item {
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid #e7e7ec;
+    }
+
+    :first-child.list-group-item {
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+    }
+
+    .list-group-divided .list-group-item {
+        background-color: transparent;
+        border-width: 1px 0;
+    }
+
+    .list-group-divided :first-child.list-group-item {
+        border-top-right-radius: 0px;
+        border-top-left-radius: 0px;
+        border-top: none;
+    }
+
+    ol, ul {
+        margin-top: 0px;
+        margin-bottom: 10px;
+    }
+
+    .list-group {
+        margin-bottom: 20px;
+        padding-left: 0px;
+    }
+
+    .card .list-group {
+        margin-bottom: 0px;
+    }
+
+    .card-body {
+        padding: 15px;
+        position: relative;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #f1f1f1;
+        border-radius: 4px;
+        display: block;
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .media-body {
+        width: 10000px;
+    }
+
+    .media-right, .media > .pull-right {
+        padding-left: 10px;
+    }
+
+    .media-body, .media-left, .media-right {
+        display: table-cell;
+        vertical-align: top;
+    }
+
+    .media-middle {
+        vertical-align: middle;
+    }
+
+    .bg-primary {
+        background-color: #f7a033;
+        border-color: #f7a033;
+        color: #fff;
+    }
+
+
+    .circle {
+        border-radius: 50%;
+    }
+
+    .sq-40 {
+        display: inline-block;
+        font-size: 20px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        width: 40px;
+    }
+
+    .icon {
+        display: inline-block;
+        font-family: FontAwesome;
+        font-size: inherit;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1;
+        text-align: center;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .media-heading {
+        margin-top: 0px;
+        margin-bottom: 5px;
+    }
+
+
+</style>
+
+<div class="container">
+    @*<div class="row">
+        <div class="col-md-6">
+            <span class="label label-warning">Obsolescencia por SO y BD</span>
+        </div>
+        <div class="col-md-6">
+            <a href="@Url.Content("~/Dashboard/IndicadorObsolescenciaSubdominio")" class="label label-warning" target="_blank">Indicadores Evolución Subdominio</a>
+        </div>
+    </div>*@
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-4 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo de equipo: (*)</h5>
+                                    <select id="cbFilTipoEquipo" name="cbFilTipoEquipo" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Fecha de la consulta: (*)</h5>
+                                    <div class="input-group date" id="divFechaFiltro">
+                                        <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        <span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Subsidiaria: (*)</h5>
+                                    <select id="cbFilDominioRed" name="cbFilDominioRed" class="form-control" multiple="multiple"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo de tecnología: (*)</h5>
+                                    <select id="cbFilTipo" name="cbFilTipo" class="form-control" multiple="multiple"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="ActualizarGraficos()">
+        <span class="count-text">Ver indicadores</span>
+    </a>
+</div>
+<div class="container">
+    <div class="row">
+        <span class="label label-warning">Tecnologías relacionadas con aplicaciones y equipos</span>
+    </div>
+</div>
+<div class="row gutter-xs">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">                
+                <strong>Tecnologías y equipos</strong>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 m-y">
+                        <ul class="list-group list-group-divided">
+                            <li class="list-group-item">
+                                <div class="media">
+                                    <div class="media-middle media-body">
+                                        <h6 class="media-heading">
+                                            <span>Tecnologías usadas por los equipos</span>
+                                        </h6>
+                                        <h4 class="media-heading">1807</h4>
+                                    </div>
+                                    <div class="media-middle media-right">
+                                        <span class="bg-primary circle sq-40">
+                                            <span class="icon icon-arrow-right"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>                            
+                        </ul>
+                    </div>
+                    <div class="col-md-6 m-y">
+                        <table class="table table-borderless table-fixed">
+                            <tbody>
+                                <tr>
+                                    <td class="col-xs-1 text-left"><img src="~/images/verde.png" /></td>
+                                    <td class="col-xs-7 text-left">
+                                        <a class="link-muted" href="#">
+                                            <span class="truncate">Indefinidas</span>
+                                        </a>
+                                    </td>
+                                    <td class="col-xs-4 text-right">1295</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-xs-1 text-left"><img src="~/images/verde.png" /></td>
+                                    <td class="col-xs-7 text-left">
+                                        <a class="link-muted" href="#">
+                                            <span class="truncate">Vigentes</span>
+                                        </a>
+                                    </td>
+                                    <td class="col-xs-4 text-right">83</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-xs-1 text-left"><img src="~/images/amarillo.png" /></td>
+                                    <td class="col-xs-7 text-left">
+                                        <a class="link-muted" href="#">
+                                            <span class="truncate">Por vencer</span>
+                                        </a>
+                                    </td>
+                                    <td class="col-xs-4 text-right">42</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-xs-1 text-left"><img src="~/images/rojo.png" /></td>
+                                    <td class="col-xs-7 text-left">
+                                        <a class="link-muted" href="#">
+                                            <span class="truncate">Obsoletos</span></a>
+                                    </td>
+                                    <td class="col-xs-4 text-right">387</td>
+                                </tr>                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">                
+                <strong>Tecnologías y aplicaciones</strong>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 m-y">
+                        <ul class="list-group list-group-divided">
+                            <li class="list-group-item">
+                                <div class="media">
+                                    <div class="media-middle media-body">
+                                        <h6 class="media-heading">
+                                            <span>Tecnologías usadas por las aplicaciones</span>
+                                        </h6>
+                                        <h4 class="media-heading">469</h4>
+                                    </div>
+                                    <div class="media-middle media-right">
+                                        <span class="bg-primary circle sq-40">
+                                            <span class="icon icon-arrow-right"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                        </ul>
+                    </div>
+                    <div class="col-md-6 m-y">
+                        <table class="table table-borderless table-fixed">
+                            <tbody>
+                                <tr>
+                                    <td class="col-xs-1 text-left"><img src="~/images/verde.png" /></td>
+                                    <td class="col-xs-7 text-left">
+                                        <a class="link-muted" href="#">
+                                            <span class="truncate">Indefinidas</span>
+                                        </a>
+                                    </td>
+                                    <td class="col-xs-4 text-right">10</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-xs-1 text-left"><img src="~/images/verde.png" /></td>
+                                    <td class="col-xs-7 text-left">
+                                        <a class="link-muted" href="#">
+                                            <span class="truncate">Vigentes</span>
+                                        </a>
+                                    </td>
+                                    <td class="col-xs-4 text-right">58</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-xs-1 text-left"><img src="~/images/amarillo.png" /></td>
+                                    <td class="col-xs-7 text-left">
+                                        <a class="link-muted" href="#">
+                                            <span class="truncate">Por vencer</span>
+                                        </a>
+                                    </td>
+                                    <td class="col-xs-4 text-right">47</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-xs-1 text-left"><img src="~/images/rojo.png" /></td>
+                                    <td class="col-xs-7 text-left">
+                                        <a class="link-muted" href="#">
+                                            <span class="truncate">Obsoletos</span>
+                                        </a>
+                                    </td>
+                                    <td class="col-xs-4 text-right">354</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <span class="label label-warning">Obsolescencia por sistemas operativos y bases de datos (relacionales y no relacionales)</span>
+    </div>
+</div>
+<div class="row gutter-xs">
+    <div class="col-xs-12 col-md-12 div-report">
+        <div class="card">
+            <div class="card-header">
+                <strong>Sistema Operativo y Bases de Datos</strong>
+            </div>
+            <div class="card-body">
+                <div id="reportPieSoBd"></div>
+            </div>
+        </div>        
+    </div>
+    <div class="col-xs-12 col-md-12 div-report">
+        <div class="col-xs-6 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Sistema Operativo</strong>
+                </div>
+                <div class="card-body">
+                    <div id="reportPieSo"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Bases de Datos</strong>
+                </div>
+                <div class="card-body">
+                    <div id="reportPieBd"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <span class="label label-warning">Evolución de obsolescencia si no se toman acciones (sistemas operativos y bases de datos)</span>
+    </div>
+</div>
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header">
+                <strong>Evolución de obsolescencia en equipos</strong>
+            </div>
+            <div class="card-body">
+                <div id="reportEvolucion"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <span class="label label-warning">Obsolescencia por Dominio y Subdominio</span>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <div class="card-search-box">
+                    <form id="formFiltros2">
+                        <div class="row gutter-xs">
+                            <div class="form-group">
+                                <div class="col-xs-4 col-md-6">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Dominio: (*)</h5>
+                                        <select id="cbFilDominio" name="cbFilDominio" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4 col-md-6">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Subdominio: (*)</h5>
+                                        <select id="cbFilSubdominio" name="cbFilSubdominio" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="ActualizarGraficos2()">
+        <span class="count-text">Generar Gráficos</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report2">
+        <div class="card">
+            <div class="card-header">
+                <strong>Vigentes y obsoletos</strong>
+            </div>
+            <div class="card-body">
+                <div id="reportPie_0"></div>
+            </div>
+            <div class="card-header">
+                <strong>Vigentes, obsoletos y por vencer</strong>
+            </div>
+            <div class="card-body">
+                <div id="reportPie"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <script src="~/app/dashboardIndicadorObsolescenciaSoBd.js?v=2.1.0"></script>

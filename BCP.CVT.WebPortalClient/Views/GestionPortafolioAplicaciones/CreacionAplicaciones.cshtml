@@ -1,0 +1,1088 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Creación de aplicaciones";
+    ViewBag.Title2 = "Gestión de Portafolio";
+    ViewBag.Title3 = "Creación de aplicaciones";
+
+    int paginaTamanio = (int)ViewBag.PaginaTamanio;
+}
+
+<style>
+    .modal-xl {
+        width: 90%;
+        max-width: 1200px;
+    }
+
+    .width-des {
+        min-width: 300px;
+    }
+
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    /* Chat containers */
+    .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    /* Darker chat container */
+    .darker {
+        border-color: #f7a033;
+        background-color: #ddd;
+    }
+
+    /* Clear floats */
+    .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    /* Style images */
+    .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+        /* Style the right image */
+        .container img.right {
+            float: right;
+            margin-left: 20px;
+            margin-right: 0;
+        }
+
+    /* Style time text */
+    .time-right {
+        float: right;
+        color: #aaa;
+    }
+
+    /* Style time text */
+    .time-left {
+        float: left;
+        color: #999;
+    }
+
+    .user-name {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+                                    <h5>Aplicación (código) </h5>
+                                    <input type="text" id="txtAplicacionFiltro" name="txtAplicacionFiltro" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    <input type="hidden" name="hdAplicacionFiltroId" id="hdAplicacionFiltroId" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Estado de la aplicación</h5>
+                                    <select id="cbFilEstado" name="cbFilEstado" class="form-control">
+                                        <option value="-1" selected="selected">Todos</option>
+                                        <option value="1">En Desarrollo</option>
+                                        <option value="2">Vigente</option>
+                                        <option value="3">No Vigente</option>
+                                        <option value="4">Eliminada</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Situación de registro de la aplicación</h5>
+                                    <select id="cbFilSituacionRegistro" name="cbFilSituacionRegistro" class="form-control">
+                                        <option value="-1" selected="selected">Todos</option>
+                                        <option value="1">Registro preliminar</option>
+                                        <option value="2">Registro completo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 text-right">
+                                <h5>&nbsp;</h5>
+                                <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistro" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Aplicaciones registradas</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            <th data-formatter="situacionFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Situación de registro</th>
+                            <th data-field="applicationId" data-formatter="linkFormatter" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationId">Código</th>
+                            <th data-field="name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Nombre</th>
+                            <th data-field="managedBy" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="managedBy">Gestionado por</th>
+                            <th data-field="statusDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="status">Estado de la aplicación</th>
+                            <th data-field="solicitante" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="status">Solicitante</th>
+                            <th data-formatter="dateFormat" data-field="registerDate" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="registerDate">Fecha de registro <br />de la aplicación</th>
+                            @*<th  data-field="approvedDateStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="approvedDateStr">Fecha de aprobacion</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+<input type="hidden" name="hdFlowId" id="hdFlowId" value="0" />
+<input type="hidden" name="hdDesId" id="hdDesId" value="0" />
+
+<div id="modalRechazarAplicacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRechazarAplicacion" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Información detallada de la aplicación</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table id="tblFlujos" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true" style="font-size: 11px !important;">
+                                        <caption class="caption text-left">
+                                            <span>Solicitudes registradas para la aplicación</span>
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                                <th data-formatter="opcionesFlujoFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                                                @*<th data-formatter="estadoFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Estado de atención</th>*@
+                                                <th data-field="applicationId" data-halign="center" data-valign="middle" data-align="left">Código APT</th>
+                                                <th data-field="applicationName" data-halign="center" data-valign="middle" data-align="left">Nombre</th>
+                                                <th data-field="statusDetail" data-halign="center" data-valign="middle" data-align="center">Estado de la aplicación</th>
+                                                <th data-field="name" data-halign="center" data-valign="middle" data-align="center">Matrícula</th>
+                                                <th data-field="typeRegisterDetail" data-halign="center" data-valign="middle" data-align="center">Rol asignado</th>
+                                                <th data-field="isApprovedDetail" data-halign="center" data-valign="middle" data-align="center">Situación de <br /> la solicitud</th>
+                                                <th data-formatter="dateFormat" data-field="dateApproved" data-halign="center" data-valign="middle" data-align="center">Fecha de atención <br /> de la solicitud</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalVerAplicacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalVerAplicacion" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="title-md">Información detallada de la aplicación</h5>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs nav-justified otros">
+                    <li class="active tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datGen" data-toggle="tab">Datos Generales</a></li>
+                    <li class="tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datTran" data-toggle="tab">Información adicional</a></li>
+                </ul>
+                <form id="formAddOrEditApp">
+                    <div class="tab-content">
+                        <div class="tab-pane fade active in" id="datGen">
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="row">
+                                        &nbsp;
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Código de la aplicación
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" maxlength="4" id="txtCodigoAPT" name="txtCodigoAPT" disabled="disabled" />
+                                                <input type="hidden" value="0" id="hdAplicacionId" name="hdAplicacionId" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                Gestionado por
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlGestionadoPor" name="ddlGestionadoPor" class="form-control" disabled="disabled">
+                                                </select>
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Nombre de la aplicación
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtNombre" name="txtNombre" disabled="disabled" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 divUnidadContainer">
+                                            <div class="col-md-4">
+                                                Tipo de implementación
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlTipoImplementacion" name="ddlTipoImplementacion" class="form-control" disabled="disabled">
+                                                </select>
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Descripción
+                                            </div>
+                                            <div class="col-md-7">
+                                                <textarea class="form-control" rows="7" id="txtDescripcion" name="txtDescripcion" disabled="disabled"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 divUnidadContainer">
+                                            <div class="col-md-4">
+                                                Modelo de entrega
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlModeloEntrega" name="ddlModeloEntrega" class="form-control" disabled="disabled">
+                                                </select>
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Código de aplicación padre
+                                            </div>
+                                            <div class="col-md-7 containerPadreAplicacion">
+                                                <input id="txtCodigoAppPadre" name="txtCodigoAppPadre" type="text" class="form-control" maxlength="200" disabled="disabled" />
+                                                <input type="hidden" id="hCodigoPadre" name="hCodigoPadre" value="" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                Estado de la aplicación
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlEstadoAplicacion" name="ddlEstadoAplicacion" class="form-control" disabled="disabled">
+                                                    <option value="-1">-- Seleccione --</option>
+                                                    <option value="1">En desarrollo</option>
+                                                    <option value="2">Vigente</option>
+                                                    <option value="3">No Vigente</option>
+                                                    <option value="4">Eliminada</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Arquitecto evaluador de la aplicación (solución, tecnología)
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlArquitectoNegocio" name="ddlArquitectoNegocio" class="form-control" disabled="disabled">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 divInterfaz">
+                                            <div class="col-md-4">
+                                                Requiere de un código de interfaz
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="input-group" id="divFlagInterface" disabled="disabled"></div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <input id="txtCodigoInterfaz" class="form-control" type="text" name="txtCodigoInterfaz" disabled="disabled" />
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Arquitecto de Solucion
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlArquitectoSolucion" name="ddlArquitectoSolucion" class="form-control" disabled="disabled">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Gerencia
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtGerencia" name="txtGerencia" disabled="disabled" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                Área
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtArea" name="txtArea" disabled="disabled" />
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                División
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtDivision" name="txtDivision" disabled="disabled" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 divUnidadContainer">
+                                            <div class="col-md-4">
+                                                Unidad dueña de la aplicación
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input id="txtUnidad" name="txtUnidad" type="text" class="form-control" maxlength="120" disabled="disabled" />
+                                                <input type="hidden" id="hdUnidadId" value="" />
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Equipo/Squad
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlEquipo" name="ddlEquipo" class="form-control" disabled="disabled">
+                                                    <option value="-1">-- Seleccione --</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 divExpertoContainer">
+                                            <div class="col-md-5">
+                                                Experto
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input id="txtExperto" name="txtExperto" type="text" class="form-control" maxlength="120" disabled="disabled" />
+                                                <input type="hidden" id="hExpertoId" value="" />
+                                                <input type="hidden" id="hExpertoMatricula" value="" />
+                                                <input type="hidden" id="hExpertoCorreo" value="" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 divUnidadContainer">
+                                            <div class="col-md-4">
+                                                Entidades usuarias
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlEntidades" name="ddlEntidades" class="form-control" multiple="multiple" disabled="disabled">
+                                                </select>
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Tipo de desarrollo
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlTipoDesarrollo" name="ddlTipoDesarrollo" class="form-control" disabled="disabled">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 divUnidadContainer">
+                                            <div class="col-md-4">
+                                                Requiere un Proveedor
+                                            </div>
+                                            <div class="col-md-7">
+                                                <div class="input-group" id="divFlagProveedorDesarrollo"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                <span>Proveedor de desarrollo</span>  <span class="etiquetaRoja">(*)</span>
+                                                <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanProveedorDesarrollo"></span></a>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input id="txtProveedorDesarrollo" name="txtProveedorDesarrollo" type="text" class="form-control" maxlength="120" />
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Código de aplicación reemplazada
+                                            </div>
+                                            <div class="col-md-7 containerReemplazoAplicacion">
+                                                <input id="txtAplicacionReemplazada" name="txtAplicacionReemplazada" type="text" class="form-control" maxlength="120" disabled="disabled" />
+                                                <input type="hidden" id="hCodigoReemplazada" name="hCodigoReemplazada" value="" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 divUnidadContainer">
+                                            <div class="col-md-4">
+                                                Infraestructura de la aplicación
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlInfraestructura" name="ddlInfraestructura" class="form-control" disabled="disabled">
+                                                </select>
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Método de autenticación
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlAutenticacion" name="ddlAutenticacion" class="form-control" disabled="disabled">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 divUnidadContainer">
+                                            <div class="col-md-4">
+                                                Método de autorización
+                                            </div>
+                                            <div class="col-md-7">
+                                                <select id="ddlAutorizacion" name="ddlAutorizacion" class="form-control" disabled="disabled">
+                                                </select>
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Grupo Ticket Remedy
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input id="txtGrupoTicketRemedy" name="txtGrupoTicketRemedy" class="form-control" disabled="disabled" type="text" maxlength="200">
+                                                <input type="hidden" id="hGrupoTicketRemedy" name="hGrupoTicketRemedy" value="" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                URL - Dominio web
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input id="txtURL" name="txtURL" type="text" class="form-control" maxlength="300" disabled="disabled" />
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Nivel de Cumplimiento de Seguridad
+                                                <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanComplianceLevel"></span></a>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input id="txtComplianceLevel" name="txtComplianceLevel" type="text" class="form-control" maxlength="300" disabled="disabled" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 divUnidadContainer adjunto">
+                                            <div class="col-md-4">
+                                                Correo de conformidad del OFICIAL DE SEGURIDAD sobre la MES de la aplicación.
+                                            </div>
+                                            <div class="col-md-7">
+                                                <a id="btnDescargar" class="btn btn-primary btn-width-custom">
+                                                    <span class="icon icon-arrow-down"></span>
+                                                    <span class="count-text">Descargar</span>
+                                                </a>
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="col-md-2">
+                                                Resumen de lineamientos de seguridad
+                                                <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanSummaryStandard"></span></a>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <textarea class="form-control" rows="7" id="txtSummaryStandard" name="txtSummaryStandard" disabled="disabled"></textarea>
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="datTran">
+                            <div class="row">
+                                <div class="form-group">
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+
+                                            </div>
+                                            <div class="col-md-7">
+
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                <b>Arquitectura de Negocio</b>
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Tipo Activo
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtTipoActivo" name="txtTipoActivo" disabled="disabled" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                Área  BIAN
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtAreaBIAN" name="txtAreaBIAN" disabled="disabled" />
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Dominio BIAN
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtDominioBIAN" name="txtDominioBIAN" disabled="disabled" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                Jefatura ATI
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtJefaturaATI" name="txtJefaturaATI" disabled="disabled" />
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                TOBE
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtTOBE" name="txtTOBE" disabled="disabled" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                <b>Arquitectura de Tecnología</b>
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Categoría Tecnológica
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtCategoriaTecnologica" name="txtCategoriaTecnologica" maxlength="180" disabled="disabled" />
+                                            </div>
+                                        </div>
+                                        @*<div class="col-md-6">
+                <div class="col-md-4">
+                    Clasificación Técnica
+                </div>
+                <div class="col-md-7">
+                    <input type="text" class="form-control" id="txtClasificacionTecnica" name="txtClasificacionTecnica" disabled="disabled" />
+                </div>
+                <div class="col-md-1"></div>
+            </div>*@
+                                    </div>
+                                    @*<div class="row">
+
+            <div class="col-md-6">
+                <div class="col-md-5">
+                    Sub Clasificación Técnica
+                </div>
+                <div class="col-md-7">
+                    <input type="text" class="form-control" id="txtSubClasificacionTecnica" name="txtSubClasificacionTecnica" maxlength="180" disabled="disabled" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="col-md-4">
+
+                </div>
+                <div class="col-md-7">
+
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+        </div>*@
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                <b>Arquitectura de Solución</b>
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Capa Funcional
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtCapaFuncional" name="txtCapaFuncional" maxlength="180" disabled="disabled" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                <b>Owner</b>
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                Horario de funcionamiento
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtHorarioFuncionamiento" name="txtHorarioFuncionamiento" maxlength="180" disabled="disabled" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                Flag Activación Pieza Cross Crítica
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="input-group" id="divFlagComponenteCross" disabled="disabled"></div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <input id="txtRegistroUmbral" class="form-control" type="text" name="txtRegistroUmbral" disabled="disabled" />
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                <b>AIO</b>
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                TIER Producción
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtTIERProduccion" name="txtTIERProduccion" maxlength="180" disabled="disabled" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                TIER Pre Producción
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control" id="txtTIERPreProduccion" name="txtTIERPreProduccion" disabled="disabled" />
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-5">
+                                                <b>Roles</b>
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="col-md-4">
+
+                                            </div>
+                                            <div class="col-md-7">
+
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row gutter-xs">
+                                        <div class="col-md-1"></div>
+                                        <div class="col-md-10">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <table id="tblRoles" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                                                        <caption class="caption text-left">
+                                                            <span>Registros configurados</span>
+                                                        </caption>
+                                                        <thead>
+                                                            <tr>
+                                                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                                                <th data-field="applicationManagerIdDetail" data-halign="center" data-valign="middle" data-align="left">Rol</th>
+                                                                <th data-field="managerName" data-halign="center" data-valign="middle" data-align="left">Responsable</th>
+                                                                <th data-field="email" data-halign="center" data-valign="middle" data-align="left">Correo electrónico</th>
+                                                                <th data-field="username" data-halign="center" data-valign="middle" data-align="left">Matrícula</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <form id="formRechazarSolicitante2">
+                    <div class="row">
+                        <div class="col-md-12 font-weight-bold text-left">
+                            <span>Ingrese el comentario indicando las observaciones encontradas</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-9">
+                                <textarea id="txtDescripcionRechazoSolicitante2" name="txtDescripcionRechazoSolicitante2" rows="5" class="form-control"></textarea>
+                            </div>
+                            <div class="col-md-1"></div>
+                        </div>
+                    </div>
+                    <button id="btnProcesarRechazoSolicitante2" class="btn btn-primary" type="button" data-loading-text="Procesando...">Enviar Observaciones</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalVerFlujosAprobacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalVerFlujosAprobacion" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Información detallada de los responsables de aprobación de la aplicación: <span id="spanApp"></span></h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table id="tblFlujosAprobacion" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+                                        <caption class="caption text-left">
+                                            <span>Solicitudes registradas para la aplicación</span>
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                                <th data-formatter="estadoFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Estado de atención</th>
+                                                <th data-field="nameDetail" data-halign="center" data-valign="middle" data-align="center">Responsable</th>
+                                                <th data-field="typeRegisterDetail" data-halign="center" data-valign="middle" data-align="center">Rol asignado</th>
+                                                <th data-field="isApprovedDetail" data-halign="center" data-valign="middle" data-align="center">Situación de <br /> la solicitud</th>
+                                                <th data-field="dateApprovedStr" data-halign="center" data-valign="middle" data-align="center">Fecha de Atención</th>
+                                                <th data-field="dateRejectedStr" data-halign="center" data-valign="middle" data-align="center">Fecha de Rechazo</th>
+                                                <th data-field="comments" data-halign="center" data-valign="middle" data-align="center">Comentarios</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalRechazar" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRechazar" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formRechazar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el comentario indicando el rechazo de la solicitud</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a este cambio de estado: </label>
+                                <textarea id="txtDescripcionRechazo" name="txtDescripcionRechazo" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnProcesarRechazo" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalDesactivar" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalDesactivar" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formDesactivar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el comentario indicando motivo de la desactivación de la aplicación</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Archivo:
+                        </label>
+                        <div class="input-group">
+                            <input id="hdArchivoId" name="hdArchivoId" class="form-control" type="hidden" value="">
+                            <input id="txtArchivo" name="txtArchivo" class="form-control" type="text" value="Ningún archivo seleccionado" readonly>
+                            <span class="input-group-btn">
+                                <label class="btn btn-primary file-upload-btn">
+                                    <input id="flArchivo" class="file-upload-input inputfile" type="file" name="flArchivo">
+                                    <span class="glyphicon glyphicon-folder-open"></span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a esta desactivación: </label>
+                                <textarea id="txtDescripcionDesactivacion" name="txtDescripcionDesactivacion" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnProcesarDesactivacion" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalRechazarSolicitante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRechazarSolicitante" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formRechazarSolicitante">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el comentario indicando el rechazo de la solicitud</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a este cambio de estado: </label>
+                                <textarea id="txtDescripcionRechazoSolicitante" name="txtDescripcionRechazoSolicitante" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnProcesarRechazoSolicitante" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const REGISTRO_PARCIAL = 1;
+    const REGISTRO_COMPLETO = 2;
+
+    const ESTADO_ENDESARROLLO = 1;
+    const ESTADO_VIGENTE = 2;
+    const ESTADO_NOVIGENTE = 3;
+    const ESTADO_ELIMINADA = 4;
+    var ULTIMO_REGISTRO_PAGINACION = @paginaTamanio;
+</script>
+<script src="~/app/GestionPortafolio/creacionAplicaciones.js?v=2.0.0"></script>

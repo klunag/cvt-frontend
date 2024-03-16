@@ -1,0 +1,391 @@
+﻿@using BCP.CVT.WebPortalClient.Models;
+@{
+    var proyecciones = MetodosUtiles.ObtenerProyecciones();
+}
+@{
+    ViewBag.Title1 = "Detalle por equipo";
+    ViewBag.Title2 = "Equipos y aplicaciones";
+    ViewBag.Title3 = "Detalle por equipo";
+    int IdEquipo = (int)ViewBag.IdEquipo;
+}
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<style>
+    #reportPie {
+        width: 100%;
+        height: 350px;
+    }
+
+    #reportParticiones {
+        width: 100%;
+        height: 350px;
+    }
+</style>
+<div class="view-detalle col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+        <div class="row"></div>
+        <div class="x_title">
+            <div class="pull-right" style="display: inline-flex">
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row"></div>
+            <input type="hidden" id="hdId" name="hdId" value="0" />
+            <input type="hidden" id="hdEquipoId" name="hdId" value="0" />
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Equipo / Activo TI:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtEquipoNombre" name="txtEquipoNombre" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Tipo:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtTipoEquipo" name="txtTipoEquipo" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Creado por:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtCreadoPor" name="txtCreadoPor" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Fecha de creación:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtFechaCreacion" name="txtFechaCreacion" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Ambiente:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtAmbiente" name="txtAmbiente" class="form-control" readonly /></div>
+                        </div>
+                        @*<div class="col-md-12">
+                        <div class="col-md-5"><label>Ventana:</label></div>
+                        <div class="col-md-7"><input type="text" id="txtVentana" name="txtVentana" class="form-control" readonly /></div>
+                    </div>*@
+                        <div class="col-md-12 ">
+                            <div class="col-md-5"><label>Dominio:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtDominio" name="txtDominio" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12 onClientS">
+                            <div class="col-md-5"><label>Característica:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtTipo" name="txtTipo" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12 onClientS">
+                            <div class="col-md-5"><label>S.O.:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtSO" name="txtSO" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12 onClientS">
+                            <div class="col-md-5"><label>IP:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtIP" name="txtIP" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12 onClientS">
+                            <div class="col-md-5"><label>Memoria RAM (en MB):</label></div>
+                            <div class="col-md-7"><input type="text" id="txtRAM" name="txtRAM" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12 onClientS">
+                            <div class="col-md-5"><label>Código de equipo:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtCodigoEquipo" name="txtCodigoEquipo" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12 onClientS">
+                            <div id="servidorVirtual">
+                                <div class="col-md-5"><label>Equipo Físico:</label></div>
+                                <div class="col-md-7"><input type="text" id="txtEquipoFisico" name="txtEquipoFisico" class="form-control" readonly /></div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 onClientS">
+                            <div class="col-md-5"><label>Vulnerabilidades (New, Active, Re-opened):</label></div>
+                            <div class="col-md-7">
+                                <div class="input-group">
+                                    <input type="text" id="txtVulns" name="txtVulns" class="form-control" readonly />
+                                    <a href="#" class="input-group-addon" onclick="verVulnerabilidades()">
+                                        Ver Vulnerabilidades
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="col-md-12 onClientS">
+                            <div id="reportPie"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row ">
+                <br>
+                <br>
+                <div class="col-md-12 onClientS" style="margin-bottom:15px;">
+                    <div id="servidorFisico">
+                        <label class="control-label">Servidores virtuales del host: </label>
+                        <div class="pull-right" style="display: inline;">
+                            <a class="btn btn-primary" onclick="ExportarServidoresVirtualesHost()">
+                                <span class="count-text">Exportar</span>
+                            </a>
+                        </div>
+                        <table id="tbl-servidoresVirtualesHost" class="table" data-unique-id="Id">
+                            @*<caption style="border-bottom: 1px solid #ddd ">
+                                <div class="pull-left" style="display: inline;">
+                                    <label class="control-label">Servidores virtuales del host: </label>
+                                </div>
+                                <div class="pull-right" style="display: inline;">
+                                    <a class="btn btn-primary" onclick="ExportarServidoresVirtualesHost()">
+                                        <span class="count-text">Exportar</span>
+                                    </a>
+                                </div>
+                            </caption>*@
+                            <thead>
+                                <tr>
+                                    <th data-field="tbl-servidoresVirtualesHost" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                    <th data-field="EquipoId" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-visible="false">Id</th>
+                                    <th data-formatter="linkFormatterName" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="false">Nombre</th>
+                                    <th data-field="Estado" data-halign="center" data-valign="middle" data-align="left" data-sortable="false">Estado</th>
+                                    <th data-field="SistemaOperativo" data-halign="center" data-valign="middle" data-align="left" data-sortable="false">Sistema Operativo</th>
+                                    <th data-field="Ambiente" data-halign="center" data-valign="middle" data-align="left" data-sortable="false">Ambiente</th>
+                                    <th data-formatter="verMasSrvVirtualFormatter" data-field="appRelacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="false">App relacionadas</th>
+
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row onClientS">
+                <div class="col-md-6">
+                    <label class="control-label">Procesadores: </label>
+                    <table id="tbl-Procesadores" class="table">
+                        <thead>
+                            <tr>
+                                <th data-field="tbl-procesadores" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="Fabricante" data-halign="center" data-valign="middle" data-align="left">Fabricante</th>
+                                <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Información del procesador</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <label class="control-label">Discos: </label>
+                    <table id="tbl-EspacioDisco" class="table">
+                        <thead>
+                            <tr>
+                                <th data-field="tbl-discos" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="DescripcionCorta" data-halign="center" data-valign="middle" data-align="left">Partición</th>
+                                <th data-field="FileSystemType" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">File system</th>
+                                <th data-field="FileSystemSize" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Espacio total</th>
+                                <th data-field="AvailableSpace" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Espacio disponible</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            @*<div class="row">
+            <div class="col-md-12">
+                <label class="control-label">Certificado digital: </label>
+                <table id="tbl-certificadodigital" class="table">
+                    <thead>
+                        <tr>
+                            <th data-field="tbl-certificadodigital" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                            <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Nombre</th>
+                            <th data-field="TipoCertificado" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tipo</th>
+                            <th data-field="DescripcionTipoCertificado" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Descripción</th>
+                            <th data-field="FechaCreacionCertificadoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Fecha creación</th>
+                            <th data-field="FechaCalculoBaseStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Fecha vencimiento</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>*@
+            <div class="row ">
+                <div class="col-md-12 onClientS" style="margin-bottom:15px;">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label">Fecha de consulta: </label>
+                            <div class="input-group date" id="divFechaFiltro">
+                                <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                <span class="input-group-addon">
+                                    <span class="icon icon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <label class="control-label">Tecnología instalada: </label>
+                    </div>
+                    <table id="tbl-tecnologiaInstaladas" class="table" data-unique-id="Id">
+                        <thead>
+                            <tr>
+                                <th data-field="tbl-tecnologiaInstaladas" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="DominioNomb" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Dominio</th>
+                                <th data-field="SubdominioNomb" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Subdominio</th>
+                                <th data-formatter="ClaveTecnologiaLink" data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tecnología</th>
+                                <th data-field="TipoTecNomb" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Estado de <br /> estandarización</th>
+                                <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Estado de <br /> tecnología</th>
+                                <th data-field="FechaCalculoBaseStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaCalculoBase">Fecha Fin <br />Soporte</th>
+                                <th data-field="ObsoletoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Obsoleto">Obsoleto</th>
+                                <th data-formatter="semaforoFormatter" data-field="IndicadorObsolescencia" data-halign="center" data-valign="middle" data-align="center" data-sortable="false">Estado <br /> Actual</th>
+                                <th data-formatter="semaforoIndice1Formatter" data-field="IndicadorObsolescencia_Proyeccion1" data-halign="center" data-valign="middle" data-align="center" data-sortable="false">Estado a <br /> <span id="cabMesesProyeccion1"></span> meses</th>
+                                <th data-formatter="semaforoIndice2Formatter" data-field="IndicadorObsolescencia_Proyeccion2" data-halign="center" data-valign="middle" data-align="center" data-sortable="false">Estado a <br /> <span id="cabMesesProyeccion2"></span> meses</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-md-12 onClientS" style="margin-bottom:15px;">
+                    @*<h5>Tecnología no registrada:</h5>*@
+                    <label class="control-label">Tecnología no registrada: </label>
+                    <table id="tbl-tecnologiaNoRegistrada" class="table" data-unique-id="Id">
+                        <thead>
+                            <tr>
+                                <th data-field="tbl-tecnologiaNoRegistrada" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="Aplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Aplicación</th>
+                                <th data-field="FechaEscaneoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="90">Fecha Escaneo</th>
+                                <th data-field="FechaFinSoporteStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="90">Fecha Fin Soporte</th>
+                                <th data-formatter="semaforoFormatter" data-field="IndicadorObsolescencia" data-halign="center" data-valign="middle" data-align="center" data-sortable="false" data-width="50">Estado <br /> Actual</th>
+                                <th data-formatter="semaforoIndice1Formatter" data-field="IndicadorObsolescencia_Proyeccion1" data-halign="center" data-valign="middle" data-align="center" data-sortable="false" data-width="50">Estado a <br /> @proyecciones.MesProyeccion1 meses</th>
+                                <th data-formatter="semaforoIndice2Formatter" data-field="IndicadorObsolescencia_Proyeccion2" data-halign="center" data-valign="middle" data-align="center" data-sortable="false" data-width="50">Estado a <br /> @proyecciones.MesProyeccion2 meses</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-md-12 offClientS" style="margin-bottom:15px;">
+                    <label class="control-label">Datos Adicionales: </label>
+                    <table id="tbl-clientSecrets" class="table">
+                        <thead>
+                            <tr>
+                                <th data-field="tbl-clientSecrets" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="NombreCloud" data-halign="center" data-valign="middle" data-align="left">Cloud</th>
+                                <th data-field="Suscripcion" data-halign="center" data-valign="middle" data-align="left">Suscripción</th>
+                                <th data-field="TipoRecurso" data-halign="center" data-valign="middle" data-align="left">Resource Type</th>
+                                <th data-field="AKSsecret" data-halign="center" data-valign="middle" data-align="left">AKS Secret</th>
+                                <th data-field="Recurso" data-halign="center" data-valign="middle" data-align="left">Resource</th>
+                                <th data-field="TipoClientSecret" data-halign="center" data-valign="middle" data-align="left">Tipo</th>
+                                <th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Fecha de Inicio</th>
+                                <th data-field="FechaFinSoporteStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Fecha de Caducidad</th>
+                                <th data-field="NamespaceClientSecret" data-halign="center" data-valign="middle" data-align="left">Namespace</th>
+                                <th data-field="ResourceGroupClientSecret" data-halign="center" data-valign="middle" data-align="left">Resource Group</th>
+                                <th data-field="ThumbprintClientSecret" data-halign="center" data-valign="middle" data-align="left">Thumbprint</th>
+                                <th data-field="IssuerClientSecret" data-halign="center" data-valign="middle" data-align="left">Issuer</th>
+                                <th data-field="IdentificadorClientSecret" data-halign="center" data-valign="middle" data-align="left">Identificador</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-md-12" style="margin-bottom:15px;">
+                    @*<h5>Aplicaciones relacionadas:</h5>*@
+                    <label class="control-label">Aplicaciones relacionadas: </label>
+                    <table id="tbl-aplicacionesRelacionadas" class="table" data-unique-id="Id">
+                        <thead>
+                            <tr>
+                                <th data-field="tbl-aplicacionesRelacionadas" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-formatter="AplicacionLink" data-field="Relacion.CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Código</th>
+                                <th data-field="Relacion.AplicacionStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Aplicación</th>
+                                <th data-field="Relacion.TipoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Relacion.TipoId">Tipo de Relación</th>
+                                <th data-field="Relacion.AmbienteStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Ambiente</th>
+                                <th data-field="Relacion.ListaPCI" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tratamiento PCI DSS</th>
+                                <th data-field="Relacion.EstadoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Estado</th>
+
+                                @*<th data-formatter="ClaveTecnologiaLink2" data-field="TecnologiaStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tecnología</th>*@
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdVulnsByEquipo" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Vulnerabilidades</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group text-right">
+                    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarRegistrosVulnerabilidades()">
+                        <span class="icon icon-external-link"></span>
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+                <div class="form-group ">
+                    <table id="tbl-vulns" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServerAlt" data-field="tbl-tecnologias" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                <th data-field="QualyId" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">QID</th>
+                                <th data-field="Title" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Título</th>
+                                <th data-field="VulnStatusIdStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Estado de Vulnerabilidad</th>
+                                <th data-field="NivelSeveridad" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Nivel de severidad</th>
+                                <th data-field="Categoria" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Categoría</th>
+                                <th data-field="Solucion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Solución</th>
+                                <th data-field="ProductoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Producto</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <input type="text" id="msjValidTbl" name="msjValidTbl" class="form-control field-tecnologia" style="display:none;" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdVerMas" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormVerMas"></h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdAppRelacionadas" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg-1">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormVerMasAppRelacionadas">Aplicaciones</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group ">
+                    <table id="tbl-AppSrvRelacionadas" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServerAlt" data-field="tbl-tecnologias" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                <th data-formatter="verAplicacionsFormatter" data-field="CodigoApt" data-halign="center" data-valign="middle" data-align="center" data-sortable="false">Código</th>
+                                <th data-field="Aplicacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="false">Nombre</th>
+                                <th data-field="Owner" data-halign="center" data-valign="middle" data-align="center" data-sortable="false">Owner</th>
+                                <th data-field="OwnerEmail" data-halign="center" data-valign="middle" data-align="center" data-sortable="false">Correo Owner</th>
+                                <th data-field="Experto" data-halign="center" data-valign="middle" data-align="center" data-sortable="false">LT/Experto</th>
+                                <th data-field="ExpertoEmail" data-halign="center" data-valign="middle" data-align="center" data-sortable="false">Correo LT/Experto</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <input type="text" id="msjValidTbl" name="msjValidTbl" class="form-control field-tecnologia" style="display:none;" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var IdEquipo = parseInt('@IdEquipo');
+</script>
+<script src="~/app/Detalleequipo.js?v1.3.3"></script>

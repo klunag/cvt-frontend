@@ -1,0 +1,229 @@
+﻿@using BCP.CVT.WebPortalClient.Models;
+@using System.Configuration;
+
+@{
+    Usuario_Storage eUsuario = (Usuario_Storage)Session["Usuario"];
+    UsuarioCurrent user = MetodosUtiles.getCurrentUser();
+    string eusername = eUsuario == null ? "" : eUsuario.UsuarioBCP_Dto.Name;
+    int perfilId = user == null ? 0 : user.PerfilId;
+    string title_site = eUsuario == null ? "" : eUsuario.SiteTitle;
+    bool flagPortafolio = user == null ? false : user.FlagPortafolio;
+    bool flagAdmin = user == null ? false : user.FlagAdmin;
+    bool detalle = user == null ? false : user.VerDetalle;
+    int detalleId = detalle == true ? 1 : 0;
+    int perfil = perfilId == 2 ? 0 : 1;
+    string matriculasMep = "S13929;S84225;U19423;S87706";
+    List<string> matrilasMepArr = matriculasMep.Split(';').ToList();
+    bool registro = eUsuario == null ? false : string.IsNullOrEmpty(matriculasMep) ? false : matrilasMepArr.Select(x => x.ToUpper()).Contains(eUsuario.UserName.ToUpper());
+    //bool registro = false;
+}
+<!DOCTYPE html>
+<html lang="es-ES">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/png" href="~/favicon.ico" />
+
+    <!--Bootstrap 4.3.1-->
+    <link href="~/content/fontawesome.css" rel="stylesheet" />
+    <link href="~/content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/content/site.css" rel="stylesheet" />
+    <link href="~/content/stylesheet.css" rel="stylesheet" />
+    <link href="~/content/select2.min.css" rel="stylesheet" />
+    <link href="~/content/metismenu.min.css" rel="stylesheet" />
+    <link href="~/content/jquery-jvectormap-2.0.3.css" rel="stylesheet" />
+    <link href="~/Content/toastr.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
+    <title>@title_site</title>
+
+    <style>
+        /*ui-menu ui-widget ui-widget-content ui-autocomplete ui-front*/
+        /*ui-menu-item*/
+        /*ui-menu-item-wrapper*/
+        ul.ui-autocomplete {
+            z-index: 1100;
+        }
+
+        .my-error-class {
+            color: #dc3545;
+            font-weight: bold !important;
+            font-size: 12px;
+        }
+
+        .my-valid-class {
+        }
+    </style>
+
+    <!-- Bootstrap table -->
+    @Styles.Render("~/Content/bootstrap-table.min.css")
+    <!-- Bootstrap toggle -->
+    @Styles.Render("~/Content/bootstrap-toggle.min.css")
+    <!-- Bootstrap datetimepicker -->
+    @Styles.Render("~/Content/bootstrap-datetimepicker.min.css")
+    <!-- jQuery -->
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    @Scripts.Render("~/Scripts/bootstrap-table.min.js")
+    @Scripts.Render("~/Scripts/bootstrap-toggle.min.js")
+    @Scripts.Render("~/Scripts/util.js")
+
+    <!-- Moment -->
+    @Scripts.Render("~/Scripts/moment.min.js")
+    @Scripts.Render("~/Scripts/moment-with-locales.min.js")
+
+    <script src="~/app/common.js?v=3.0.0"></script>
+    <script>
+        var URL_LOGIN_SERVER = '@Url.Content("~/Login")';
+        var URL_API = "@BCP.CVT.Cross.Utilitarios.URL_API";
+        var REGISTRO_PAGINACION = "10";
+        var OPCIONES_PAGINACION = "[10,20,30]";
+
+        var REGISTRO_PAGINACION_ALT = "30";
+        var OPCIONES_PAGINACION_ALT = "[30,60,90]";
+        USUARIO = getCache(NAME_CACHE_USUARIO);
+        var FLAG_ADMIN = @perfil;
+        var FLAG_DETALLE = @detalleId;
+
+        var URL_PREGUNTA = '@Url.Content("~/Alertas/Ayuda")';
+        var URL_CATALOGO_APP = '@Url.Content("~/Configuracion/CatalogoAplicacion")';
+        var URL_BANDEJA_APP = '@Url.Content("~/Configuracion/BandejaAprobacionSolicitud")';
+        var URL_BANDEJA_CREACION_APP = '@Url.Content("~/Configuracion/SolicitudCreacionAplicacion")'; 
+
+        @*if ("@eusername" == "" || USUARIO == null) LoginUsuario(false);*@
+        if (USUARIO !== null) GuardarVisitaSite(USUARIO);
+
+    </script>
+</head>
+
+<body class="layout layout-header-fixed">
+    <div class="layout-header">
+        <div class="navbar navbar-default">
+            <div class="navbar-header">
+                <a class="navbar-brand navbar-brand-center" href="/">
+                    <img class="navbar-brand-logo" src="~/images/logo-bcp.svg" alt="">
+                </a>
+                <button class="navbar-toggler visible-xs-block collapsed" type="button" data-toggle="collapse" data-target="#sidenav">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="bars">
+                        <span class="bar-line bar-line-1 out"></span>
+                        <span class="bar-line bar-line-2 out"></span>
+                        <span class="bar-line bar-line-3 out"></span>
+                    </span>
+                    <span class="bars bars-x">
+                        <span class="bar-line bar-line-4"></span>
+                        <span class="bar-line bar-line-5"></span>
+                    </span>
+                </button>
+                <button class="navbar-toggler visible-xs-block collapsed" type="button" data-toggle="collapse" data-target="#navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="arrow-up"></span>
+                    <span class="ellipsis ellipsis-vertical">
+                        <img class="ellipsis-object" width="32" height="32" src="/images/user.png" alt="Usuario">
+                    </span>
+                </button>
+            </div>
+            <div class="navbar-toggleable">
+                <nav id="navbar" class="navbar-collapse collapse">
+                    <button class="sidenav-toggler hidden-xs" title="Colapsar menu ( [ )" aria-expanded="true" type="button">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="bars">
+                            <span class="bar-line bar-line-1 out"></span>
+                            <span class="bar-line bar-line-2 out"></span>
+                            <span class="bar-line bar-line-3 out"></span>
+                            <span class="bar-line bar-line-4 in"></span>
+                            <span class="bar-line bar-line-5 in"></span>
+                            <span class="bar-line bar-line-6 in"></span>
+                        </span>
+                    </button>
+                    <div class="title-bar">
+                        <h1 class="title-bar-title">
+                            <span class="d-ib">@ViewBag.Title1</span>
+                        </h1>
+                        <p class="title-bar-description">
+                            @if (!string.IsNullOrEmpty(ViewBag.Title2) && !string.IsNullOrEmpty(ViewBag.Title3))
+                            {
+                                <small>@ViewBag.Title2</small><small> > @ViewBag.Title3</small>
+                            }
+                        </p>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="layout-main">
+        <div class="layout-sidebar">
+            <div class="layout-sidebar-backdrop"></div>
+            <div class="layout-sidebar-body">
+                <div class="custom-scrollbar">
+                    <nav id="sidenav" class="sidenav-collapse collapse">
+                        <ul class="sidenav level-1">
+                            <li class="sidenav-item has-subnav">
+                                <a href="@Url.Content("~/mep/Reporte")" aria-haspopup="true">
+                                    <span class="sidenav-icon icon icon-works">&#103;</span>
+                                    <span class="sidenav-label">Listado de notas</span>
+                                </a>
+                            </li>
+                             @if (registro) {
+                            <li class="sidenav-item has-subnav">
+                                <a href="@Url.Content("~/mep/Registro")" aria-haspopup="true">
+                                    <span class="sidenav-icon icon icon-works">&#103;</span>
+                                    <span class="sidenav-label">Registro de nota</span>
+                                </a>
+                            </li>             
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="layout-content">
+            <div class="layout-content-body">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/Scripts/jqueryUI/jquery-ui.min.js"></script>
+    <script src="~/scripts/fontawesome.min.js"></script>
+
+    <script src="~/scripts/peity.min.js"></script>
+    <script src="~/scripts/jquery.matchheight-min.js"></script>
+    <script src="~/scripts/metismenu.min.js"></script>
+    <script src="~/scripts/jquery.slimscroll.min.js"></script>
+    <script src="~/scripts/select2.min.js"></script>
+    <script src="~/scripts/jquery-jvectormap-2.0.3.min.js"></script>
+    <script src="~/scripts/js/application.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/bootbox.min.js")
+    @Scripts.Render("~/Scripts/bootbox.locales.min.js")
+    @Scripts.Render("~/Scripts/bootbox.all.js")
+
+    @Scripts.Render("~/Scripts/locale/bootstrap-table-es-SP.min.js")
+
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+
+    <script src="~/Scripts/bootstrap.js"></script>
+    @RenderSection("scripts", required: false)
+
+    <script src="~/app/home.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            if (!window.console) window.console = {};
+            var methods = ["log", "debug", "warn", "info", "dir", "dirxml", "trace", "profile"];
+            for (var i = 0; i < methods.length; i++) {
+                console[methods[i]] = function () { };
+            }
+
+            MethodValidarSinEspacios();
+
+            activeMenu();
+        });
+
+    </script>
+</body>
+</html>
+

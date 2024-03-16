@@ -1,0 +1,202 @@
+﻿@{
+    ViewBag.Title1 = "Gestión de dominios";
+    ViewBag.Title2 = "Gestión de las Tecnologías";
+    ViewBag.Title3 = "Dominios";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusDominio" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre o descripción del dominio...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusDominio" class="btn btn-primary btn-width-custom" onclick="BuscarDominio()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddDominio()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de Dominios</strong>
+            </div>
+            <div class="card-body">
+                <table id="tbl-dominios" data-locale="es-SP" class="table table-striped table-nowrap dataTable" cellspacing="0" data-unique-id="WorkerId" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="8%">Código</th>
+                            <th data-formatter="linkFormatterName" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                            <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Descripción</th>
+                            <th data-formatter="linkFormatterSub" data-field="NumSubdominios" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NumSubdominios" data-width="10%"># Subdominios</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                            <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hIdSubByDom" id="hIdSubByDom" value="0" />
+    <input type="hidden" name="hFilDom" id="hFilDom" value="" />
+</div>
+
+<!--Modal Add or Edit (Dominio)-->
+<div id="MdAddOrEditDominio" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormDominio"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditDominio">
+                    <div class="form-group">
+                        <label class="control-label">Nombre: </label>
+                        <input id="txtNomDom" class="form-control" type="text" name="txtNomDom" maxlength="120">
+                        <input type="hidden" name="hIdDom" id="hIdDom" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Descripción: </label>
+                        <textarea id="txtDesDom" class="form-control" rows="3" name="txtDesDom" maxlength="300"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Nombre de Equipo: </label>
+                        <textarea id="txtEquiDom" class="form-control" rows="2" name="txtEquiDom" maxlength="120"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Dueño del dominio (Owner): </label>
+                        <div class="row">
+                            <div class="col-md-8">                                
+                                <div class="form-group matriculaContainer">
+                                    <input id="txtOwnDom" name="txtOwnDom" class="form-control inputMatricula" type="text" maxlength="120" placeholder="Matrícula">
+                                </div>                                    
+                            </div>
+                            <div class="col-md-4">
+                                <label id="lblUsuario" class="control-label"></label>
+                                <input type="hidden" value="" id="hidMatricula" name="hidMatricula" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Se incluye en el cálculo de obsolescencia?
+                        </label>
+                        <div class="input-group" id="divCbCalObsDom"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Activo?
+                        </label>
+                        <div class="input-group" id="divActivo">
+                        </div>
+                        <input type="hidden" name="hdNumTecAsoc" id="hdNumTecAsoc" value="0" />
+                        <input type="text" id="msjActivo" name="msjActivo" class="form-control clActivo" style="display:none;" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegDominio" class="btn btn-primary" onclick="GuardarAddOrEditDominio()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit (Dominio)-->
+<!--Modal Subdominios Asociados (Dominio)-->
+<div id="MdSubByDom" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Relación de subdominios asociados al dominio configurado</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formSubByDom">
+                    <div class="form-group">
+                        <table id="tbl-SubByDom" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="WorkerId" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center">Subdominio</th>
+                                    <th data-field="UsuarioAsociadoPor" data-halign="center" data-valign="middle" data-align="center">Asociado por</th>
+                                    <th data-field="FechaAsociacionToString" data-halign="center" data-valign="middle" data-align="center">Fecha de asociación</th>
+                                    <th data-formatter="optCambiarDom" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Subdominios Asociados (Dominio)-->
+<!-- Modal Validar matricula -->
+<div class="modal fade" id="mdValidarMatricula" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Validar usuario</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formValidarMatricula">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Posibles matrículas:
+                        </label>
+                        <select id="cbMatricula" name="cbMatricula" class="form-control posibleMatricula">
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnValidarMatricula" type="button" class="btn btn-primary" onclick="ValidarMatricula()" data-loading-text="Procesando...">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Validar matricula -->
+
+
+
+<script src="~/app/dominio.js?v=1.1.1"></script>

@@ -1,0 +1,308 @@
+﻿@{
+    ViewBag.Title1 = "Reporte de pedidos a la gestión del portafolio";
+    ViewBag.Title2 = "Reportes portafolio";
+    ViewBag.Title3 = "Reporte de pedidos a la gestión del portafolio";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+}
+@using BCP.CVT.Cross
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+<style>
+    .btn-width-custom {
+        width: 112px;
+    }
+
+    .btn-group {
+        width: 100% !important;
+    }
+
+    .multiselect-container {
+        position: absolute;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+    }
+
+    div.col-xs-4.col-md-4:nth-child(n) {
+        margin-right: 7%;
+    }
+
+    select {
+        text-align: center;
+        /*appearance: none;*/
+    }
+
+    #tableAplicaciones {
+        margin-top: 5%;
+        display: none;
+    }
+
+    .div-report {
+        display: none;
+    }
+
+    #report4, #report5, #report6, #report1_1 {
+        width: 100%;
+        height: 500px;
+    }
+
+    #report1, #report2, #report3, #report7 {
+        width: 100%;
+        height: 350px;
+    }
+
+    .table {
+        font-size: 11px !important;
+    }
+
+    .div-report h4 {
+        font-size: 14px;
+    }
+
+    .card-header-title {
+        display: inline-block;
+        width: 85%;
+    }
+
+    .card .card-body .alerta {
+        font-size: 13px;
+        color: red;
+        font-weight: 300;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Gerencia: </h5>
+                                    <select id="cbFiltroGerencia" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>División: </h5>
+                                    <select id="cbFiltroDivision" name="cbFiltroDivision" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Área: </h5>
+                                    <select id="cbFiltroArea" name="cbFiltroArea" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Unidad: </h5>
+                                    <select id="cbFiltroUnidad" name="cbFiltroUnidad" class="form-control"></select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo de activo de información: </h5>
+                                    <select id="ddlTipoActivo" name="ddlTipoActivo" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Gestionado por: </h5>
+                                    <select id="cbFiltroGestionadoPor" name="cbFiltroGestionadoPor" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Desde:</h5>
+                                    <div class="input-group date" id="divFechaFiltroDesde">
+                                        <input type="text" id="FechaFiltroDesde" name="FechaFiltroDesde" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        <span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Hasta:</h5>
+                                    <div class="input-group date" id="divFechaFiltroHasta">
+                                        <input type="text" id="FechaFiltroHasta" name="FechaFiltroHasta" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        <span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-12 col-md-12">
+                                <div class="text-right">
+                                    <h5>&nbsp;</h5>
+                                    <a id="btnBuscar" class="btn btn-primary btn-width-custom" href="javascript: void(0)">
+                                        <span class="icon icon-search"></span>
+                                        <span class="count-text">Ver reporte</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report" style="margin-top:3%;">
+        <div class="card">
+            <div class="card-header-title">
+                <h4 style="color:#ee8809; font-weight:bold;">Distribuciones por tipo de atención (acumulado)</h4>
+            </div>
+            <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                <a id="btnExportarReporte1" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                    <span class="count-text">Exportar</span>
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="report1"></div>
+                <div id="report1_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header-title">
+                <h4 style="color:#ee8809; font-weight:bold;">Distribuciones por tipo de atención (por periodo de tiempo)</h4>
+            </div>
+            <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                <a id="btnExportarReporte1_1" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                    <span class="count-text">Exportar</span>
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="report1_1"></div>
+                <div id="report1_1_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header-title">
+                <h4 style="color:#ee8809; font-weight:bold;">Consultas</h4>
+            </div>
+            <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                <a id="btnExportarReporte7" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                    <span class="count-text">Exportar</span>
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="report7"></div>
+                <div id="report7_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div class="col-xs-6 div-report">
+        <div class="card">
+            <div class="card-header-title">
+                <h4 style="color:#ee8809; font-weight:bold;">Datos de consultas al portafolio</h4>
+            </div>
+            <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                <a id="btnExportarReporte2" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                    <span class="count-text">Exportar</span>
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="report2"></div>
+                <div id="report2_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 div-report">
+        <div class="card">
+            <div class="card-header-title">
+                <h4 style="color:#ee8809; font-weight:bold;">Días reales de registro de app (situacion de registro)</h4>
+            </div>
+            <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                <a id="btnExportarReporte3" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                    <span class="count-text">Exportar</span>
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="report3"></div>
+                <div id="report3_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header-title">
+                <h4 style="color:#ee8809; font-weight:bold;">Campos más requeridos (top 5) para actualización en promedio</h4>
+            </div>
+            <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                <a id="btnExportarReporte4" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                    <span class="count-text">Exportar</span>
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="report4"></div>
+                <div id="report4_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header-title">
+                <h4 style="color:#ee8809; font-weight:bold;">Reporte de SLA (promedio de días)</h4>
+            </div>
+            <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                <a id="btnExportarReporte5" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                    <span class="count-text">Exportar</span>
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="report5"></div>
+                <div id="report5_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<script>
+    const REPORTE_DISTRIBUCIONES_ATENCION_ACUMULADA = @Html.Raw((int)ETipoExportarReportePortafolioPedidos.EstadoAtencion);
+    const REPORTE_DISTRIBUCIONES_ATENCION_PERIODO = @Html.Raw((int)ETipoExportarReportePortafolioPedidos.EstadoAtencionXTiempo);
+    const REPORTE_CONSULTAS_PORTAFOLIO = @Html.Raw((int)ETipoExportarReportePortafolioPedidos.ConsultasPortafolio);
+    const REPORTE_CAMPOS_MAS_REQUERIDOS = @Html.Raw((int)ETipoExportarReportePortafolioPedidos.CamposMasActualizados);
+    const REPORTE_REGISTRO_APP = @Html.Raw((int)ETipoExportarReportePortafolioPedidos.RegistroApp);
+    const REPORTE_SLA = @Html.Raw((int)ETipoExportarReportePortafolioPedidos.ReporteSLA);
+    const REPORTE_CONSULTAS = @Html.Raw((int)ETipoExportarReportePortafolioPedidos.Consultas);
+</script>
+<script src="~/app/ReportePortafolio/reportePortafolioPedidos.js?v=1.0.1"></script>

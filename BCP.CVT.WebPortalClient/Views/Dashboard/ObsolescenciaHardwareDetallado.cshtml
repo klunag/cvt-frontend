@@ -1,0 +1,226 @@
+﻿@using BCP.CVT.WebPortalClient.Models;
+@{
+    /**/
+
+    var proyecciones = MetodosUtiles.ObtenerProyecciones();
+}
+@{
+    ViewBag.Title1 = "Obsolescencia de Hardware - Detallado";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Equipos";
+    ViewBag.Title3 = "Obsolescencia de Hardware";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .table-scrollable {
+        width: auto;
+        overflow-x: auto;
+        overflow-y: hidden;
+        margin: 10px 0;
+    }
+
+    .table th {
+        white-space: nowrap;
+    }
+
+    .table td {
+        vertical-align: top;
+        border-bottom: 1px solid #ddd;
+        padding: 2px 5px;
+    }
+
+    .fixed-table-container {
+        position: initial;
+        clear: none;
+    }
+
+    th.table-fixed-cell {
+        border: 1px solid #ddd !important;
+        border-right: none !important;
+    }
+
+    td.table-fixed-cell {
+        border-left: 1px solid #ddd !important;
+        border-top: none !important;
+    }
+</style>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <form id="formFiltros">
+                    <div class="card-search-box">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Unidad de Fondeo:</h5>
+                                    <select id="cbUnidadFondeo" name="cbUnidadFondeo" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Gestionado por:</h5>
+                                    <select id="cbGestionadoPor" name="cbGestionadoPor" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Unidad / Squad:</h5>
+                                    <select id="cbTeamSquad" name="cbTeamSquad" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 containerFiltroEquipo">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Equipo: </h5>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtEquipo" id="txtEquipo" class="form-control input-thick pill input-with-icon-search" value="" maxlength="200" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="0" id="hEquipo" name="hEquipo" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Fabricante:</h5>
+                                    <select id="cbFabricante" name="cbFabricante" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Modelo:</h5>
+                                    <select id="cbModelo" name="cbModelo" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Estados Actual de Obsolescencia:</h5>
+                                    <select id="cbEstadoObsolescencia" name="cbEstadoObsolescencia" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Fecha de la consulta: (*)</h5>
+                                    <div class="input-group date" id="divFechaFiltro">
+                                        <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Tipo de Hardware:</h5>
+                                    <select id="cbTipoHardware" name="cbTipoHardware" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-6 col-md-6"></div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-right">
+                                    <h5>&nbsp;</h5>
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+                                    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+                                        <span class="icon icon-external-link"></span>
+                                        <span class="count-text">Exportar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<br />
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Reporte detallado de equipos de hardware  </strong>
+            </div>
+            <div class="card-body">
+                <div id="table-listing">
+                    <div class="table-scrollable">
+                        <table id="tblRegistro"  cellpadding="0" cellspacing="0" class="table" data-show-columns="true" data-detail-view="false" data-detail-formatter="detailFormatter" style="font-size:11px !important;">
+                            <thead>
+                                <tr>
+                                    @*<th data-formatter="estadoFormatter" data-field="TotalTecnologiasObsoletas" data-halign="center" data-valign="middle" data-align="center" data-width="120">Estado</th>*@
+                                    @*<th data-field="CodigoApt" data-formatter="linkFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="CodigoApt">Código de <br />aplicación</th>*@
+                                    <th data-formatter="linkFormatterEquipo" data-field="Equipo" data-halign="center" data-valign="middle" data-align="left" data-width="200" data-sortable="true" data-sort-name="Equipo">Equipo</th>
+                                    <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-width="200" data-sortable="true" data-sort-name="TipoEquipo">Tipo</th>
+                                    <th data-field="Modelo" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="Modelo">Modelo</th>
+                                    <th data-field="Fabricante" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="Fabricante">Fabricante</th>
+                                    <th data-field="SistemaOperativo" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="SistemaOperativo">Sistema Operativo</th>
+                                    <th data-field="GestionadoPor" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="GestionadoPor">Gestionado Por</th>
+                                    <th data-field="TeamSquad" data-halign="center" data-valign="middle" data-align="left" data-width="200" data-sortable="true" data-sort-name="TeamSquad">Squad / Unidad</th>
+                                    <th data-field="FechaCalculoBaseStr" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="FechaCalculoBase">Fecha Fin de Soporte</th>
+                                    <th data-formatter="semaforoFormato" data-field="EstadoActual" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="EstadoActual">Estado Actual</th>
+                                    <th data-formatter="semaforoFormato" data-field="Proyeccion1" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="Proyeccion1">Estado a 12 meses</th>
+                                    <th data-formatter="semaforoFormato" data-field="Proyeccion2" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="Proyeccion2">Estado a 24 meses</th>
+                                    @*<th data-field="TribeTechnicalLead" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="TribeTechnicalLead">TTL</th>
+                                    <th data-field="Owner_LiderUsuario_ProductOwner" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="Owner_LiderUsuario_ProductOwner">Líder usuario</th>
+                                    <th data-field="ExpertoEspecialista" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="ExpertoEspecialista">Experto / Especialista</th>
+                                    <th data-field="Gestor" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="Gestor">Gestor / Usuario autorizador</th>
+                                    <th data-field="BrokerSistemas" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="Broker">Broker</th>
+                                    <th data-field="RoadMap" data-halign="center" data-valign="middle" data-align="center" data-width="80" data-sortable="true" data-sort-name="RoadMap">Clasificación técnica</th>
+                                    <th data-field="TotalServidores" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="TotalServidores">Total de <br />servidores <br />relacionados</th>
+                                    <th data-field="TotalTecnologias" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="TotalTecnologias">Total de <br />tecnologías</th>
+                                    <th data-field="IndiceObsolescencia_FLooking" data-formatter="porcentajeFormatter" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="IndiceObsolescencia_FLooking">KPI Obsolescencia<br />Forward Looking (%)</th>
+                                    <th data-field="IndiceObsolescencia" data-formatter="porcentajeFormatter" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="IndiceObsolescencia">KPI Obsolescencia<br /> Real (%)</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hdFiltro" id="hdFiltro" value="" />
+</div>
+
+<!--Modal-->
+<div id="MdAddOrEditModal" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document" style="width: 90%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Componentes tecnológicos</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hdId" name="hdId" value="0" />
+                <div class="form-group">
+                    <table id="tblRegistrosDetalle" data-mobile-responsive="true" data-check-on-init="true" data-pagination="true" data-page-size="10" data-page-list="[10, 20, 50, 100, 200]" style="font-size:11px !important;">
+                        <thead>
+                            <tr>
+                                <th data-formatter="semaforoFormatter" data-field="IndicadorObsolescencia" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado actual</th>
+                                <th data-formatter="semaforoIndice1Formatter" data-field="IndicadorObsolescencia_Proyeccion1" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado a <br />@proyecciones.MesProyeccion1 meses</th>
+                                <th data-formatter="semaforoIndice2Formatter" data-field="IndicadorObsolescencia_Proyeccion2" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado a <br />@proyecciones.MesProyeccion2 meses</th>
+                                <th data-field="TipoToString" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="TipoId">Tipo</th>
+                                <th data-formatter="linkFormatterEquipo" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="Nombre">Equipo / Activo TI</th>
+                                <th data-field="DetalleAmbiente" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="Ambiente">Ambiente</th>
+                                <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="Dominio">Dominio</th>
+                                <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="Subdominio">Subdominio</th>
+                                <th data-formatter="linkFormatterTecnologia" data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="ClaveTecnologia">Tecnología</th>
+                                <th data-field="TipoTecnologia" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="TipoTecnologia">Estado de <br />estandarización</th>
+                                <th data-field="EstadoIdTecnologiaStr" data-halign="center" data-valign="middle" data-align="center" data-width="200" data-sortable="true" data-sort-name="EstadoTecnologia">Estado de <br />tecnología</th>
+                                <th data-field="FechaFinToString" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="FechaCalculoBase">Fecha de fin <br />de soporte</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal-->
+
+<script src="~/app/obsolescenciaHardwareDetallado.js?v=1.0.0"></script>

@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  For more information on how to configure your ASP.NET application, please visit
+  https://go.microsoft.com/fwlink/?LinkId=301880
+  -->
+<configuration>
+	<appSettings>
+		<add key="webpages:Version" value="3.0.0.0" />
+		<add key="webpages:Enabled" value="false" />
+		<add key="ClientValidationEnabled" value="true" />
+		<add key="UnobtrusiveJavaScriptEnabled" value="true" />
+		<!--Azure AD Key-->
+		<add key="Authority" value="https://login.microsoftonline.com/{0}/v2.0" />
+		<add key="Azure.App.Id" value="46959aa5-8963-4536-9134-f8f1b1cc896c" />
+		<add key="Azure.App.Id.2" value="46959aa5-8963-4536-9134-f8f1b1cc896c" />
+		<add key="Azure.App.Tenant" value="5d93ebcc-f769-4380-8b7e-289fc972da1b" />
+		<add key="redirectUri" value="https://wappeu2e195d01.azurewebsites.net/" />
+		<add key="redirectUriLogOut" value="https://portal.office.com/" />
+		<!--Azure AD Key-->
+
+		<add key="UrlApi" value="http://localhost:50475/api" />
+		<add key="AD.Activo" value="1" />
+		<add key="AD.Matricula.Activo" value="1" />
+
+		<add key="log4net.Config" value="log4net.config" />
+		<add key="log4net.Config.Watch" value="True" />
+
+		<!--Para pruebas Matricula.Activo = 0 -->
+		<add key="AD.Dominio" value="BCPDOM" />
+		<add key="Dominio" value="CREDITO.BCP.COM.PE" />
+		<add key="Azman.Validar" value="true" />
+		<add key="Azman.CodigoAPT" value="E195" />
+		
+		<add key="Configuracion.Aplicacion" value="true" />
+		<add key="PortafolioResponsableDefecto.Id" value="2" />		
+		
+		<add key="Azure.Matricula" value="" />
+
+		<add key="Graph.API.Token" value="https://login.microsoftonline.com/{0}/oauth2/v2.0/token" />
+		<add key="Graph.API.Users" value="https://graph.microsoft.com/v1.0/users/{0}" />
+		<add key="Graph.API.Groups" value="https://graph.microsoft.com/v1.0/groups" />
+		<add key="Graph.API.SSLDeshabilitar" value="true" />		
+		
+		<add key="Auth.CodigoApp" value="E195" />
+		<add key="Auth.Key" value="V2VsY29tZTIwMjA=" />
+
+		<add key="Azure.KeyVault.Url" value="https://akvteu2e195d01.vault.azure.net" />
+		<add key="Azure.KeyVault.Secret.UserSQL" value="E195-UsuarioBD" />
+		<add key="Azure.KeyVault.Secret.PwdSQL" value="E195-UsuarioContrasenia" />
+		<add key="Azure.KeyVault.Secret.ServerSQL" value="E195-ServidorAzureSQL" />
+		<add key="Azure.KeyVault.Secret.BDSQL" value="E195-BDAzureSQL" />
+		<add key="Azure.KeyVault.Secret.SecretAPP" value="E195-SecretoAplicacion" />
+		<add key="Configuracion.Id" value="1" />
+
+		<add key="Azure.KeyVault.Url" value="https://akve195p01.vault.azure.net" />
+		<add key="Azure.KeyVault.Secret.UserSQL" value="E195-UsuarioBD" />
+		<add key="Azure.KeyVault.Secret.PwdSQL" value="E195-UsuarioContrasenia" />
+		<add key="Azure.KeyVault.Secret.ServerSQL" value="E195-ServidorAzureSQL" />
+		<add key="Azure.KeyVault.Secret.BDSQL" value="E195-BDAzureSQL" />
+		<add key="Azure.KeyVault.Secret.SecretAPP" value="E195-SecretoAplicacion" />
+
+		<add key="PaginasAutorizadas" value="/Vista/TecnologiaEstandar|/otraPagina"/>
+		<add key="Restriccion.Paginas" value="/Relacion/Tecnologia|/Relacion/Configuracion|/Relacion/Bandeja|/Flujos/SolicitudEquipo|/Configuracion/EquipoAppliance|/Configuracion/EquipoFisico"/>
+		<add key="Restriccion.HoraInicio" value="00:00:00"/>
+		<add key="Restriccion.HoraFIn" value="05:00:00"/>
+		<add key="Menu.FichaMEP" value="https://wappeu2e195d05.azurewebsites.net/"/>
+		<add key="OnPremise.Consulta" value="false"/>
+
+		<add key="PAPP.ActivarListadoApps" value="true" />
+		<add key="Matricula.AccesoEspecial" value="U19211" />
+  </appSettings>
+	<system.web>
+		<!--<sessionState timeout="1"></sessionState>-->
+		<compilation targetFramework="4.7.2" debug="true">
+			<assemblies>
+				<add assembly="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
+			</assemblies>
+		</compilation>
+		<authentication mode="Windows"></authentication>
+		<sessionState mode="InProc" timeout="90"></sessionState>
+		<httpRuntime targetFramework="4.7.2" maxRequestLength="2147483647" executionTimeout="9800" enableVersionHeader="false" />
+		<httpCookies httpOnlyCookies="true" requireSSL="true" />
+		<httpModules></httpModules>
+		<customErrors mode="On">
+			<error statusCode="404" redirect="~/Error/NotFound" />
+			<error statusCode="403" redirect="~/Error/Forbidden" />
+			<error statusCode="400" redirect="~/Error/BadRequest" />
+			<error statusCode="500" redirect="~/Error/NotFound" />
+		</customErrors>
+		<!--<customErrors mode="RemoteOnly"/>-->
+	</system.web>
+	<runtime>
+		<assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+			<dependentAssembly>
+				<assemblyIdentity name="Newtonsoft.Json" culture="neutral" publicKeyToken="30ad4fe6b2a6aeed" />
+				<bindingRedirect oldVersion="0.0.0.0-12.0.0.0" newVersion="12.0.0.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="System.Web.Optimization" publicKeyToken="31bf3856ad364e35" />
+				<bindingRedirect oldVersion="1.0.0.0-1.1.0.0" newVersion="1.1.0.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="WebGrease" publicKeyToken="31bf3856ad364e35" />
+				<bindingRedirect oldVersion="0.0.0.0-1.5.2.14234" newVersion="1.5.2.14234" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="System.Web.Helpers" publicKeyToken="31bf3856ad364e35" />
+				<bindingRedirect oldVersion="1.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="System.Web.WebPages" publicKeyToken="31bf3856ad364e35" />
+				<bindingRedirect oldVersion="1.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" />
+				<bindingRedirect oldVersion="1.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="DocumentFormat.OpenXml" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-2.5.5631.0" newVersion="2.5.5631.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="System.Numerics.Vectors" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-4.1.4.0" newVersion="4.1.4.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="System.Runtime.CompilerServices.Unsafe" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-4.0.5.0" newVersion="4.0.5.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="System.Buffers" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-4.0.3.0" newVersion="4.0.3.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="System.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-4.0.1.1" newVersion="4.0.1.1" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="System.ValueTuple" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-4.0.3.0" newVersion="4.0.3.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="Microsoft.Azure.KeyVault.Core" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-3.0.5.0" newVersion="3.0.5.0" />
+			</dependentAssembly>
+		</assemblyBinding>
+	</runtime>
+	<system.webServer>
+		<validation validateIntegratedModeConfiguration="false" />
+		<modules></modules>
+		<!--<security>
+      <requestFiltering>
+        <verbs>
+          <add verb="TRACE" allowed="false" />
+          <add verb="TRACK" allowed="false" />
+        </verbs>
+      </requestFiltering>
+    </security>-->
+		<httpProtocol>
+			<customHeaders>
+				<add name="X-Frame-Options" value="SAMEORIGIN" />
+				<add name="X-Xss-Protection" value="1" />
+				<add name="X-Content-Type-Options" value="nosniff" />
+				<!--<add name="Strict-Transport-Security" value="max-age=31536000"/>-->
+				<remove name="X-Powered-By" />
+			</customHeaders>
+		</httpProtocol>
+		<!--<rewrite>
+      <rules>
+        <rule name="HTTP to HTTPS redirect" stopProcessing="true">
+          <match url="(.*)" />
+          <conditions>
+            <add input="{HTTPS}" pattern="off" ignoreCase="true" />
+          </conditions>
+          <action type="Redirect" url="https://{HTTP_HOST}/{R:1}" redirectType="Permanent" />
+        </rule>
+      </rules>
+      <outboundRules rewriteBeforeCache="true">
+        <rule name="Remove Server header">
+          <match serverVariable="RESPONSE_Server" pattern=".+" />
+          <action type="Rewrite" value="" />
+        </rule>
+        <rule name="Use only secure cookies" preCondition="Unsecured cookie">
+          <match serverVariable="RESPONSE_SET_COOKIE" pattern=".*" negate="false" />
+          <action type="Rewrite" value="{R:0}; secure" />
+        </rule>
+        <rule name="Add Strict-Transport-Security when HTTPS" enabled="true">
+          <match serverVariable="RESPONSE_Strict_Transport_Security" pattern=".*" />
+          <conditions>
+            <add input="{HTTPS}" pattern="on" ignoreCase="true" />
+          </conditions>
+          <action type="Rewrite" value="max-age=31536000" />
+        </rule>
+        <preConditions>
+          <preCondition name="Unsecured cookie">
+            <add input="{RESPONSE_SET_COOKIE}" pattern="." />
+            <add input="{RESPONSE_SET_COOKIE}" pattern="; secure" negate="true" />
+          </preCondition>
+        </preConditions>
+      </outboundRules>
+    </rewrite>-->
+		<staticContent>
+			<remove fileExtension=".woff" />
+			<remove fileExtension=".woff2" />
+			<mimeMap fileExtension=".woff" mimeType="application/x-font-woff" />
+			<mimeMap fileExtension=".woff2" mimeType="application/font-woff2" />
+		</staticContent>
+		<handlers>
+			<remove name="ExtensionlessUrlHandler-Integrated-4.0" />
+			<remove name="OPTIONSVerbHandler" />
+			<remove name="TRACEVerbHandler" />
+			<add name="ExtensionlessUrlHandler-Integrated-4.0" path="*." verb="*" type="System.Web.Handlers.TransferRequestHandler" preCondition="integratedMode,runtimeVersionv4.0" />
+		</handlers>
+	</system.webServer>
+</configuration>

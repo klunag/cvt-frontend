@@ -1,0 +1,288 @@
+﻿@{
+    ViewBag.Title1 = "Gestión de subdominios";
+    ViewBag.Title2 = "Gestión de las Tecnologías";
+    ViewBag.Title3 = "Subdominios";
+}
+
+<style>
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .custom-checkbox {
+        display: inline;
+        margin-left: 5px;
+    }
+
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusSubdom" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre o descripción del subdominio...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusSubdom" class="btn btn-primary btn-width-custom" onclick="BuscarSubdom()">Buscar</button>
+                            </div>
+                        </div>
+                        <div class="form-group form-inline col-md-4">
+                            <h5>Dominio: </h5>
+                            <select id="cbFiltroDom" class="form-control">
+                                <option value="-1">-- Todos --</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>           
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddSubdom()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de Subdominios</strong>
+            </div>
+            <div class="card-body">
+                <table id="tbl-subdom" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="20%">Código</th>
+                            <th data-formatter="linkFormatterName" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                            <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Descripción</th>
+                            <th data-field="DomNomAsociado" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DomNomAsociado" data-width="10%">Dominio</th>
+                            <th data-field="Peso" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Peso" data-width="5%">Peso</th>
+                            <th data-formatter="linkFormatterTec" data-field="NumTecAsociadas" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NumTecAsociadas" data-width="5%"># Tecnologías</th>
+                            <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="15%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Subdominio)-->
+<div id="MdAddOrEditSubdom" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormSubdom"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditSubdom">
+                    <div class="form-group">
+                        <label class="control-label">Dominio: </label>
+                        <select name="cbDom" id="cbDom" class="form-control" style="width: 250px;" data-loading-text="Cargando...">
+                            <option value="-1" disabled>-- Seleccione --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Nombre: </label>
+                        <input id="txtNomSubdom" class="form-control" type="text" name="txtNomSubdom" maxlength="120">
+                        <input type="hidden" name="hIdSubdom" id="hIdSubdom" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Descripción: </label>
+                        <textarea id="txtDesSubdom" class="form-control" rows="3" name="txtDesSubdom" maxlength="300"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Peso: </label>
+                        <input id="txtPesSubdom" class="form-control" type="text" name="txtPesSubdom" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Dueño del dominio (Owner): </label>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input id="txtOwnSubdom" name="txtOwnSubdom" class="form-control inputMatricula" type="text" maxlength="120" placeholder="Matrícula">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label id="lblUsuario" class="control-label"></label>
+                                <input type="hidden" value="" id="hidMatricula" name="hidMatricula" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Se incluye en el cálculo de obsolescencia?
+                        </label>
+                        <div class="input-group" id="divCbCalObsSubDom"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="control-label">
+                                    ¿Activo?
+                                </label>
+                                <div class="input-group" id="divActivo"></div>
+                                <input type="hidden" name="hdNumTecAsoc" id="hdNumTecAsoc" value="0" />
+                                <input type="text" id="msjActivo" name="msjActivo" class="form-control clActivo" style="display:none;" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="control-label">
+                                    ¿Es visible?
+                                </label>
+                                <div class="input-group" id="divIsVisible"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegSubdom" class="btn btn-primary" onclick="GuardarAddOrEditSubdom()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit (Subdominio)-->
+<!--Modal Tecnologias Asociadas (Subdominio)-->
+<div id="MdTecBySub" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Relación de tecnologías asociadas al subdominio</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTecBySub">
+                    <div class="form-group">
+                        <label class="control-label">Tecnología: </label>
+                        <div class="form-inline">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <input id="txtNomTecBySub" name="txtNomTecBySub" class="form-control" type="text">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <button id="btnBusTecBySub" class="btn btn-primary" type="button" onclick="BuscarTecBySub()">Buscar</button>
+                                    <button id="btnExportar" class="btn btn-primary" type="button" onclick="exportarTecAsociadas()">Exportar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <table id="tbl-TecBySub" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="WorkerId" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="DominioNomb" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Dominio</th>
+                                    <th data-field="SubdominioNomb" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Subdominio</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Tecnología</th>
+                                    <th data-field="Versiones" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Version</th>
+                                    <th data-field="Dueno" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Dueño</th>
+                                    <th data-field="FechaLanzamientoToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Fecha de lanzamiento</th>
+                                    <th data-field="FechaExtendidaToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Fecha extendida</th>
+                                    <th data-field="FechaFinSoporteToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Fecha fin de soporte</th>
+                                    <th data-field="FechaAcordadaToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Fecha interna</th>
+                                    <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Estado</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hIdS" id="hIdS" value="0" />
+    <input type="hidden" name="hdDominioStr" id="hdDominioStr" value="" />
+</div>
+<!--Modal Tecnologias Asociadas (Subdominio)-->
+
+<!--Modal Equivalencias Subdominio (Subdominio)-->
+<div id="mdSubdomEq" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Equivalencias del Subdominio</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formSubdomEq">
+                    <div class="form-group">
+                        <label class="control-label">Equivalencia: </label>
+                        <div class="form-group ui-widget eqContainer">
+                            <input id="txtNomSubdomEq" name="txtNomSubdomEq" class="form-control ui-autocomplete-input" type="text" autocomplete="off" maxlength="200" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button id="btnRegSubdomEq" type="button" class="btn btn-primary" onclick="guardarSubdominiosEquivalentes()" data-loading-text="Procesando...">Registrar equivalencia</button>
+                    </div>
+                    <p>
+                        Relación de equivalencias registradas para
+                        <span id="spNomSubdom"></span>
+                    </p>
+                    <div class="form-group ">
+                        <table id="tblSubdomEq" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="EquivalenciaSubdomId" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="DominioNombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Dominio">Dominio</th>
+                                    <th data-field="SubdominioNombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Subdominio</th>
+                                    <th data-field="EquivalenciaSubdomNombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Equivalencia</th>
+                                    <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Activo">Estado</th>
+                                    <th data-formatter="formatOpcSubdomEq" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="10%">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <input type="text" id="msjValidTblEq" name="msjValidTblEq" class="form-control" style="display:none;" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>                
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hIdArqByTec" id="hIdArqByTec" value="0" />
+</div>
+<!--Modal Equivalencias Subdominio (Subdominio)-->
+
+<script src="~/app/subdominios.js?v=1.1.2"></script>
+
+

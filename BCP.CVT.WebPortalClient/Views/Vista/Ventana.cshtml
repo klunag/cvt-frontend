@@ -1,0 +1,37 @@
+﻿
+@{
+    ViewBag.Title1 = "Ventana de mantenimiento";
+    ViewBag.Title2 = "Equipos y aplicaciones";
+    ViewBag.Title3 = "Ventana de mantenimiento";
+}
+
+<div class="view-listado">
+    <div class="card">
+        <h4>
+            Los horarios de mantenimientos vienen dados por la norma vigente: 4110.011.09 - Gestión de actualizaciones de software en servidores, en los siguientes horarios:
+        </h4>
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Ventana por ambientes</strong>
+                </div>
+                <div class="card-body">
+                    <table id="tbl-ambientes" class="table" data-mobile-responsive="true" data-unique-id="Id">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="10">#</th>                                
+                                <th data-field="DetalleAmbiente" data-halign="center" data-valign="middle" data-align="center" data-width="100">Ambiente</th>
+                                <th data-field="TotalEquipos" data-halign="center" data-valign="middle" data-align="center" data-width="80">Total de equipos</th>
+                                <th data-field="Ventana" data-halign="center" data-valign="middle" data-align="center">Ventana configurada</th>                                
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/ventana.js"></script>

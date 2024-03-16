@@ -1,0 +1,448 @@
+﻿
+@{
+
+    ViewBag.Title1 = "Indicador Gerencial de Equipos";
+    ViewBag.Title2 = "Indicadores";
+    ViewBag.Title3 = "Equipos";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<style>
+    .reportPie {
+        width: 98%;
+        height: 185px;
+    }
+
+    .lblBottomChart {
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .lblTitleChart {
+        text-align: center;
+        font-size: 17px;
+        font-weight: 600;
+        color: #000;
+        margin-top: 5px;
+    }
+
+    .div-report-subdominio {
+        margin-bottom: 30px;
+    }
+
+    .media {
+        margin-top: 15px;
+    }
+
+    .media, .media-body {
+        zoom: 1;
+        overflow: hidden;
+    }
+
+    :first-child.media {
+        margin-top: 0px;
+    }
+
+    .list-group-item {
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid #e7e7ec;
+    }
+
+    :first-child.list-group-item {
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+    }
+
+    .list-group-divided .list-group-item {
+        background-color: transparent;
+        border-width: 1px 0;
+    }
+
+    .list-group-divided :first-child.list-group-item {
+        border-top-right-radius: 0px;
+        border-top-left-radius: 0px;
+        border-top: none;
+    }
+
+    ol, ul {
+        margin-top: 0px;
+        margin-bottom: 10px;
+    }
+
+    .list-group {
+        margin-bottom: 20px;
+        padding-left: 0px;
+    }
+
+    .card .list-group {
+        margin-bottom: 0px;
+    }
+
+    .card-body {
+        padding: 15px;
+        position: relative;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #f1f1f1;
+        border-radius: 4px;
+        display: block;
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .media-body {
+        width: 10000px;
+    }
+
+    .media-right, .media > .pull-right {
+        padding-left: 10px;
+    }
+
+    .media-body, .media-left, .media-right {
+        display: table-cell;
+        vertical-align: top;
+    }
+
+    .media-middle {
+        vertical-align: middle;
+    }
+
+    .bg-primary {
+        background-color: #f7a033;
+        border-color: #f7a033;
+        color: #fff;
+    }
+
+
+    .circle {
+        border-radius: 50%;
+    }
+
+    .sq-40 {
+        display: inline-block;
+        font-size: 20px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        width: 40px;
+    }
+
+    .icon {
+        display: inline-block;
+        font-family: FontAwesome;
+        font-size: inherit;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1;
+        text-align: center;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .media-heading {
+        margin-top: 0px;
+        margin-bottom: 5px;
+    }
+</style>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="form-group">
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left">
+                                        <h5>Tipo de Equipo: (*)</h5>
+                                        <select id="cbFilTipoEquipo" name="cbFilTipoEquipo" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-2 col-md-2">
+                                    <div class="text-left">
+                                        <h5>Nro. Meses: (*)</h5>
+                                        <select id="cbNroMeses" name="cbNroMeses" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-2 col-md-4">
+                                    <div class="text-left">
+                                        <h5>Grupo Tecnologías: (*)</h5>
+                                        <select id="cbSubdominios" name="cbSubdominios" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left">
+                                        <h5>Fecha de la consulta: (*)</h5>
+                                        <div class="input-group date" id="divFechaFiltro">
+                                            <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                            @*<span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>*@
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row gutter-xs">
+                            <div class="form-group">
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left">
+                                        <h5>Subsidiaria: (*)</h5>
+                                        <select id="cbSubsidiaria" name="cbSubsidiaria" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left">
+                                        <h5>Estado de Estandarización (*)</h5>
+                                        <select id="cbTipoTecnologia" name="cbTipoTecnologia" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-6 col-md-6">
+                                    <h5 style="color:transparent"> .</h5>
+                                    <a class="btn btn-primary pull-right" href="javascript: void(0)" onclick="GetReporte()">
+                                        <span class="icon icon-external-link"></span>
+                                        <span class="count-text">Generar Gráficos</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="row">
+</div>
+
+
+<div id="divGraficos" style="display: none">    
+    <div class="row gutter-xs">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Detalle de equipos</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 m-y">
+                            <ul class="list-group list-group-divided">
+                                <li class="list-group-item">
+                                    <div class="media">
+                                        <div class="media-middle media-body">
+                                            <h6 class="media-heading">
+                                                <span>Total de equipos</span>
+                                            </h6>
+                                            <h4 class="media-heading">
+                                                <div id="lblTotalEquipos" class="lblTitleChart">
+                                                    <span></span>                                                    
+                                                </div>
+                                            </h4>
+                                        </div>
+                                        <div class="media-middle media-right">
+                                            <span class="bg-primary circle sq-40">
+                                                <span class="icon icon-arrow-right"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6 m-y">
+                            <table class="table table-borderless table-fixed">
+                                <tbody>
+                                    <tr>
+                                        <td class="col-xs-1 text-left"></td>
+                                        <td class="col-xs-7 text-left">
+                                            <a class="link-muted" href="#">
+                                                <span class="truncate">Descubrimiento automático</span>
+                                            </a>
+                                        </td>
+                                        <td class="col-xs-4 text-right">
+                                            <div id="lblTotalEquiposAutomatico" class="lblTitleChart">
+                                                <span></span>                                                
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-xs-1 text-left"></td>
+                                        <td class="col-xs-7 text-left">
+                                            <a class="link-muted" href="#">
+                                                <span class="truncate">Carga manual</span>
+                                            </a>
+                                        </td>
+                                        <td class="col-xs-4 text-right">
+                                            <div id="lblTotalEquiposManual" class="lblTitleChart">
+                                                <span></span>                                                
+                                            </div>
+                                        </td>
+                                    </tr>                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Relación con aplicaciones</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 m-y">
+                            <ul class="list-group list-group-divided">
+                                <li class="list-group-item">
+                                    <div class="media">
+                                        <div class="media-middle media-body">
+                                            <h6 class="media-heading">
+                                                <span>Equipos sin relación con las aplicaciones</span>
+                                            </h6>
+                                            <h4 class="media-heading">
+                                                <div id="lblTotalEquiposHuerfanos" class="lblTitleChart">
+                                                    <span></span>                                                    
+                                                </div>
+                                            </h4>
+                                        </div>
+                                        <div class="media-middle media-right">
+                                            <span class="bg-primary circle sq-40">
+                                                <span class="icon icon-arrow-right"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">
+                Todos los subdominios
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">
+                S.O. + B.D.
+            </a>
+        </li>
+
+    </ul>
+
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="tab1">
+            <div class="row gutter-xs">
+                <div class="col-xs-6 div-report">
+                    <div class="card" id="divChartActual">
+                        <div class="card-body">
+                            <div id="divPieActualLbl" class="lblTitleChart">Hoy</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 div-report">
+                    <div class="card" id="divChartMesesAtras">
+                        <div class="card-body">
+                            <div id="divPieMesesAtrasLbl" class="lblTitleChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            </div>
+
+            <h3 id="lblTituloTopSubdominios"></h3>
+            <div class="row">
+            </div>
+
+            <div id="divPieSubdominios" class="row gutter-xs">
+                <div class="col-xs-6 div-report">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="divPieSubdominioActual" class="reportPie"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 div-report">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="divPieSubdominioActual" class="reportPie"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="tab2">
+            <div class="row gutter-xs">
+                <div class="col-xs-6 div-report">
+                    <div class="card" id="divChartActualOtros">
+                        <div class="card-body">
+                            <div id="divPieActualLblOtros" class="lblTitleChart">Hoy</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 div-report">
+                    <div class="card" id="divChartMesesAtrasOtros">
+                        <div class="card-body">
+                            <div id="divPieMesesAtrasLblOtros" class="lblTitleChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            </div>
+
+            <h3 id="lblTituloTopSubdominiosOtros"></h3>
+            <div class="row">
+            </div>
+
+            <div id="divPieSubdominiosOtros" class="row gutter-xs">
+                <div class="col-xs-6 div-report">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="divPieSubdominioActualOtros" class="reportPie"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 div-report">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="divPieSubdominioActualOtros" class="reportPie"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+
+
+<script src="~/app/IndicadoresGerencialEquipos.js?v=2.1.0"></script>

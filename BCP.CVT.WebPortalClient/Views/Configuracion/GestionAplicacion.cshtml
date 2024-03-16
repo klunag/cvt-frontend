@@ -1,0 +1,129 @@
+﻿@{
+    ViewBag.Title1 = "Gestión de Aplicaciones";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Gestión de Aplicaciones";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Gerencia: </h5>
+                                <select id="cbFiltroGerencia" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>División: </h5>
+                                <select id="cbFiltroDivision" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Unidad: </h5>
+                                <select id="cbFiltroUnidad" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Área: </h5>
+                                <select id="cbFiltroArea" class="form-control"></select>
+                            </div>
+                        </div>
+                        @*<div class="col-xs-3 col-md-2">
+                                <button class="btn btn-primary btn-width-custom">Buscar</button>
+                            </div>*@
+                    </div>
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3 appContainer">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Aplicación (código): </h5>
+                                <input type="text" value="" maxlength="100" autocomplete="off" id="txtAplicacion" name="txtAplicacion" class="form-control" />
+                                <input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3 tribuContainer">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Jefe de equipo/Experto aplicación User IT</h5>
+                                <input type="text" value="" maxlength="100" autocomplete="off" id="txtLiderTribu" name="txtLiderTribu" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3 usuarioContainer">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Líder usuario/Owner</h5>
+                                <input type="text" value="" maxlength="100" autocomplete="off" id="txtProduct" name="txtProduct" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Estado de la aplicación                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </h5>
+                                <select id="cbFiltroEstado" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gutter-xs">
+                        <div class="col-md-12">
+                            <div class="text-right">
+                                <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="RefrescarListado()">
+                                    <span class="count-text">Buscar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    @*
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarResponsables()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar responsables</span>
+    </a>*@
+    <a class="btn btn-primary btn-width-custom" href="NuevaAplicacion?Id=0">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de Aplicaciones</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistro" class="table table-striped table-nowrap dataTable" data-mobile-responsive="true" data-unique-id="Id">
+                    <thead>
+                        <tr>
+                            @*<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="3%">#</th>*@
+                            <th data-formatter="opcionesFormatter" data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                            <th data-formatter="NombreFormatter" data-field="CodigoAPTStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="5%" data-sort-name="CodigoAPT">Código</th>
+                            <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="15%">Nombre</th>
+                            <th data-field="CriticidadToString" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="15%">Criticidad</th>
+                            <th data-field="AplicacionDetalle.EstadoSolicitudStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="15%">Estado solicitud</th>
+                            <th data-field="GestionadoPor" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="GestionadoPor" data-width="15%">Gestionado por</th>
+                            <th data-field="FechaRegistroProcedenciaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion" data-width="10%">Registrado por</th>
+                            <th data-field="FlagRelacionarToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion" data-width="10%">Relacionar con<br /> tecnologías</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/app/gestionAplicacion.js"></script>

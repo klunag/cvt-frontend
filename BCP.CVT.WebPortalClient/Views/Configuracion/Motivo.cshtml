@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title1 = "Gestión de Motivos";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Gestión de Motivos";
+}
+@*<style>
+    span.input-group-addon {
+        z-index: 2;
+        margin-left: -1px;
+        position: relative;
+        background-color: #f7a033;
+        border-color: #f7a033;
+        color: #fff;
+    }
+</style>*@
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusMotivo" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre o descripción de la motivo...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusMotivo" class="btn btn-primary btn-width-custom" onclick="BuscarMotivo()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddMotivo()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+    @*<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>*@
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de motivos</strong>
+            </div>
+            <div class="card-body">
+                <table id="tbl-motivos" class="table">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="linkFormatterName" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                            <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Descripción</th>
+                            <th data-field="CantidadTecnologiasAsociadas" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Total Tecnologías</th>
+                            <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%">Creado Por</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Motivo)-->
+<div id="MdAddOrEditMotivo" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormMotivo"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditMotivo">
+                    <div class="form-group">
+                        <label class="control-label">Nombre: </label>
+                        <input id="txtNomMotivo" class="form-control" type="text" name="txtNomMotivo" maxlength="120">
+                        <input type="hidden" name="hIdMotivo" id="hIdMotivo" value="0" />
+                        <input type="hidden" name="hdTecVin" id="hdTecVin" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Descripción: </label>
+                        <textarea id="txtDesMotivo" class="form-control" rows="3" name="txtDesMotivo" maxlength="300"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Activo?
+                        </label>
+                        <div class="input-group" id="divActivo">
+                        </div>
+                        <input type="text" id="msjActivo" name="msjActivo" class="form-control clActivo" style="display:none;" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegMotivo" class="btn btn-primary" onclick="GuardarAddOrEditMotivo()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit (Motivo)-->
+
+<script src="~/app/motivos.js"></script>

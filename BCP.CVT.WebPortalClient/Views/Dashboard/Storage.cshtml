@@ -1,0 +1,121 @@
+﻿@{
+
+    ViewBag.Title1 = "Vista por volúmenes";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Storage";
+    ViewBag.Title3 = "Vista por volúmenes";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+</style>
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <form id="formFiltros">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-3 col-md-3 containerFiltro">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Storage: </h5>
+                                        <input type="text" name="txtEquipo" id="txtEquipo" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3 containerFiltroSO">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Software base: </h5>
+                                        <input type="text" name="txtSoftwareBase" id="txtSoftwareBase" class="form-control" value="" maxlength="100" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Fecha de la consulta: (*)</h5>
+                                        <div class="input-group date" id="divFechaFiltro">
+                                            <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                            @*<span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    
+                                </div>
+                            </div>
+                            <div class="row gutter-xs form-group">
+                                <div class="col-md-8 col-xs-4 col-sm-6">
+                                </div>
+                                <div class="col-md-2 col-xs-4 col-sm-3">                                    
+                                    <button id="btnExportar" type="button" class="btn btn-primary btn-width-custom" onclick="ExportarInfo()">Exportar</button>
+                                </div>
+                                <div class="col-md-2 col-xs-4 col-sm-3">
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Buscar()">Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Relación de equipos registrados en la plataforma</strong>
+                </div>
+                <div class="card-body">
+                    <table id="tblRegistro" class="table" data-mobile-responsive="true" data-unique-id="Id" style="font-size:11px !important"  >
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="IndicadorObsolescencia" data-formatter="semaforoFormatter" data-halign="center" data-valign="middle" data-align="center">Obsolescencia</th>
+                                <th data-field="Equipo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Equipo">Equipo</th>
+                                <th data-field="SoftwareBase" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="SoftwareBase">Software base</th>
+                                <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Dominio">Dominio tecnológico</th>
+                                <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Subdominio">Subdominio tecnológico</th>
+                                <th data-field="PoolName" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="PoolName">Nombre del Pool</th>
+                                <th data-field="UbicacionToString" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="UbicacionId">Ubicación</th>
+                                <th data-field="Etiqueta" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Etiqueta">Etiqueta</th>
+                                <th data-field="Volumen" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Volumen">Volumen</th>
+                                <th data-field="NombreTier" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="StorageTierId">Tier</th>
+                                <th data-field="EspacioTotalGB" data-halign="center" data-valign="middle" data-align="right" data-sortable="true" data-sort-name="EspacioTotalGB">Espacio total (GB)</th>
+                                <th data-field="EspacioUsadoGB" data-halign="center" data-valign="middle" data-align="right" data-sortable="true" data-sort-name="EspacioUsadoGB">Espacio usado (GB)</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/storage.js?v=2.1.0"></script>

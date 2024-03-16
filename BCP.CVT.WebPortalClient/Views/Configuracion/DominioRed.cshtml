@@ -1,0 +1,106 @@
+﻿@{
+    ViewBag.Title1 = "Configuración de dominios corporativos";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Dominios de red";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusDomRed" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Búsqueda por nombre o equivalencia del dominio de red...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusDomRed" class="btn btn-primary btn-width-custom" onclick="buscarDominioRed()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>           
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddDomRed()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de los dominios corporativos usados en los reportes de la aplicación</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblDomRed" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="Id" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Código</th>
+                            <th data-formatter="linkFormatter" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                            <th data-field="Equivalencias" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Equivalencias</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="FechaCreacion">Fecha de registro</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion" data-width="10%">Creado por</th>
+                            <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Dominio Red)-->
+<div id="MdAddOrEdit" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEdit">
+                    <div class="form-group">
+                        <label class="control-label">Nombre: </label>
+                        <input id="txtNomDomRed" class="form-control" type="text" name="txtNomDomRed">
+                        <input type="hidden" name="hdDomRedId" id="hdDomRedId" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Equivalencias (separadas por comas):</label>
+                        <textarea id="txtEqDomRed" class="form-control" rows="5" name="txtEqDomRed"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Activo?
+                        </label>
+                        <div class="input-group" id="divActDomRed">
+                        </div>
+                        @*<input type="hidden" name="hdNumTecAsoc" id="hdNumTecAsoc" value="0" />
+                            <input type="text" id="msjActivo" name="msjActivo" class="form-control clActivo" style="display:none;" />*@
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegDomRed" class="btn btn-primary" onclick="guardarAddOrEditDomRed()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit (Dominio Red)-->
+<script src="~/app/dominioRed.js"></script>

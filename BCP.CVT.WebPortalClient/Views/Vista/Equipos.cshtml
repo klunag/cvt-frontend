@@ -1,0 +1,169 @@
+﻿@{
+
+    ViewBag.Title1 = "Vista por equipos / activos TI";
+    ViewBag.Title2 = "Equipos y aplicaciones";
+    ViewBag.Title3 = "Vista por equipos / activos TI";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+</style>
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <form id="formFiltros">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-12 col-md-3 col-sm-6 containerFiltro">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Equipo / Activo TI: </h5>
+                                        <input type="text" name="txtEquipo" id="txtEquipo" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-md-3 col-sm-6 containerFiltroSO">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Sistema operativo: </h5>
+                                        <input type="text" name="txtSistemaOperativo" id="txtSistemaOperativo" class="form-control" value="" maxlength="100" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-md-3 col-sm-6">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Ambiente: </h5>
+                                        <select id="cbAmbiente" name="cbAmbiente" class="form-control">
+                                            @*<option value="-1">-- Todos --</option>*@
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-md-3 col-sm-6">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Tipo: </h5>
+                                        <select id="cbTipoEquipo" name="cbTipoEquipo" class="form-control">
+                                            @*<option value="-1">-- Todos --</option>*@
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-md-3 col-sm-6">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Descubrimiento: </h5>
+                                        <select id="cbDescubrimiento" name="cbDescubrimiento" class="form-control">
+                                            @*<option value="-1">-- Todos --</option>*@
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-md-3 col-sm-6">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Subsidiaria: </h5>
+                                        <select id="cbSubsidiaria" name="cbSubsidiaria" class="form-control">
+                                            @*<option value="-1">-- Todos --</option>*@
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 col-md-3 col-sm-6 containerFiltro">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>IP: </h5>
+                                        <input type="text" name="txtIP" id="txtIP" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+
+                                @*<div class="col-xs-3 col-md-3">
+                                        <div class="text-left" data-toggle="match-height">
+                                            <h5>Dominio: </h5>
+                                            <select id="cbDominioRed" name="cbDominioRed" class="form-control">
+                                            </select>
+                                        </div>
+                                    </div>*@
+
+                                <div class="col-xs-12 col-md-3 col-sm-6">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Estado: </h5>
+                                        <select id="ddlEstado" name="ddlEstado" class="form-control"></select>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row gutter-xs form-group pull-right">
+                                <div class="col-sm-12 col-xs-12 col-md-12">
+                                    <div class="col-sm-6 col-xs-6 col-md-6">
+                                        <button id="btnExportar" type="button" class="btn btn-primary btn-width-custom" onclick="ExportarInfo()">Exportar</button>
+                                    </div>
+                                    <div class="col-sm-6 col-xs-6 col-md-6">
+
+                                        <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Buscar()">Buscar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Relación de equipos registrados en la plataforma</strong>
+                </div>
+                <div class="card-body">
+                    <table id="tblRegistro" class="table" data-mobile-responsive="true" data-unique-id="Id" data-row-style="rowStyle" style="font-size: 11px !important;">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-formatter="linkFormatterName" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Equipo / Activo TI</th>
+                                <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="TipoEquipo">Tipo</th>
+                                <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Activo">Estado</th>
+                                <th data-field="CaracteristicaEquipoToString" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="CaracteristicaEquipo">Característica</th>
+                                <th data-field="EquipoFisico" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="EquipoFisico">Equipo Físico</th>
+                                <th data-field="Subsidiaria" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Subsidiaria">Subsidiaria</th>
+                                <th data-formatter="linkFormatterSO" data-field="SistemaOperativo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="SistemaOperativo">Sistema operativo</th>
+                                <th data-field="Ambiente" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Ambiente">Ambiente</th>
+                                <th data-field="TemporalToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagTemporal">Descubrimiento</th>
+                                <th data-field="FechaUltimoEscaneoCorrectoStr" data-halign="center" data-valign="middle" data-align="center">Fecha de último <br />escaneo correcto</th>
+                                <th data-field="Modelo" data-halign="center" data-valign="middle" data-align="center">Hardware asociado</th>
+                                <th data-field="CodigoEquipo" data-halign="center" data-valign="middle" data-align="center">Código</th>
+                                @if (ViewBag.ColAprovisionamiento)
+                                {
+                                    <th data-field="ControlAprovisionamientoDesc" data-halign="center" data-valign="middle" data-align="center">Característica <br />de Aprovisionamiento</th>
+                                }
+
+                                <th data-field="DominioServidor" data-halign="center" data-valign="middle" data-align="center">Dominio  <br />Servidor</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/equipo.js?v1.3.9"></script>

@@ -1,0 +1,139 @@
+﻿
+@{
+
+    ViewBag.Title1 = "Indicador Gerencial de Tecnologías";
+    ViewBag.Title2 = "Indicadores";
+    ViewBag.Title3 = "Tecnologías";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<style>
+    .reportPie {
+        width: 98%;
+        height: 185px;
+    }
+
+    .lblBottomChart {
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .lblTitleChart {
+        text-align: center;
+        font-size: 17px;
+        font-weight: 600;
+        color: #000;
+        margin-top: 5px;
+    }
+
+    .totalTitle {
+        font-size: 13px;
+        text-align: center;
+        font-weight: bold;
+        color: #000;
+        margin-bottom: 5px;
+    }
+
+    .no-header {
+        display: none !important;
+    }
+
+    #divDatosTotales .bootstrap-table .table:not(.table-condensed), .bootstrap-table .table:not(.table-condensed) > tbody > tr > td, .bootstrap-table .table:not(.table-condensed) > tbody > tr > th, .bootstrap-table .table:not(.table-condensed) > tfoot > tr > td, .bootstrap-table .table:not(.table-condensed) > tfoot > tr > th, .bootstrap-table .table:not(.table-condensed) > thead > tr > td {
+        padding: 6px;
+    }
+</style>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+
+                            <div class="form-group">
+
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left">
+                                        <h5>Estado de Estandarización: (*)</h5>
+                                        <select id="cbFilTipoTecnologia" name="cbFilTipoTecnologia" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-2 col-md-2">
+                                    <div class="text-left">
+                                        <h5>Nro. Meses: (*)</h5>
+                                        <select id="cbNroMeses" name="cbNroMeses" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left">
+                                        <h5>Fecha de la consulta: (*)</h5>
+                                        <div class="input-group date" id="divFechaFiltro">
+                                            <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                            @*<span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-2 col-md-2">
+                                    <h5 style="color:transparent"> .</h5>
+                                    <a class="btn btn-primary pull-right" href="javascript: void(0)" onclick="GetReporte()">
+                                        <span class="icon icon-external-link"></span>
+                                        <span class="count-text">Generar Gráficos</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="row">
+</div>
+
+
+
+
+<div id="divGraficos" style="display: none">
+    <div class="row">
+        <span class="label label-warning">Distribución de tecnologías por tipo y uso</span>
+    </div>
+    <div class="row gutter-xs" id="divDatosTotales">
+
+    </div>
+    <div class="row">
+        <span class="label label-warning">Tecnologías usadas por equipos y aplicaciones</span>
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-6 div-report">
+            <div class="card" id="divChartActual">
+                <div class="card-body">
+                    <div id="divPieActualLbl" class="lblTitleChart">Hoy</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-6 div-report">
+            <div class="card" id="divChartMesesAtras">
+                <div class="card-body">
+                    <div id="divPieMesesAtrasLbl" class="lblTitleChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+    </div>
+
+
+</div>
+
+
+<script src="~/app/IndicadoresGerencialTecnologias.js?v=2.0.0"></script>

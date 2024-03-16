@@ -1,0 +1,133 @@
+﻿@{
+
+    ViewBag.Title1 = "Vista por storage y aplicaciones";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Storage";
+    ViewBag.Title3 = "Vista por storage y aplicaciones";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+</style>
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <form id="formFiltros">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-3 col-md-3 equipoContainer">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Equipo: </h5>
+                                        <input type="text" name="txtEquipo" id="txtEquipo" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3 storageContainer">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Storage: </h5>
+                                        <input type="text" name="txtStorage" id="txtStorage" class="form-control" value="" maxlength="100" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3 appContainer">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Aplicación: </h5>
+                                        <input type="text" name="txtAplicacion" id="txtAplicacion" class="form-control" value="" maxlength="100" />
+                                        <input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Fecha de la consulta: (*)</h5>
+                                        <div class="input-group date" id="divFechaFiltro">
+                                            <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                            @*<span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Ambiente: </h5>
+                                        <select id="ddlAmbiente" name="ddlAmbiente" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs form-group">
+                                <div class="col-md-8 col-xs-4 col-sm-6">
+                                </div>
+                                <div class="col-md-2 col-xs-4 col-sm-3">
+                                    <button id="btnExportar" type="button" class="btn btn-primary btn-width-custom" onclick="ExportarInfo()">Exportar</button>
+                                </div>
+                                <div class="col-md-2 col-xs-4 col-sm-3">
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Buscar()">Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Relación aplicaciones y storage</strong>
+                </div>
+                <div class="card-body">
+                    <table id="tblRegistro" class="table" data-mobile-responsive="true" data-unique-id="Id" style="font-size:11px !important">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left">Código aplicación</th>
+                                <th data-field="Equipo" data-halign="center" data-valign="middle" data-align="left">Equipo</th>
+                                <th data-field="FlagTemporalToString" data-halign="center" data-valign="middle" data-align="left">Estado equipo</th>
+                                <th data-field="DetalleAmbiente" data-halign="center" data-valign="middle" data-align="left">Ambiente</th>
+                                <th data-field="EstadoIdToString" data-halign="center" data-valign="middle" data-align="left">Estado de la relación</th>
+                                <th data-field="SoftwareBase" data-halign="center" data-valign="middle" data-align="left">Software base</th>
+                                <th data-field="Storage" data-halign="center" data-valign="middle" data-align="left">Storage</th>
+                                <th data-field="NombreTier" data-halign="center" data-valign="middle" data-align="left">Tier</th>
+                                <th data-field="UbicacionToString" data-halign="center" data-valign="middle" data-align="left">Ubicación</th>
+                                <th data-field="TieneReplicaToString" data-halign="center" data-valign="middle" data-align="left">Réplica</th>
+                                <th data-field="CapacidadGB" data-halign="center" data-valign="middle" data-align="right">Espacio total (GB) <br />Equipo</th>
+                                <th data-field="UsadoGB" data-halign="center" data-valign="middle" data-align="right">Espacio usado (GB) <br />Equipo</th>
+                                <th data-field="LibreGB" data-halign="center" data-valign="middle" data-align="right">Espacio libre (GB) <br />Equipo</th>                                
+                                <th data-field="PorcentajeLibre" data-halign="center" data-valign="middle" data-align="right">% libre</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/storageAplicaciones.js?v=2.1.0"></script>

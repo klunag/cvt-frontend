@@ -1,0 +1,406 @@
+﻿@using BCP.CVT.WebPortalClient.Models
+@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Nueva aplicación";
+    ViewBag.Title2 = "Gestión de aplicaciones";
+    ViewBag.Title3 = "Nueva aplicación";
+}
+
+@{
+    Usuario_Storage eUsuario = (Usuario_Storage)Session["Usuario"];
+    string eusername = eUsuario == null ? "" : eUsuario.UsuarioBCP_Dto.Name;
+}
+
+
+<style>
+    a.tip {
+        border-bottom: 1px dashed;
+        text-decoration: none
+    }
+
+        a.tip:hover {
+            cursor: help;
+            position: relative
+        }
+
+        a.tip span {
+            display: none
+        }
+
+        a.tip:hover span {
+            border: #c0c0c0 1px dotted;
+            padding: 5px 20px 5px 5px;
+            display: block;
+            z-index: 100;
+            font-family: Roboto,sans-serif;
+            /*background: url(../images/status-info.png) #f0f0f0 no-repeat 100% 5%;*/
+            background: #F2F4F8;
+            left: 0px;
+            margin: 10px;
+            width: 250px;
+            position: absolute;
+            top: 10px;
+            text-decoration: none;
+            color: #002A8D;
+            text-align: left;
+        }
+
+    .stepwizard-step p {
+        margin-top: 0px;
+        color: #666;
+    }
+
+    .stepwizard-row {
+        display: table-row;
+    }
+
+    .stepwizard {
+        display: table;
+        width: 100%;
+        position: relative;
+    }
+
+    .stepwizard-step button[disabled] {
+        /*opacity: 1 !important;
+    filter: alpha(opacity=100) !important;*/
+    }
+
+    .stepwizard .btn.disabled, .stepwizard .btn[disabled], .stepwizard fieldset[disabled] .btn {
+        opacity: 1 !important;
+        color: #bbb;
+    }
+
+    .stepwizard-row:before {
+        top: 14px;
+        bottom: 0;
+        position: absolute;
+        content: " ";
+        width: 100%;
+        height: 1px;
+        background-color: #ccc;
+        z-index: 0;
+    }
+
+    .stepwizard-step {
+        display: table-cell;
+        text-align: center;
+        position: relative;
+        font-family: Roboto,sans-serif;
+        font-size: 18px;
+    }
+
+    .btn-circle {
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        padding: 6px 0;
+        font-size: 12px;
+        line-height: 1.428571429;
+        border-radius: 15px;
+    }
+
+    .etiquetaRoja {
+        color: #dc3545;
+        font-weight: bold !important;
+    }
+</style>
+<div class="row">
+    <div class="col-md-10">
+        <span style="font-size:14px;">
+            Al completar los datos se te asignará un código de aplicación para las gestiones internas que requieras hacer.
+            <br />Es importante que todos los datos de tu aplicación se encuentren completos, mantenlos actualizados. Los campos con  <span class="etiquetaRoja">(*)</span> requieren completarse para que tu aplicación logre el estado de <strong>Registro Completo</strong>
+        </span>
+    </div>
+    <div class="col-md-2 text-right">
+        <a id="btnAgregar" class="btn btn-primary btn-width-custom" href="/RegistroPortafolioAplicaciones/Bandeja">
+            <span class="icon icon-arrow-left"></span>
+            <span class="count-text">Volver</span>
+        </a>
+    </div>
+</div>
+<hr>
+<div class="stepwizard">
+    <div class="stepwizard-row setup-panel">
+        <div class="stepwizard-step col-xs-4">
+            <a href="#step-1" type="button" class="btn btn-warning btn-circle">1</a>
+            <p><small style="color: #002A8D;">Datos generales</small></p>
+        </div>
+        <div class="stepwizard-step col-xs-4">
+            <a href="#step-2" type="button" class="btn btn-default btn-circle" disabled="disabled">2</a>
+            <p><small>Datos detallados</small></p>
+        </div>
+        <div class="stepwizard-step col-xs-4">
+            <a href="#step-3" type="button" class="btn btn-default btn-circle" disabled="disabled">3</a>
+            <p><small>Información de custodios</small></p>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row gutter-xs" style="margin-top:5px;">
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-search">
+                    <fieldset class="fieldset">
+                        <legend class="legend">Datos generales</legend>
+                        <div class="card-search-box">
+                            <form id="formAddOrEditApp">
+                                <div class="row">
+                                    <div id="divApp" class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-5">
+                                                    <span>Código de la aplicación</span>      <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodigo"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" maxlength="4" id="txtCodigoAPT" name="txtCodigoAPT" style="text-transform:uppercase" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-4">
+                                                    <span>Gestionado por</span>  <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanGestionado"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <select id="ddlGestionadoPor" name="ddlGestionadoPor" class="form-control">
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-5">
+                                                    <span>Nombre de la aplicación</span>    <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanNombre"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="txtNombre" name="txtNombre" maxlength="180" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-4">
+                                                    <span>Equipo/Squad</span>     <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanEquipo"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <select id="ddlEquipo" name="ddlEquipo" class="form-control">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-5">
+                                                    <span>Descripción</span>     <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanDescripcion"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <textarea class="form-control" rows="10" id="txtDescripcion" name="txtDescripcion"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-4">
+                                                    <span>Modelo de entrega</span>    <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanModeloEntrega"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <select id="ddlModeloEntrega" name="ddlModeloEntrega" class="form-control">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-5">
+                                                    Código de aplicación padre
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodigoPadre"></span></a>
+                                                </div>
+                                                <div class="col-md-7 containerAplicacion">
+                                                    <input id="txtCodigoAppPadre" name="txtCodigoAppPadre" type="text" class="form-control" maxlength="200" />
+                                                    <input type="hidden" id="hCodigoPadre" name="hCodigoPadre" value="" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-4">
+                                                    <span>Estado de la aplicación</span>    <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanEstado"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <select id="ddlEstadoAplicacion" name="ddlEstadoAplicacion" class="form-control">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                        <option value="1">En desarrollo</option>
+                                                        <option value="2">Vigente</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-5">
+                                                    <span>Arquitecto evaluador de la aplicación (solución, tecnologia)</span>   <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanArquitectoNegocio"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <select id="ddlArquitectoNegocio" name="ddlArquitectoNegocio" class="form-control">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 divInterfaz">
+                                                <div class="col-md-4">
+                                                    Requiere de un código de interfaz
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodigoInterfaz"></span></a>
+                                                </div>
+                                                <div class="input-group col-md-2" id="divFlagInterface"></div>
+
+                                                <div class="col-md-5">
+                                                    <input id="txtCodigoInterfaz" class="form-control" type="text" name="txtCodigoInterfaz" disabled="disabled" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-5">
+                                                    <span>Arquitecto de Soluciones</span>   <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanArquitectoSolucion"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <select id="ddlArquitectoSolucion" name="ddlArquitectoSolucion" class="form-control">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-5">
+                                                    Gerencia
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanGerencia"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="txtGerencia" name="txtGerencia" disabled="disabled" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-4">
+                                                    Área
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanArea"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="txtArea" name="txtArea" disabled="disabled" />
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-5">
+                                                    División
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanDivision"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="txtDivision" name="txtDivision" disabled="disabled" />
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 divUnidadContainer">
+                                                <div class="col-md-4">
+                                                    <span>Unidad dueña de la aplicación</span>     <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanUnidad"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input id="txtUnidad" name="txtUnidad" type="text" class="form-control" maxlength="120" />
+                                                    <input type="hidden" id="hdUnidadId" value="" />
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-5">
+                                                    <span>Tipo de implementación</span>         <span class="etiquetaRoja">(*)</span>
+                                                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanTipoImplementacion"></span></a>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <select id="ddlTipoImplementacion" name="ddlTipoImplementacion" class="form-control">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 unidadResponsable">
+                                                <div class="col-md-4">
+                                                    Responsable
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <label id="txtResponsableUnidad" name="txtResponsableUnidad" />
+
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 divOwner">
+                                                <div class="col-md-5">
+                                                    Búsqueda por Owner
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="input-group" id="divFlagOwner"></div>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <input id="txtOwner" class="form-control" type="text" name="txtOwner" />
+                                                    <input type="hidden" id="hdOwnerId" value="" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 divRowOwner">
+                                                <div class="col-md-4">
+                                                    Unidades del Owner
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <select id="ddlUnidadesOwner" name="ddlUnidadesOwner" class="form-control">
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-5">
+                                                    Fecha de registro
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input id="txtFecha" name="txtFecha" type="text" class="form-control" disabled="disabled" value="@DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-4">
+                                                    Registrado por
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input id="txtRegistradoPor" name="txtRegistradoPor" type="text" class="form-control" disabled="disabled" value="@eusername" />
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 text-right">
+                                        <button id="btnRegistrarApp" name="btnRegistrarApp" class="btn btn-primary" type="button" data-loading-text="Procesando...">Registrar mi aplicación</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="~/app/RegistroPortafolio/nuevaAplicacion.js?v=2.2.0"></script>

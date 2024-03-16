@@ -1,0 +1,166 @@
+﻿
+@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Modificación de Aplicaciones";
+	ViewBag.Title2 = "Gestión de aplicaciones";
+	ViewBag.Title3 = "Modificación de Aplicaciones";
+
+	string nombreApp = (string)ViewBag.Nombre_App;
+	int paginaActual = (int)ViewBag.PaginaActual;
+	int paginaTamanio = (int)ViewBag.PaginaTamanio;
+}
+
+<style>
+
+
+
+	.modal-xl {
+		width: 90%;
+		max-width: 1200px;
+	}
+
+	.width-des {
+		min-width: 300px;
+	}
+
+
+	.bloq-element {
+		pointer-events: none;
+		opacity: 0.7;
+	}
+
+	/* Chat containers */
+	.container {
+		border: 2px solid #dedede;
+		background-color: #f1f1f1;
+		border-radius: 5px;
+		padding: 10px;
+		margin: 10px 0;
+	}
+
+	/* Darker chat container */
+	.darker {
+		border-color: #f7a033;
+		background-color: #ddd;
+	}
+
+	/* Clear floats */
+	.container::after {
+		content: "";
+		clear: both;
+		display: table;
+	}
+
+	/* Style images */
+	.container img {
+		float: left;
+		max-width: 60px;
+		width: 100%;
+		margin-right: 20px;
+		border-radius: 50%;
+	}
+
+		/* Style the right image */
+		.container img.right {
+			float: right;
+			margin-left: 20px;
+			margin-right: 0;
+		}
+
+	/* Style time text */
+	.time-right {
+		float: right;
+		color: #aaa;
+	}
+
+	/* Style time text */
+	.time-left {
+		float: left;
+		color: #999;
+	}
+
+	.user-name {
+		font-weight: bold;
+		text-transform: uppercase;
+	}
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+	<div class="card-body">
+		<div class="card-search">
+			<fieldset class="fieldset">
+				<legend class="legend">Filtro de búsqueda</legend>
+				<div class="card-search-box">
+					<form id="formFiltros">
+						<div class="row gutter-xs">
+							<div class="col-xs-3 col-md-3">
+								<div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+									<h5>Aplicación (código) </h5>
+									<input type="text" id="txtAplicacionFiltro" name="txtAplicacionFiltro" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+									<input type="hidden" name="hdAplicacionFiltroId" id="hdAplicacionFiltroId" />
+								</div>
+							</div>
+							<div class="col-xs-3 col-md-3">
+								
+							</div>
+							<div class="col-xs-3 col-md-3">
+								
+							</div>
+							<div class="col-xs-3 col-md-3 text-right">
+								<h5>&nbsp;</h5>
+								<button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>
+<hr />
+<div class="row gutter-xs">
+	<div class="col-xs-12">
+		<div class="card">
+			<div class="card-body">
+				<table id="tblRegistro" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+					<caption class="caption text-left">
+						<span>Aplicaciones Asignadas</span>
+					</caption>
+					<thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            <th data-field="applicationId" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationId">Código</th>
+                            <th data-field="name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Nombre</th>
+                            <th data-field="assetTypeName" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Tipo de activo de información</th>
+                            <th data-field="managedBy" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Gestionado por</th>
+                            <th data-field="statusDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="status">Estado de la aplicación</th>
+                            <th data-formatter="formatoFecha" data-field="registerDate" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="registerDate">Fecha de registro</th>
+                        </tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+<input type="hidden" name="hdFlowId" id="hdFlowId" value="0" />
+<input type="hidden" name="hdDesId" id="hdDesId" value="0" />
+
+<script>
+	const REGISTRO_PARCIAL = 1;
+	const REGISTRO_COMPLETO = 2;
+
+	const ESTADO_ENDESARROLLO = 1;
+	const ESTADO_VIGENTE = 2;
+	const ESTADO_NOVIGENTE = 3;
+	const ESTADO_ELIMINADA = 4;
+	var nombre_app = '@nombreApp';
+	    var PAGINA_ACTUAL = @paginaActual;
+    var PAGINA_TAMANIO = @paginaTamanio;
+
+</script>
+<script src="~/app/RegistroPortafolio/bandejaAplicaciones.js?v=2.1.1"></script>

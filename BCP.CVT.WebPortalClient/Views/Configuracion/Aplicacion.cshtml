@@ -1,0 +1,470 @@
+﻿@{
+    ViewBag.Title1 = "Relación de aplicaciones importadas";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Aplicaciones";
+}
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Gerencia: </h5>
+                                <select id="cbFiltroGerencia" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>División: </h5>
+                                <select id="cbFiltroDivision" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Unidad: </h5>
+                                <select id="cbFiltroUnidad" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Área: </h5>
+                                <select id="cbFiltroArea" class="form-control"></select>
+                            </div>
+                        </div>
+                        @*<div class="col-xs-3 col-md-2">
+                                <button class="btn btn-primary btn-width-custom">Buscar</button>
+                            </div>*@
+                    </div>
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3 appContainer">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Aplicación (código): </h5>
+                                <input type="text" value="" maxlength="100" autocomplete="off" id="txtAplicacion" name="txtAplicacion" class="form-control" />
+                                <input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3 tribuContainer">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Jefe de equipo/Experto aplicación User IT</h5>
+                                <input type="text" value="" maxlength="100" autocomplete="off" id="txtLiderTribu" name="txtLiderTribu" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3 usuarioContainer">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Líder usuario/Owner</h5>
+                                <input type="text" value="" maxlength="100" autocomplete="off" id="txtProduct" name="txtProduct" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Estado de la aplicación                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </h5>
+                                <select id="cbFiltroEstado" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Unidad de Fondeo: </h5>
+                                <select id="cbUnidadFondeo" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <br />
+                            <div class="text-right">
+                                <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="RefrescarListado()">
+                                    <span class="count-text">Buscar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="row gutter-xs">
+                            <div class="col-md-12">
+
+                            </div>
+                        </div>*@
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    @*<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="RefrescarListado()">
+            <span class="count-text">Buscar</span>
+        </a>*@
+    @*<a id="btnMassiveUpdate" class="btn btn-primary" href="javascript: void(0)">
+            <span class="icon icon-refresh"></span>
+            <span class="count-text">Asignación masiva OLD</span>
+        </a>*@
+    <a id="btnMassiveUpdateNew" class="btn btn-primary" href="javascript: void(0)">
+        <span class="icon icon-refresh"></span>
+        <span class="count-text">Asignación masiva</span>
+    </a>
+
+
+    @*jrodriguez - 2021.10.01*@
+    @*<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+            <span class="icon icon-external-link"></span>
+            <span class="count-text">Exportar</span>
+        </a>
+        <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarResponsables()">
+            <span class="icon icon-external-link"></span>
+            <span class="count-text">Exportar responsables</span>
+        </a>*@
+
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="icon icon-external-link"></span>
+            <span class="count-text">Exportar</span>&nbsp;
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" style="min-width: initial">
+            <li><a href="javascript:ExportarInfo()" class="text-center">Aplicaciones</a></li>
+            <li><a href="javascript:ExportarResponsables()" class="text-center">Responsables</a></li>
+            <li><a href="javascript:ExportarResponsablesPortafolio()" class="text-center">Portafolio</a></li>
+        </ul>
+    </div>
+
+
+</div>
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de Aplicaciones</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistro" class="table table-striped table-nowrap dataTable" data-mobile-responsive="true" data-unique-id="Id">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="3%">#</th>
+                            <th data-field="CodigoAPTStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="5%" data-sort-name="CodigoAPT">Código</th>
+                            <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="15%">Nombre</th>
+                            <th data-field="CriticidadToString" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="15%">Criticidad</th>
+                            <th data-field="GestionadoPor" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="GestionadoPor" data-width="15%">Gestionado por</th>
+                            <th data-field="FechaRegistroProcedenciaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion" data-width="10%">Registrado por</th>
+                            <th data-field="FlagRelacionarToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion" data-width="10%">Relacionar con<br /> tecnologías</th>
+                            <th data-field="Agrupacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion" data-width="10%">Agrupación</th>
+                            <th data-field="UnidadFondeo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UnidadFondeo" data-width="5%">Unidad de<br /> Fondeo</th>
+                            <th data-formatter="opcionesFormatter" data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="center" data-width="10%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hdFiltro" id="hdFiltro" value="" />
+</div>
+<!--Modal Editar Responsables (Aplicacion)-->
+<div id="MdAddOrEditModal" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formRegistro">
+                    <input type="hidden" id="hdId" name="hdId" value="0" />
+                    <div class="form-group">
+                        <label class="control-label">
+                            Tipo:
+                        </label>
+                        <select id="ddlTipo" name="ddlTipo" class="form-control inputMatricula"></select>
+                    </div>
+                    <div class="form-group respContainerPrincipal">
+                        <label class="control-label">
+                            Nombre del responsable:
+                        </label>
+                        <input id="txtMatricula" name="txtMatricula" class="form-control inputMatricula" type="text">
+                        <input id="hdMatriculaResponsablePrincipal" name="hdMatriculaResponsablePrincipal" type="hidden" value="">
+                        <input id="hdCorreoResponsablePrincipal" name="hdCorreoResponsablePrincipal" type="hidden" value="">
+                        @*<div class="input-group">
+
+                                <span class="input-group-btn">
+                                    <button id="txtAddResponsable" class="btn btn-primary" onclick="addItem()" type="button">Agregar Responsable</button>
+                                </span>
+                            </div>*@
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <table id="tblApExp" class="table" data-mobile-responsive="true" data-unique-id="AplicacionExpertoId">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                    <th data-field="Matricula" data-halign="center" data-valign="middle" data-align="left">Matricula</th>
+                                    <th data-field="Nombres" data-halign="center" data-valign="middle" data-align="left">Nombres</th>
+                                    <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="left">Estado</th>
+                                    <th data-field="TipoExpertoToString" data-halign="center" data-valign="middle" data-align="left">Tipo</th>
+                                    <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="left">Creado por</th>
+                                    <th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="left">Fecha creación</th>
+                                    <th data-formatter="opcionesFormatterApExp" data-field="Id" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <input type="text" id="msjValid" name="msjValid" class="form-control guardarExperto" style="display:none;" />
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <button id="btnGuardarRegistro" type="button" class="btn btn-primary" onclick="GuardarRegistro()" data-loading-text="Procesando...">Guardar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Editar Responsables (Aplicacion)-->
+<!--Modal Editar Responsables (Asignacion masiva)-->
+<div id="mdResponsables" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Configurar responsables</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formResponsables">
+                    <input type="hidden" id="hdId" name="hdId" value="0" />
+                    <div class="form-group">
+                        <label class="control-label">Tipo:</label>
+                        <select id="ddlTipoResponsable" name="ddlTipoResponsable" class="form-control input-resp"></select>
+                    </div>
+                    <div class="form-group respContainer">
+                        <label class="control-label">
+                            Nombre del responsable:
+                        </label>
+                        <input id="txtMatriculaResponsable" name="txtMatriculaResponsable" class="form-control input-resp" type="text">
+                        <input id="hdMatriculaResponsable" name="hdMatriculaResponsable" type="hidden" value="">
+                        <input id="hdCorreoResponsable" name="hdCorreoResponsable" type="hidden" value="">
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <table id="tblAplicacionExpertos"
+                               class="table"
+                               data-mobile-responsive="true"
+                               data-toggle="table"
+                               data-select-item-name="selectItemName"
+                               data-unique-id="Id"
+                               data-pagination="true"
+                               data-page-number="1"
+                               data-page-size="10"
+                               data-checkbox-header="false"
+                               data-click-to-select="true">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="cbFormatter" data-field="ItemSelected" data-halign="center" data-valign="middle" data-align="center"></th>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                    <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left">Código APT</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                                    <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="left">Estado</th>
+                                    <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="left">Creado por</th>
+                                    <th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="left">Fecha creación</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <input type="text" id="msgTableExpertos" name="msgTableExpertos" class="form-control input-tbl" style="display:none;" />
+                    </div>
+                    @*<div class="form-inline">
+                            <div class="form-group">
+                                <button id="btnSaveResponsables" type="button" class="btn btn-primary" data-loading-text="Procesando...">Guardar</button>
+                            </div>
+                        </div>*@
+                    <div class="form-group">
+                        <button id="btnSaveResponsables" type="button" class="btn btn-primary" data-loading-text="Procesando...">Guardar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Editar Responsables (Asignacion masiva)-->
+
+<div id="mdResponsablesNew" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Asignación masiva de responsables</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formResponsablesNew">
+                    <input type="hidden" id="hdId" name="hdId" value="0" />
+                    <div class="form-group">
+                        <label class="control-label">Tipo:</label>
+                        <select id="ddlTipoResponsableNew" name="ddlTipoResponsableNew" class="form-control"></select>
+                    </div>
+                    <div class="form-group respContainerNew">
+                        <label class="control-label">
+                            Nombre del responsable:
+                        </label>
+                        <input id="txtMatriculaResponsableNew" name="txtMatriculaResponsableNew" class="form-control" type="text">
+                        <input id="hdMatriculaResponsableNew" name="hdMatriculaResponsableNew" type="hidden" value="">
+                        <input id="hdCorreoResponsableNew" name="hdCorreoResponsableNew" type="hidden" value="">
+                    </div>
+                    <div class="form-group">
+                        <button id="btnSaveResponsablesNew" type="button" class="btn btn-primary" data-loading-text="Procesando...">Guardar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Editar Responsables (Asignacion masiva NEW)-->
+<!--Modal Editar Etiqueta (Aplicacion)-->
+<div id="EditEtiquetaModal" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Editar Agrupación</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formEtiqueta">
+                    <input type="hidden" id="hdId" name="hdId" value="0" />
+                    <div class="form-group">
+                        <label class="control-label">
+                            Agrupación:
+                        </label>
+                        <select id="ddlEtiqueta" name="ddlEtiqueta" class="form-control inputMatricula"></select>
+                    </div>
+
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <button id="btnGuardarRegistro" type="button" class="btn btn-primary" onclick="GuardarEtiqueta()" data-loading-text="Procesando...">Guardar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Editar Etiqueta (Aplicacion)-->
+<!--Modal Editar Unidad Fondeo (Aplicacion)-->
+<div id="EditUnidadFondeoModal" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Editar Unidad de Fondeo</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formUnidadFondeo">
+                    <input type="hidden" id="hdId" name="hdId" value="0" />
+                    <div class="form-group">
+                        <label class="control-label">
+                            Unidad de Fondeo:
+                        </label>
+                        <select id="ddlUnidadFondeo" name="ddlUnidadFondeo" class="form-control inputMatricula"></select>
+                    </div>
+
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <button id="btnGuardarRegistro" type="button" class="btn btn-primary" onclick="GuardarUnidadFondeo()" data-loading-text="Procesando...">Guardar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Editar Etiqueta (Aplicacion)-->
+
+<!--Modal Editar Componentes (Aplicacion)-->
+<div id="MdAddOrEditModal_Componentes" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm_Componentes"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formRegistro_Componentes">
+                    <input type="hidden" id="hdId_Componente" name="hdId_Componente" value="0" />
+                    <div class="col-xs-12 col-md-3 col-sm-6 containerFiltro">
+                        <div class="text-left" data-toggle="match-height">
+                            <h5>Componente: </h5>
+                            <input type="text" name="txtEquipo" id="txtEquipo" class="form-control" value="" maxlength="80" />
+                            <input type="hidden" value="0" id="hEquipoId" name="hEquipoId" />
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-3 col-sm-6 containerFiltro_EquipoRelacionado">
+                        <div class="text-left" data-toggle="match-height">
+                            <h5>Conecta con: </h5>
+                            <input type="text" name="txtEquipo_Relacionado" id="txtEquipo_Relacionado" class="form-control" value="" maxlength="80" />
+                            <input type="hidden" value="0" id="hEquipoId_Relacionado" name="hEquipoId_Relacionado" />
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-3 col-sm-6" style="padding-top: 3%;">
+                        <div class="input-group">
+                             <button id="btnAddRelacionComponente" class="btn btn-primary" onclick="addItem_Componente()" type="button">Agregar conexión</button>
+                        </div>
+                    </div>
+                    <div class="form-group" style="padding-top: 9%;">
+                        <table id="tblApp_Componentes" class="table" data-mobile-responsive="true" data-unique-id="RelacionReglasPorAppId">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left">Componente</th>
+                                    <th data-field="Nombre_EquipoRelacion" data-halign="center" data-valign="middle" data-align="left">Conecta con</th>
+                                    <th data-field="Estado" data-halign="center" data-valign="middle" data-align="left">Estado</th>
+                                    <th data-field="CreadoPor" data-halign="center" data-valign="middle" data-align="left">Creado por</th>
+                                    <th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="left">Fecha creación</th>
+                                    <th data-formatter="opcionesFormatterApp_Componentes" data-field="RelacionReglasPorAppId" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <input type="text" id="msjValid" name="msjValid" class="form-control guardarExperto" style="display:none;" />
+                    </div>
+                    @*<div class="form-inline">
+                        <div class="form-group">
+                            <button id="btnGuardarRegistro_Componentes" type="button" class="btn btn-primary" onclick="GuardarRegistro_Componentes()" data-loading-text="Procesando...">Guardar</button>
+                        </div>
+                    </div>*@
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Editar Componentes (Aplicacion)-->
+<script src="~/app/aplicacion.js?v=1.5.1"></script>

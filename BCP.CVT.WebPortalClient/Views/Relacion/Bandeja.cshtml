@@ -1,0 +1,1262 @@
+﻿
+@{
+    ViewBag.Title1 = "Bandeja de gestión de relaciones";
+    ViewBag.Title2 = "Relaciones y formatos";
+    ViewBag.Title3 = "Bandeja de aprobación y desaprobación de relaciones";
+}
+@using BCP.CVT.Cross
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<style>
+    .my-error-class-custom {
+        color: #dc3545;
+        font-weight: bold !important;
+        font-size: 12px;
+        display: inherit;
+    }
+
+    .fixed-table-container thead th .th-inner {
+        line-height: 1.5;
+    }
+
+    #divSideRight {
+        background-color: #ee8809 !important;
+        /*border-radius: 4px;*/
+        left: 22px;
+        width: 90%;
+    }
+
+    .table {
+        background-color: #fff !important;
+    }
+
+    .legend {
+        margin: 0px !important;
+    }
+
+    .list-group-item-heading {
+        font-size: 11px;
+    }
+
+    .pull-left {
+        float: right !important;
+    }
+
+    .indice-width {
+        min-width: 50px;
+    }
+
+    .tecnologia-width {
+        min-width: 150px;
+    }
+
+    .relevancia-width {
+        min-width: 50px;
+    }
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.8;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .list-group-item.active {
+        background-color: #ee8809 !important;
+        border-color: #ee8809 !important;
+    }
+
+    .table {
+        font-size: 11px !important;
+    }
+
+    /* The sidepanel menu */
+    .sidepanel {
+        /*height: 800px;  Specify a height */
+        width: 0; /* 0 width - change this with JavaScript */
+        /*position: fixed;*/ /* Stay in place */
+        /*z-index: 1;*/ /* Stay on top */
+        /*top: 0;
+        left: 0;*/
+        background-color: #ee8809; /* Black*/
+        overflow-x: hidden; /* Disable horizontal scroll */
+        padding-top: 0px; /* Place content 60px from the top */
+        transition: 0.5s; /* 0.5 second transition effect to slide in the sidepanel */
+        /*border-radius: 4px;*/
+    }
+
+        /* The sidepanel links */
+        .sidepanel a {
+            padding: 5px 8px 5px 8px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+            /* When you mouse over the navigation links, change their color */
+            .sidepanel a:hover {
+                color: #ee8809;
+            }
+
+        /* Position and style the close button (top right corner) */
+        .sidepanel .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+    /* Style the button that is used to open the sidepanel */
+    .openbtn {
+        font-size: 10px;
+        cursor: pointer;
+        background-color: #ee8809;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+    }
+
+        .openbtn:hover {
+            background-color: #444;
+            /*color: #ee8809;*/
+        }
+
+    .fixed-table-pagination .pagination-detail {
+        color: #fff;
+    }
+    /*.comboComponente{
+        width:100%;
+    }
+    .opcionEditable{
+        width:90%;*/
+        /*position: relative;*/
+        /*top: -34px
+    }*/
+</style>
+
+@*<div class="panel panel-body text-left" style="background-color: transparent;" data-toggle="match-height">
+        <a id="btnAgregar" class="btn btn-primary btn-width-custom" href="/Relacion/Nueva">
+            <span class="icon icon-plus"></span>
+            <span class="count-text">Agregar</span>
+        </a>
+        <a id="btnExportar" class="btn btn-primary btn-width-custom" href="javascript: void(0)" title="Exportar relaciones">
+            <span class="icon icon-download"></span>
+            <span class="count-text">Exportar</span>
+        </a>
+        <a id="btnActualizar" class="btn btn-primary btn-width-custom" href="/Relacion/Actualizacion">
+            <span class="icon icon-refresh"></span>
+            <span class="count-text">Actualizar</span>
+        </a>
+    </div>*@
+
+<div class="card">
+    <div id="filters-box" class="card-body collapse">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Aplicación: </h5>
+                                    <div class="input-with-icon filAppContainer">
+                                        <input id="txtFilApp" name="txtFilApp" class="form-control input-thick pill input-with-icon-search" type="text">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                    <input type="hidden" id="hdFilAppId" name="hdFilAppId" value="" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Equipo / Activo TI: </h5>
+                                    <div class="input-with-icon filCompContainer">
+                                        <input id="txtFilComp" name="txtFilComp" class="form-control input-thick pill input-with-icon-search" type="text">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                    <input type="hidden" id="hdFilCompId" name="hdFilCompId" value="0" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tecnología: </h5>
+                                    <div class="input-with-icon filTecContainer">
+                                        <input id="txtFilTecnologia" name="txtFilTecnologia" class="form-control input-thick pill input-with-icon-search" type="text">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                    <input type="hidden" id="hdFilTecnologiaId" name="hdFilTecnologiaId" value="0" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-4">
+                                <h5>Estado: </h5>
+                                <select id="cbEstadoFiltro" name="cbEstadoFiltro" class="form-control" multiple="multiple"></select>
+                            </div>
+                            <div class="col-xs-3 col-md-4">
+                                <h5>Ambiente: </h5>
+                                <select id="ddlAmbienteFiltro" name="ddlAmbienteFiltro" class="form-control" multiple="multiple"></select>
+                            </div>
+                            <div class="col-xs-3 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Fecha consulta: </h5>
+                                    <div class="input-group date" id="dpFecConsulta-btn">
+                                        <input type="text" id="txtFilFecha" name="txtFilFecha" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                    </div>
+                                    @*<div class="input-group date" id="dpFecConsulta-btn">
+                                                <span class="input-group-addon">
+                                                    <span class="icon icon-calendar"></span>
+                                                </span>
+                                                <input type="text" id="txtFilFecha" name="txtFilFecha" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        </div>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            @*<div class="col-xs-3 col-md-4">
+                                    <h5>Estado: </h5>
+                                    <select id="cbEstadoFiltro" name="cbEstadoFiltro" class="form-control" multiple="multiple"></select>
+                                </div>
+                                <div class="col-xs-3 col-md-4">
+                                    <h5>Ambiente: </h5>
+                                    <select id="ddlAmbienteFiltro" name="ddlAmbienteFiltro" class="form-control" multiple="multiple"></select>
+                                </div>*@
+                            <div class="col-md-8">
+                            </div>
+                            <div class="col-xs-3 col-md-4">
+                                <h5>&nbsp;</h5>
+                                <div class="text-right" data-toggle="match-height">
+                                    <button id="btnBuscar" type="button" class="btn btn-primary" title="Buscar relaciones">
+                                        <span class="icon icon-search"></span>
+                                        Buscar
+                                    </button>
+                                    <button id="btnExportar" type="button" class="btn btn-primary" title="Exportar relaciones">
+                                        <span class="icon icon-download"></span>
+                                        Exportar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div id="menu-div" class="row gutter-xs" style="margin-top:15px;">
+    <div id="divSideLeft" class="col-md-1">
+        <button id="btnSidebar" class="openbtn" title="Selecciona una categoría">&#9776;</button>
+        <div id="mySidepanel" class="sidepanel list-group">
+            <a id="sideFil14" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-cubes icon-1x"></span>
+                <h4 class="list-group-item-heading">Relaciones entre Aplicaciones</h4>
+            </a>
+            <a id="sideFil09" href="javascript: void(0)" class="list-group-item active">
+                <span class="icon icon-globe icon-1x"></span>
+                <h4 class="list-group-item-heading">Relaciones de aplicación con componentes</h4>
+            </a>
+            <a id="sideFil01" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-desktop icon-1x"></span>
+                <h4 class="list-group-item-heading">Servidor</h4>
+            </a>
+            <a id="sideFil02" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-shield icon-1x"></span>
+                <h4 class="list-group-item-heading">Application Server</h4>
+            </a>
+            <a id="sideFil03" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-cog icon-1x"></span>
+                <h4 class="list-group-item-heading">Web Server</h4>
+            </a>
+            <a id="sideFil04" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-building icon-1x"></span>
+                <h4 class="list-group-item-heading">Databases</h4>
+            </a>
+            <a id="sideFil05" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-bolt icon-1x"></span>
+                <h4 class="list-group-item-heading">Middleware</h4>
+            </a>
+            <a id="sideFil06" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-refresh icon-1x"></span>
+                <h4 class="list-group-item-heading">Browser</h4>
+            </a>
+            <a id="sideFil07" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-code icon-1x"></span>
+                <h4 class="list-group-item-heading">Lenguajes de programación e IDEs</h4>
+            </a>
+            <a id="sideFil08" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-cloud icon-1x"></span>
+                <h4 class="list-group-item-heading">Servicios en la nube</h4>
+            </a>
+            <a id="sideFil11" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-chain icon-1x"></span>
+                <h4 class="list-group-item-heading">Flujos Broker</h4>
+            </a>
+            <a id="sideFil10" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-terminal icon-1x"></span>
+                <h4 class="list-group-item-heading">Todas las tecnologías</h4>
+            </a>
+            <a id="sideFil12" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-certificate icon-1x"></span>
+                <h4 class="list-group-item-heading">Certificados Digitales (CA)</h4>
+            </a>
+            <a id="sideFil13" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-cogs icon-1x"></span>
+                <h4 class="list-group-item-heading">Apis</h4>
+            </a>
+            <a id="sideFil15" href="javascript: void(0)" class="list-group-item">
+                <span class="icon icon-book icon-1x"></span>
+                <h4 class="list-group-item-heading">Certificados Digitales & Client Secrets (Cloud) </h4>
+            </a>
+        </div>
+    </div>
+    <div id="divSideRight" class="col-md-11">
+        <div class="card">
+            <div class="card-body">
+                <div id="toolbar">
+                    <button id="btnNewRelacion" class="btn btn-default" title="Nueva relación">
+                        <span class="icon icon-plus"></span>
+                    </button>
+                    <button id="btnNewRelacionApp" class="btn btn-default" title="Nueva relación">
+                        <span class="icon icon-plus"></span>
+                    </button>
+                    <a id="btnFilters" href="#filters-box" class="btn btn-default" data-toggle="collapse" title="Mostrar filtros">
+                        <span class="icon icon-filter"></span>
+                    </a>
+                    <button id="btnAuditoria" class="btn btn-default" title="Mostrar auditoría">
+                        <span class="icon icon-list"></span>
+                    </button>
+                </div>
+                <table id="tblRegistro"
+                       class="table"
+                       data-mobile-responsive="true"
+                       data-unique-id="Id"
+                       data-toolbar="#toolbar"
+                       data-toggle="table">
+                    <caption id="cptRelaciones" class="caption text-left">
+                        Relaciones
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                            <th data-formatter="opcionesFormatter" data-field="RelacionId" data-halign="center" data-valign="middle" data-align="center">Acciones</th>
+                            <th data-field="CodigoAPT" data-valign="middle" data-align="center" data-width="30">Código <br /> aplicación</th>
+                            <th data-formatter="linkFormatter" data-field="AplicacionStr" data-halign="center" data-valign="middle" data-align="left" data-sort-name="Aplicacion">Aplicación</th>
+
+                            <th data-field="CodigoAptOrigen" data-valign="middle" data-align="center" data-visible="true" data-width="30">Código<br />aplicación</th>
+                            <th data-formatter="linkFormatterApps" data-field="NombreAptOrigen" data-visible="true" data-halign="center" data-valign="middle" data-align="left" data-sort-name="Aplicacion">Aplicación</th>
+
+                            <th data-field="CodigoAptDestino" data-valign="middle" data-align="center" data-visible="true" data-width="30">Código<br />aplicación<br />relacionada</th>
+                            <th data-formatter="linkFormatterApps" data-field="NombreAptDestino" data-visible="true" data-halign="center" data-valign="middle" data-align="left" data-sort-name="Aplicacion">Aplicación<br />relacionada</th>
+
+                            <th data-field="TipoStr" data-halign="center" data-valign="middle" data-align="left" data-sort-name="TipoId">Tipo</th>
+                            <th data-field="DescripcionTipoRelacion" data-halign="center" data-valign="middle" data-align="left" data-sort-name="TipoId">Tipo</th>
+                            <th data-field="Componente" data-halign="center" data-valign="middle" data-align="center" data-sort-name="Componente">Equipo / Activo TI</th>
+                            <th data-field="AmbienteStr" data-halign="center" data-valign="middle" data-align="center" data-sort-name="Ambiente">Ambiente</th>
+                            <th data-field="Tecnologia" data-halign="center" data-valign="middle" data-align="left" data-sort-name="Tecnologia">Tecnología</th>
+                            <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="center" data-sort-name="EstadoId">Estado</th>
+                            <th data-field="DescTipoRelacionComp" data-halign="center" data-valign="middle" data-align="center" data-sort-name="DescTipoRelacionComp">Tipo de Relación</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-visible="true" data-sort-name="FechaCreacion">F. Registro</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-visible="true" data-sort-name="UsuarioCreacion">Registrado por</th>
+                            <th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="center" data-visible="true" data-sort-name="FechaModificacion">F. última modificación</th>
+                            <th data-field="UsuarioModificacion" data-halign="center" data-valign="middle" data-align="center" data-visible="true" data-sort-name="UsuarioModificacion">Modificado por</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hdIdOptSideBar" id="hdIdOptSideBar" value="" />
+</div>
+
+<!--Modal Cambiar Estado (Tecnologia)-->
+<div class="modal fade" id="mdCambioEstado" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="exampleModalLabel">Cambiar Estado</h5>
+            </div>
+            <div class="modal-body">
+                <form id="formCambioEstado">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Estado Actual:
+                        </label>
+                        <input id="txtEstadoActual" class="form-control" type="text" name="txtEstadoActual" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Nuevo Estado:</label>
+                        <select id="cbNuevoEstado" name="cbNuevoEstado" class="form-control form-modal-cambioestado"></select>
+                    </div>
+                    <div class="form-group form-modal-cambioestado" style="display:none">
+                        <label class="control-label">Observación:</label>
+                        <textarea id="txtObservacion" name="txtObservacion" class="form-control form-modal-cambioestado textarea" rows="5" maxlength="250"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnGuardarEstado" type="button" class="btn btn-primary" onclick="GuardarNuevoEstado()" data-loading-text="Procesando...">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Cambiar Estado (Tecnologia)-->
+<!--Modal Aplicacion vinculada (Relacion)-->
+<div id="MdAppVin" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormAppVin">Aplicación relacionada</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAppVin">
+                    <div class="form-group">
+                        <label class="control-label">Tu aplicación: </label>
+                        <div class="input-with-icon appBaseContainer">
+                            <input id="txtAppBase" name="txtAppBase" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="">
+                            <span class="icon icon-search input-icon"></span>
+                        </div>
+                        <input type="hidden" name="hdAppBaseId" id="hdAppBaseId" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Relacionar con: </label>
+                        <div class="input-with-icon appVinculoContainer">
+                            <input id="txtAppVinculo" name="txtAppVinculo" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="">
+                            <span class="icon icon-search input-icon"></span>
+                        </div>
+                        <input type="hidden" name="hdAppVinculoId" id="hdAppVinculoId" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Equipo / Activo TI: </label>
+                        <select id="cbEquipoVin" name="cbEquipoVin" class="form-control">
+                            <option value="-1">-- Seleccione --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Recurso relacionado: </label>
+                        <textarea id="txtDetAppVin" name="txtDetAppVin" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegAppVin" class="btn btn-primary" onclick="guardarAplicacionVinculada()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Aplicacion vinculada (Relacion)-->
+<!--Modal Agregar tecnologia (Relacion)-->
+<div id="MdAddTec" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormAddTec">Agregar tecnología</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddTec">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Fabricante:
+                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el nombre del fabricante."></span>
+                                </label>
+                                <input id="txtFabricanteTec" class="form-control" type="text" name="txtFabricanteTec">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Nombre de la tecnología a estandarizar:
+                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el nombre con el cual será definido el estándar en el site de estándares de arquitectura TI."></span>
+                                </label>
+                                <input id="txtNomTec" class="form-control" type="text" name="txtNomTec" pos-tab="0">
+                                @*<input type="hidden" name="hIdTec" id="hIdTec" value="0" />
+                                    <input type="hidden" name="hActTec" id="hActTec" value=false />
+                                    <input type="hidden" name="hEstTec" id="hEstTec" value="0" />*@
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Versiones:
+                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica las versiones"></span>
+                                </label>
+                                <textarea id="txtVerTec" class="form-control" rows="2" name="txtVerTec"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Clave de la tecnología:
+                                </label>
+                                <input id="txtClaveTecnologia" class="form-control" type="text" name="txtClaveTecnologia" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            @*<div class="row gutter-xs">*@
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Dominio:
+                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el dominio"></span>
+                                </label>
+                                <select id="cbDomTec" name="cbDomTec" class="form-control">
+                                    <option value="-1">-- Seleccione --</option>
+                                </select>
+                            </div>
+                            @*</div>*@
+                            @*<div class="row gutter-xs">*@
+                            @*<div class="row"></div>*@
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Subdominio:
+                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el subdominio"></span>
+                                </label>
+                                <select id="txtSubTec" name="txtSubTec" class="form-control">
+                                    <option value="-1"> -- Seleccione -- </option>
+                                </select>
+                            </div>
+                            @*</div>*@
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegTec" class="btn btn-primary" onclick="guardarAddTec()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Agregar tecnologia (Relacion)-->
+<!--Modal Observar Solicitud-->
+<div id="mdOS" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title_modal"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formOS">
+                    <div class="form-group">
+                        <label class="control-label">Motivo de la eliminación:</label>
+                        <select id="ddlMotivo" name="ddlMotivo" class="form-control"></select>
+                    </div>
+                    <div class="form-group divObs" style="display:none;">
+                        <label class="control-label">Comentarios:</label>
+                        <textarea id="txtObs" name="txtObs" rows="8" class="form-control input-obs"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnOS" type="button" class="btn btn-primary" onclick="eliminarRelacion()" data-loading-text="Procesando..." title="Eliminar relación">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Observar Solicitud-->
+
+<div id="mdOSAppsElimi" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-titleAppsElimi" id="title_modal"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formOSAppsElimi">
+                    <div class="form-group">
+                        <label class="control-label">Motivo de la eliminación:</label>
+                        <select id="ddlMotivoAppsElimi" name="ddlMotivoAppsElimi" class="form-control"></select>
+                    </div>
+                    <div class="form-group divObs" style="display:none;">
+                        <label class="control-label">Comentarios:</label>
+                        <textarea id="txtObsAppsElimi" name="txtObsAppsElimi" rows="8" class="form-control input-obs"></textarea>
+                    </div>
+                    <input type="hidden" id="hdAplicacionIdAppsOrigenEli" name="hdAplicacionIdAppsOrigenEli" class="form-control" />
+                    <input type="hidden" id="hdAplicacionIdAppsDestinoEli" name="hdAplicacionIdAppsDestinoEli" class="form-control" />
+                    <input type="hidden" id="hdTipoRelacionAppsEli" name="hdTipoRelacionAppsEli" class="form-control" />
+                    <input type="hidden" id="hdRelacionIdEli" name="hdRelacionIdEli" class="form-control" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnOSAppsElimi" type="button" class="btn btn-primary" onclick="eliminarRelacionApps()" data-loading-text="Procesando..." title="Eliminar relación">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mdCambioEstadoAppsEst" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-titleAppsEst" id="exampleModalLabel">Cambiar Estado</h5>
+            </div>
+            <div class="modal-body">
+                <form id="formCambioEstadoAppsEst">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Estado Actual:
+                        </label>
+                        <input id="txtEstadoActualAppsEst" class="form-control" type="text" name="txtEstadoActualAppsEst" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Nuevo Estado:</label>
+                        <select id="cbNuevoEstadoAppsEst" name="cbNuevoEstadoAppsEst" class="form-control form-modal-cambioestado"></select>
+                    </div>
+                    <div class="form-group form-modal-cambioestado" style="display:none">
+                        <label class="control-label">Observación:</label>
+                        <textarea id="txtObservacionAppsEst" name="txtObservacionAppsEst" class="form-control form-modal-cambioestado textarea" rows="5" maxlength="250"></textarea>
+                    </div>
+                    <input type="hidden" id="hdAplicacionIdAppsOrigenEst" name="hdAplicacionIdAppsOrigenEst" class="form-control" />
+                    <input type="hidden" id="hdAplicacionIdAppsDestinoEst" name="hdAplicacionIdAppsDestinoEst" class="form-control" />
+                    <input type="hidden" id="hdTipoRelacionAppsEst" name="hdTipoRelacionAppsEli" class="form-control" />
+                    <input type="hidden" id="hdRelacionIdCambioEstado" name="hdRelacionIdCambioEstado" class="form-control" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnGuardarEstadoAppsEst" type="button" class="btn btn-primary" onclick="GuardarNuevoEstadoEst()" data-loading-text="Procesando...">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mdNewOrEditRelacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="titleModalRelacion">Nueva Relación</h5>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-search">
+                            <fieldset class="fieldset">
+                                <legend class="legend">Datos de la relación</legend>
+                                <div class="card-search-box">
+                                    <h3 id="titleForm">Equipo / Activo TI</h3>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <form id="formAddOrEdit">
+                                                <input type="hidden" id="hdId" name="hdId" value="0" />
+                                                <input type="hidden" id="hdRelacionDetalleId" name="hdRelacionDetalleId" value="0" />
+                                                <input type="hidden" id="hdTipoRelacionId" name="hdTipoRelacionId" value="0" />
+                                                <div class="form-group tipo-equipo" style="display:none">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label class="control-label">Tipo equipo: </label>
+                                                            <select id="ddlTipoEquipo" name="ddlTipoEquipo" class="form-control tipo-equipo"></select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label id="lblNameEquipo" class="control-label">Servidor: </label>
+                                                            <div class="form-group ui-widget equipoContainer">
+                                                                <input id="txtEquipo" name="txtEquipo" class="form-control tipo-equipo" type="text">
+                                                                <input type="hidden" id="hdEquipoId" name="hdEquipoId" class="form-control" />
+                                                                <input type="hidden" id="hdSubdominioIds" name="hdSubdominioIds" />
+                                                            </div>
+                                                            <span id="lblSuscripcion" class="lbl-custom"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-principal">
+                                                    <label class="control-label">Aplicación: </label>
+                                                    <div class="form-group ui-widget aplicacionContainer">
+                                                        <input id="txtAplicacion" name="txtAplicacion" class="form-control form-principal" type="text">
+                                                        <input type="hidden" id="hdAplicacionId" name="hdAplicacionId" class="form-control" />
+                                                    </div>
+                                                </div>
+
+                                                <!--<div class="row">
+                                                    <div class="col-md-2">
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div id="msjUsuarioRepetido" display="none">-->
+                                                @*<p style="color: #ff0000">Ya agrego al usuario buscado a la lista.</p>*@
+                                                <!--<label class="my-error-class">
+                                                                Esta aplicación esta en un proceso de eliminación y no se le puede crear una relación nueva.
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-1"></div>
+                                                </div>-->
+
+                                                <div class="form-group tipo-tecnologia">
+                                                    <label class="control-label">Tecnología: </label>
+                                                    @*<a class="" href="javascript:irModalTecnologia()" title="Ir a tecnología">
+                                                            [¿No encuentras la tecnología en el catálogo?]
+                                                        </a>*@
+                                                    <div class="form-group ui-widget tecnologiaContainer">
+                                                        <input id="txtTecnologia" name="txtTecnologia" class="form-control tipo-tecnologia ui-autocomplete-input" type="text">
+                                                        <input type="hidden" id="hdTecnologiaId" name="hdTecnologiaId" class="form-control" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group tipo-equipo tipo-aplicacion" style="display:none">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label class="control-label">Ambiente: </label>
+                                                            <select id="cbAmbiente" name="cbAmbiente" class="form-control tipo-equipo tipo-aplicacion"></select>
+                                                        </div>
+                                                        <div class="col-md-6 tipo-equipo tipo-funcion">
+                                                            <label class="control-label" style="display:block">Función: </label>
+                                                            <select id="ddlFuncion" name="ddlFuncion" class="form-control tipo-equipo tipo-funcion" multiple="multiple">
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group tipo-aplicacion" style="display:none">
+                                                    <label class="control-label">Relacionar con: </label>
+                                                    <div class="input-with-icon appVinculoContainer">
+                                                        <input id="txtAppVinculo" name="txtAppVinculo" class="form-control input-thick pill input-with-icon-search tipo-aplicacion" type="text">
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                    <input type="hidden" name="hdAppVinculoId" id="hdAppVinculoId" value="0" />
+                                                </div>
+                                                <div class="form-group tipo-aplicacion" style="display:none">
+                                                    <label class="control-label">Equipo / Activo TI: </label>
+                                                    <select id="cbEquipoVin" name="cbEquipoVin" class="form-control tipo-aplicacion">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group tipo-aplicacion" style="display:none">
+                                                    <label class="control-label">Recurso relacionado: </label>
+                                                    <textarea id="txtDetAppVin" name="txtDetAppVin" class="form-control tipo-aplicacion" rows="3"></textarea>
+                                                </div>
+                                                <div class="form-group tipo-tecnologia tipo-aplicacion">
+                                                    <label class="control-label">Relevancia: </label>
+                                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="ALTA: Componente crítico de la aplicación, cualquier fallo hace imposible el funcionamiento. MEDIA: Componente importante pero no crítico, la aplicación puede ejecutar sus funcionalidades principales con limitaciones. BAJA: Componente no crítico para la aplicación, cualquier incidente no afecta el funcionamiento de la aplicación."></span>
+                                                    <select id="cbRelevancia" name="cbRelevancia" class="form-control tipo-tecnologia tipo-aplicacion"></select>
+                                                </div>
+                                                <div class="form-group tipo-tecnologia data-extra">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label class="control-label">Dominio: </label>
+                                                            <input type="text" id="txtDominio" name="txtDominio" class="form-control tipo-tecnologia" readonly />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="control-label">Subdominio: </label>
+                                                            <input type="text" id="txtSubdominio" name="txtSubdominio" class="form-control tipo-tecnologia" readonly />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group tipo-tecnologia">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label class="control-label">Estado de Estandarización: </label>
+                                                            <input type="text" id="txtTipoTecnologia" name="txtTipoTecnologia" class="form-control tipo-tecnologia" readonly />
+                                                        </div>
+                                                        @*<div class="col-md-6">
+                                                                                                                                <label class="control-label">Fecha fin de soporte: </label>
+                                                            <input type="text" id="txtFechaFinSoporte" name="txtFechaFinSoporte" class="form-control tipo-tecnologia" readonly />
+                                                                                                        </div>*@
+                                                        <div class="col-md-6">
+                                                            <label class="control-label" style="display:block">Tipo de Relación: </label>
+                                                            <select id="ddlTipoRelacionComponenteTec" name="ddlTipoRelacionComponenteTec" class="form-control tipo-tecnologia"></select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @*<div class="form-group tipo-tecnologia">
+                                                        <label class="control-label">Indicador de obsolescencia: </label>
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <button type="button" class="btn btn-lg btn-danger btn-circle"></button>
+                                                                <label class="control-label">El dia de hoy</label>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <button type="button" class="btn btn-lg btn-danger btn-circle"></button>
+                                                                <label class="control-label">Dentro de 12 meses</label>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <button type="button" class="btn btn-danger btn-circle btn-xl"></button>
+                                                                <label class="control-label">Dentro de 24 meses</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>*@
+
+                                                <div class="form-group tipo-equipo input-relacion-app">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label class="control-label" style="display:block">Relación con la aplicación: </label>
+                                                            <div class="radio">
+                                                                <input id="rbItem01" type="radio" name="optradio" value="1" class="input-relacion-app tipo-equipo">
+                                                                <span id="spItem01">Relación primaria (el servidor es propio de la aplicación)</span>
+                                                            </div>
+                                                            <div class="radio">
+                                                                <input id="rbItem02" type="radio" name="optradio" value="0" class="input-relacion-app tipo-equipo">
+                                                                <span id="spItem02">Relación secundaria (el servidor le pertenece a otra aplicación)</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="control-label" style="display:block">Tipo de Relación: </label>
+                                                            <select id="ddlTipoRelacionComponenteEq" name="ddlTipoRelacionComponenteEq" class="form-control tipo-equipo"></select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tipo-equipo" style="display:none">
+                                                    <label class="control-label">Seleccione las tecnologías que utiliza su aplicación: </label>
+                                                    <table id="tblRegistroTecnologia" class="table" data-mobile-responsive="true" data-unique-id="Id" data-page-size="3000" data-page-number="1">
+                                                        <thead>
+                                                            <tr>
+                                                                <th data-field="tblRegistroTecnologia" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                                                <th data-field="FlagSeleccionado" data-halign="center" data-valign="middle" data-align="left" data-checkbox="true"></th>
+                                                                <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left">Tecnología</th>
+                                                                <th data-formatter="relevanciaFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center">Relevancia</th>
+                                                                @*<th data-formatter="componenteFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center">Componente</th>*@
+                                                                <th data-formatter="componente2Formatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center"> Componente</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                    <input type="text" style="display:none" id="txtCantidadTecnologia" name="txtCantidadTecnologia" class="form-control" />
+                                                </div>
+                                                @*<div class="tipo-aprobar form-group permiso-aprobar">
+                                                        <label class="control-label">Estado de Aprobación:</label>
+                                                        <select id="cbEstado" name="cbEstado" class="form-control form-aprobar permiso-aprobar"></select>
+                                                    </div>*@
+                                                <input type="hidden" id="hdEstadoId" name="hdEstadoId" class="form-control" />
+                                            </form>
+                                        </div>
+                                    </div>
+                                    @*<div class="row">
+                                            <div class="col-md-12 text-right">
+                                                <button id="btnRegistrar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Registrar</button>
+                                            </div>
+                                        </div>*@
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button id="btnRegistrar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mdMessageRemove" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:4%;">
+                <h5 class="modal-title col-md-11 col-xs-11" id="title_modal">Mensaje de advertencia - Eliminación de relaciones</h5>
+                <button type="button" class="close col-md-1 col-xs-1" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Tu aplicación es la última asociada al servidor, el flujo normal implica que solicites la baja del servidor ya que eres la única aplicación relacionada. Esta coordinación se debe hacer con el equipo de <strong>Aprovisionamiento</strong>
+                    <br /> <br />
+                    Una vez que el servidor se haya dado de baja, CVT suspenderá la relación y entrará en un periodo de cuarentena por <span id="periodoCuarentena"></span> días, luego del cual se eliminará.
+                    <br /> <br />
+                    Si es que tienes dudas u observaciones, contáctate con: <a href="mailto:GestionDeObsolescenciaTecnologica@bcp.com.pe">GestionDeObsolescenciaTecnologica@bcp.com.pe.</a>
+                    <span id="mjeAdmin" style="display:none">
+                        <br /> <br />
+                        Como eres administrador del portafolio puedes eliminar la relación. Presiona en el botón continuar para realizar la acción.
+                    </span>
+                </p>
+            </div>
+            <div class="modal-footer" id="mdMessageFot">
+                <button id="btnContinuarR" class="btn btn-primary" type="button">Continuar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="mdNewOrEditCertificadoD" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="titleModalCertificadoD">Relación</h5>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-search">
+                            <fieldset class="fieldset">
+                                <legend class="legend">Datos de la relación</legend>
+                                <div class="card-search-box">
+                                    <h3 id="titleForm">Certificados Digitales (CA)</h3>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <form id="formAddOrEditCD">
+                                                <div class="form-group tipo-equipo" style="display:none">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <label id="lblNameEquipoCD" class="control-label">Nombre: </label>
+                                                            <div class="form-group ui-widget equipoContainer">
+                                                                <input id="txtEquipoCD" name="txtEquipoCD" class="form-control tipo-equipo" type="text" readonly>
+                                                            </div>
+                                                            <span id="lblSuscripcionCD" class="lbl-custom"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-principal">
+                                                    <label class="control-label">Aplicación: </label>
+                                                    <div class="form-group ui-widget aplicacionContainer">
+                                                        <input id="txtAplicacionCD" name="txtAplicacionCD" class="form-control form-principal" type="text" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-principal">
+                                                    <label class="control-label">Ambiente: </label>
+                                                    <div class="form-group ui-widget aplicacionContainer">
+                                                        <input id="txtAmbienteCD" name="txtAmbienteCD" class="form-control form-principal" type="text" readonly>
+                                                    </div>
+                                                </div>
+
+
+
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mdNewOrEditRelacionApps" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="titleModalRelacionApps">Nueva Relación</h5>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-search">
+                            <fieldset class="fieldset">
+                                <legend class="legend">Datos de la relación</legend>
+                                <div class="card-search-box">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <form id="formAddOrEditApps">
+
+                                                <div class="form-group form-principal">
+                                                    <label class="control-label">Aplicación: </label>
+                                                    <div class="form-group ui-widget OrigenaplicacionContainer">
+                                                        <input id="txtAplicacionAppsOrigen" name="txtAplicacionAppsOrigen" class="form-control form-principal" type="text">
+                                                        <input type="hidden" id="hdAplicacionIdAppsOrigen" name="hdAplicacionIdAppsOrigen" class="form-control" />
+                                                        <input type="hidden" id="hdAplicacionDesAppsOrigen" name="hdAplicacionDesAppsOrigen" class="form-control" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group form-principal">
+                                                    <label class="control-label">Aplicación relacionada: </label>
+                                                    <div class="form-group ui-widget DestinoaplicacionContainer">
+                                                        <input id="txtAplicacionAppsDestino" name="txtAplicacionAppsDestino" class="form-control form-principal" type="text">
+                                                        <input type="hidden" id="hdAplicacionIdAppsDestino" name="hdAplicacionIdAppsDestino" class="form-control" />
+                                                        <input type="hidden" id="hdAplicacionDesAppsDestino" name="hdAplicacionDesAppsDestino" class="form-control" />
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="form-group form-principal">
+                                                    <label class="control-label">Tipo de Relacionamiento: </label>
+                                                    <div class="form-group ui-widget TipoRelacionContainer">
+                                                        <select id="cbTipoRelacionApps" name="cbTipoRelacionApps" class="form-control">
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <input type="hidden" id="hdEstadoIdApps" name="hdEstadoIdApps" class="form-control" />
+                                                <input type="hidden" id="hdRelacionIdApps" name="hdRelacionIdApps" class="form-control" />
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button id="btnRegistrarApps" class="btn btn-primary" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mdFechaCuarentena" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:4%;">
+                <h5 class="modal-title col-md-11 col-xs-11" id="title_modal">Mensaje informativo - Fecha de cuarentena</h5>
+                <button type="button" class="close col-md-1 col-xs-1" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    La relacion de la aplicación <span id="nombreAplicacion"></span> se encuentra <strong>suspendida</strong>.
+                    <br /> <br />
+                    Esta en un periodo de cuarentena antes de poder ser eliminado completamente. La fecha de inicio de cuarentena fue el  <span id="inicioCuarentena"></span> y la fecha final de cuarentena es <span id="finCuarentena"></span>.
+                    <br /> <br />
+                    Si es que tienes dudas u observaciones, contáctate con: <a href="mailto:GestionDeObsolescenciaTecnologica@bcp.com.pe">GestionDeObsolescenciaTecnologica@bcp.com.pe.</a>
+
+                </p>
+            </div>
+            <div class="modal-footer" id="mdMessageFot">
+                <button class="btn btn-primary" type="button" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="mdNewOrEditApi" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="titleModalApi">Relación</h5>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-search">
+                            <fieldset class="fieldset">
+                                <legend class="legend">Datos de la relación</legend>
+                                <div class="card-search-box">
+                                    <h3 id="titleForm">API</h3>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <form id="formAddOrEditApi">
+                                                <div class="form-group form-principal">
+                                                    <label class="control-label">Aplicación: </label>
+                                                    <div class="form-group ui-widget aplicacionContainer">
+                                                        <input id="txtAplicacionApi" name="txtAplicacionApi" class="form-control form-principal" type="text" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-principal">
+                                                    <label id="lblNameEquipoApi" class="control-label">Equipo / Activo TI: </label>
+                                                    <div class="form-group ui-widget aplicacionContainer">
+                                                        <input id="txtEquipoApi" name="txtEquipoApi" class="form-control form-principal" type="text" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-principal">
+                                                    <label class="control-label">Ambiente: </label>
+                                                    <div class="form-group ui-widget aplicacionContainer">
+                                                        <input id="txtAmbienteApi" name="txtAmbienteApi" class="form-control form-principal" type="text" readonly>
+                                                    </div>
+                                                </div>
+
+
+
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="mdNewOrEditClientSecret" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg-1" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="titleModalClientSecret">Relación</h5>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-search">
+                            <fieldset class="fieldset">
+                                <legend class="legend">Datos de la relación</legend>
+                                <div class="card-search-box">
+                                    <h3 id="titleForm">Certificados Digitales & Client Secrets (Cloud)</h3>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <form id="formAddOrEditCS">
+                                                <div class="form-group form-principal">
+                                                    <label id="lblNameEquipoCS" class="control-label">Nombre: </label>
+                                                    <div class="form-group ui-widget equipoContainer">
+                                                        <input id="txtEquipoCS" name="txtEquipoCS" class="form-control form-principal" type="text" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-principal">
+                                                    <label class="control-label">Aplicación: </label>
+                                                    <div class="form-group ui-widget aplicacionContainer">
+                                                        <input id="txtAplicacionCS" name="txtAplicacionCS" class="form-control form-principal" type="text" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-principal">
+                                                    <label class="control-label">Ambiente: </label>
+                                                    <div class="form-group ui-widget aplicacionContainer">
+                                                        <input id="txtAmbienteCS" name="txtAmbienteCS" class="form-control form-principal" type="text" readonly>
+                                                    </div>
+                                                </div>
+
+
+
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    let TRUE_TEXT = "TRUE";
+    var objPermiso = {
+        Crear: "@ViewData.Eval("Permisos.Crear")".toString().toUpperCase() == TRUE_TEXT,
+        Editar: "@ViewData.Eval("Permisos.Editar")".toString().toUpperCase() == TRUE_TEXT,
+        Eliminar: "@ViewData.Eval("Permisos.Eliminar")".toString().toUpperCase() == TRUE_TEXT,
+        Exportar: "@ViewData.Eval("Permisos.Exportar")".toString().toUpperCase() == TRUE_TEXT,
+        Aprobar: "@ViewData.Eval("Permisos.Aprobar")".toString().toUpperCase() == TRUE_TEXT
+    };
+    var FLAG_USUARIO_APROBADOR = USUARIO.FlagAprobador;//objPermiso.Aprobar||false;
+    //CargarPermisos(objPermiso);
+
+    const TIPO_RELACION = {
+        ALL: -1,
+        EQUIPO: @Html.Raw((int)ETipoRelacion.Equipo),
+        TECNOLOGIA: @Html.Raw((int)ETipoRelacion.Tecnologia),
+        APLICACION: @Html.Raw((int)ETipoRelacion.Aplicacion),
+        SERVICIO_NUBE: @Html.Raw((int)ETipoRelacion.ServicioNube),
+        SERVICIO_BROKER: @Html.Raw((int)ETipoRelacion.ServicioBroker),
+        API: @Html.Raw((int)ETipoRelacion.Api),
+        CLIENT_SECRET:@Html.Raw((int)ETipoRelacion.ClientSecrets),
+    };
+
+    const PERFIL_ADMIN = @Html.Raw((int)EPerfilBCP.Administrador);
+</script>
+
+<script src="~/app/Relaciones/bandejaAprobacionRelacion.js?v=2.2.10"></script>

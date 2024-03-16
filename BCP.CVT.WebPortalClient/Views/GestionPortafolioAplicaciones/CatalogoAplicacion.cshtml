@@ -1,0 +1,369 @@
+﻿@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Catálogo de Aplicaciones";
+	ViewBag.Title2 = "Gestión de Portafolio";
+	ViewBag.Title3 = "Catálogo de Aplicaciones";
+
+	int PaginaActual = (int)ViewBag.PaginaActual;
+	int PaginaTamanio = (int)ViewBag.PaginaTamanio;
+	string nombreApp = (string)ViewBag.Nombre_App;
+	int paginaActual = (int)ViewBag.PaginaActual;
+	int paginaTamanio = (int)ViewBag.PaginaTamanio;
+}
+@using BCP.CVT.Cross
+<style>
+	.opcionesStyle {
+		width: 600px;
+	}
+
+	.table {
+		font-size: 11px !important;
+	}
+</style>
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+	<div class="card-body">
+		<div class="card-search">
+			<fieldset class="fieldset">
+				<legend class="legend">Filtro de búsqueda</legend>
+				<div class="card-search-box">
+					<div class="row gutter-xs">
+						<div class="col-xs-3 col-md-3">
+							<div class="text-left" data-toggle="match-height">
+								<h5>Gerencia: </h5>
+								<select id="cbFiltroGerencia" class="form-control"></select>
+							</div>
+						</div>
+						<div class="col-xs-3 col-md-3">
+							<div class="text-left" data-toggle="match-height">
+								<h5>División: </h5>
+								<select id="cbFiltroDivision" class="form-control"></select>
+							</div>
+						</div>
+						<div class="col-xs-3 col-md-3">
+							<div class="text-left" data-toggle="match-height">
+								<h5>Unidad: </h5>
+								<select id="cbFiltroUnidad" class="form-control"></select>
+							</div>
+						</div>
+						<div class="col-xs-3 col-md-3">
+							<div class="text-left" data-toggle="match-height">
+								<h5>Área: </h5>
+								<select id="cbFiltroArea" class="form-control"></select>
+							</div>
+						</div>
+						@*<div class="col-xs-3 col-md-2">
+								<button class="btn btn-primary btn-width-custom">Buscar</button>
+							</div>*@
+					</div>
+                    <div class="row gutter-xs">
+                        @*<div class="col-xs-3 col-md-3 appContainer">
+            <div class="text-left" data-toggle="match-height">
+                <h5>Aplicación (código): </h5>
+                <input type="text" value="" maxlength="100" autocomplete="off" id="txtAplicacion" name="txtAplicacion" class="form-control" />
+                <input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+            </div>
+        </div>*@
+                        @*<div class="col-xs-3 col-md-3 tribuContainer">
+            <div class="text-left" data-toggle="match-height">
+                <h5>Jefe de equipo/Experto aplicación User IT</h5>
+                <input type="text" value="" maxlength="100" autocomplete="off" id="txtLiderTribu" name="txtLiderTribu" class="form-control" />
+            </div>
+        </div>*@
+                        @*<div class="col-xs-3 col-md-3 usuarioContainer">
+            <div class="text-left" data-toggle="match-height">
+                <h5>Líder usuario/Owner</h5>
+                <input type="text" value="" maxlength="100" autocomplete="off" id="txtProduct" name="txtProduct" class="form-control" />
+            </div>
+        </div>*@
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Estado de la aplicación: </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                                <select id="cbFiltroEstado" class="form-control">
+                                </select>
+                            </div>
+                        </div>
+                        @*<div class="col-xs-3 col-md-3">
+            <div class="text-left" data-toggle="match-height">
+                <h5>Clasificación técnica: </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                <select id="ddlClasificacionTecnica" name="ddlClasificacionTecnica" class="form-control"></select>
+            </div>
+        </div>
+        <div class="col-xs-3 col-md-3">
+            <div class="text-left" data-toggle="match-height">
+                <h5>Subclasificación técnica: </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                <select id="ddlSubclasificacionTecnica" name="ddlSubclasificacionTecnica" class="form-control"></select>
+            </div>
+        </div>*@
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Tipo de activo de información: </h5>
+                                <select id="ddlTipoActivo" name="ddlTipoActivo" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Tratamiento PCI DSS: </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                                <select id="ddlPCI" name="ddlPCI" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Gestionado Por: </h5>
+                                <select id="ddlGestionadoPor" name="ddlGestionadoPor" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gutter-xs">
+                        
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Líder Usuario/Owner: </h5>
+                                <select id="ddlLiderUsuario" class="form-control">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+                                <h5>Aplicación (código): </h5>
+                                <input type="text" id="txtAplicacion" name="txtAplicacion" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                <input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+                            </div>
+                        </div>
+                    </div>
+					<div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Aplicaciones reactivadas: </h5>
+                                <select id="ddlAppReactivadas" class="form-control">
+                                    <option value="-1">Ninguno</option>
+                                    <option value="1">Aplicación reactivada</option>
+                                    <option value="2">Aplicación en proceso de reactivación</option>
+                                </select>
+                            </div>
+                        </div>
+
+						<div class="col-xs-9 col-md-9">
+							<div class="text-right">
+								<h5>&nbsp;</h5>
+								<a id="btnBuscar" class="btn btn-primary" href="javascript: void(0)" title="Buscar aplicaciones">
+									<span class="icon icon-search"></span>
+									<span class="count-text">Buscar</span>
+								</a>
+								<a id="btnUpdate" class="btn btn-primary" href="javascript: void(0)" title="Actualizar aplicaciones">
+									<span class="icon icon-upload"></span>
+									<span class="count-text">Actualizar</span>
+								</a>
+								<a id="btnExportar" class="btn btn-primary" href="javascript: void(0)" title="Exportar aplicaciones">
+									<span class="icon icon-file-excel-o"></span>
+									<span class="count-text">Exportar</span>
+								</a>
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+<div class="row gutter-xs" style="margin-top:15px;">
+	<div class="col-xs-12">
+		<div class="card">
+			<div class="card-body">
+				<table id="tblRegistro" class="table" data-mobile-responsive="true" data-unique-id="Id">
+					<caption class="caption text-left">
+						<span>Catálogo de Aplicaciones</span>
+					</caption>
+				</table>
+			</div>
+		</div>
+	</div>
+	<input type="hidden" name="hdFiltro" id="hdFiltro" value="" />
+</div>
+<input type="hidden" name="hdAplicacionDetalleId" id="hdAplicacionDetalleId" value="0" />
+<div id="modalVerFlujosAprobacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalVerFlujosAprobacion" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="title-md">Información detallada de los responsables de aprobación</h5>
+				</div>
+				<div class="modal-body">
+					<div class="row gutter-xs">
+						<div class="col-xs-12">
+							<div class="card">
+								<div class="card-body">
+
+									<ul class="nav nav-tabs nav-justified otros">
+										<li class="active tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#dat" data-toggle="tab">Solicitudes asociadas el registro de aplicación</a></li>
+										<li class="tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#dat2" data-toggle="tab">Solicitudes pendientes</a></li>
+									</ul>
+									<div class="tab-content">
+										<div class="tab-pane fade active in" id="dat">
+											<table id="tblFlujosAprobacion" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+												<caption class="caption text-left">
+													<span>Solicitudes de registro de la aplicación</span>
+												</caption>
+												<thead>
+													<tr>
+														<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+														<th data-formatter="estadoFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Estado de atención</th>
+														<th data-field="nameDetail" data-halign="center" data-valign="middle" data-align="center">Responsable</th>
+														<th data-field="typeRegisterDetail" data-halign="center" data-valign="middle" data-align="center">Rol asignado</th>
+														<th data-field="isApprovedDetail" data-halign="center" data-valign="middle" data-align="center">Situación de <br /> la solicitud</th>
+														<th data-field="comments" data-halign="center" data-valign="middle" data-align="center">Comentarios</th>
+														<th data-field="dateApproved" data-halign="center" data-valign="middle" data-align="center">Fecha de aprobación</th>
+
+													</tr>
+												</thead>
+											</table>
+										</div>
+										<div class="tab-pane" id="dat2">
+											<div class="tab-pane fade active in" id="dat2">
+												<table id="tblFlujosAprobacion2" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+													<caption class="caption text-left">
+														<span>Solicitudes pendientes de modificación</span>
+													</caption>
+													<thead>
+														<tr>
+															<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+															<th data-formatter="dateFormat2" data-field="dateCreation" data-halign="center" data-valign="middle" data-align="center">Fecha de creación</th>
+															<th data-field="NombreUsuarioCreacion" data-halign="center" data-valign="middle" data-align="center">Solicitado por</th>
+															<th data-field="EstadoSolicitud" data-halign="center" data-valign="middle" data-align="center">Estado de la solicitud</th>
+														</tr>
+													</thead>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--Modal Actualizar (Gestion Aplicacion)-->
+<div id="mdImportar" tabindex="-1" role="dialog" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title" id="titleFormImp"></h4>
+			</div>
+			<div class="modal-body">
+				<form id="formImportar">
+					<div class="form-group">
+						<a id="btnDescarApps" href="javascript:void(0)" title="Descargar aplicaciones">
+							[Descargar aplicaciones]
+						</a>
+					</div>
+					<div class="form-group">
+						<label class="control-label">
+							Archivo excel:
+							<span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="La aplicación carga los registros que se encuentren en la primera hoja del archivo MS Excel."></span>
+						</label>
+						<div class="input-group">
+							<input id="txtArchivo" name="txtArchivo" class="form-control" type="text" value="Ningún archivo seleccionado" readonly>
+							<span class="input-group-btn">
+								<label class="btn btn-primary file-upload-btn">
+									<input id="flArchivo" name="flArchivo" class="file-upload-input inputfile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+									<span class="glyphicon glyphicon-folder-open"></span>
+								</label>
+							</span>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				<button id="btnActualizar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Actualizar</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Modal Actualizar (Gestion Aplicacion)-->
+<!--Modal Results (Gestion Aplicacion)-->
+<div id="mdResults" tabindex="-1" role="dialog" class="modal fade">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title">Resultados de la actualización masiva</h4>
+			</div>
+			<div class="modal-body">
+				<form id="formResults">
+					<div class="form-group">
+						<p id="pDetalleCarga"></p>
+					</div>
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<label class="control-label">Registros procesados: </label>
+								<input type="text" id="txtTotal" name="txtTotal" class="form-control" disabled />
+							</div>
+							<div class="col-md-6">
+								<label class="control-label">Registros actualizados: </label>
+								<input type="text" id="txtTotalUpdate" name="txtTotalUpdate" class="form-control" disabled />
+							</div>
+						</div>
+					</div>
+					<div class="form-group error-div">
+						<label class="control-label">Errores encontrados: </label>
+					</div>
+					<div class="form-group error-div">
+						<table id="tblResults" class="table" data-unique-id="Id" data-mobile-responsive="true">
+							<thead>
+								<tr>
+									<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+									<th data-field="TipoErrorIdStr" data-halign="center" data-valign="middle" data-align="center" data-width="15%">Tipo error</th>
+									<th data-field="Detalle" data-halign="center" data-valign="middle" data-align="center">Evidencia, detalle o entidad</th>
+									<th data-field="FilaExcel" data-halign="center" data-valign="middle" data-align="center" data-width="4%">Fila en archivo excel</th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+					<div class="error-div">
+						<a id="btnExportarValidacionCargaMasiva">Descargar Validaciones</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Modal Results (Gestion Aplicacion)-->
+
+
+<script>
+    var ULTIMO_REGISTRO_PAGINACION = @PaginaTamanio;
+    var ULTIMO_PAGE_NUMBER = @PaginaActual;
+
+    var nombre_app = '@nombreApp';
+    var PAGINA_ACTUAL = @paginaActual;
+    var PAGINA_TAMANIO = @paginaTamanio;
+
+    const TABLA_PROCEDENCIA_ID = {
+        APP_INFOCAMPOAPLICACION: @Html.Raw((int)ETablaProcedenciaAplicacion.InfoCampoPortafolio)
+    };
+</script>
+<script src="~/app/ConfiguracionPortafolio/catalogoAplicacion.js?v=2.5.0"></script>

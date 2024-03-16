@@ -1,0 +1,143 @@
+﻿@{
+
+    ViewBag.Title1 = "Solicitudes de Baja de Servidores";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Solicitudes de Baja de Servidores";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .btn-width-custom
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .multiselect-native-select .btn-group {
+        max-width: 100%;
+    }
+</style>
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <form id="formCargaFile">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-12 col-md-3 col-sm-6 containerFiltro">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Equipo / Activo TI: </h5>
+                                        <input type="text" name="txtEquipo" id="txtEquipo" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-md-3 col-sm-6 containerFiltroTk">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Ticket: </h5>
+                                        <input type="text" name="txtTicket" id="txtTicket" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Desde:</h5>
+                                        <div class="input-group date" id="divFechaFiltroDesde">
+                                            <input type="text" id="FechaFiltroDesde" name="FechaFiltroDesde" class="form-control" />
+                                            <span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Hasta:</h5>
+                                        <div class="input-group date" id="divFechaFiltroHasta">
+                                            <input type="text" id="FechaFiltroHasta" name="FechaFiltroHasta" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                            <span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Estado de Resolución: </h5>
+                                        <select id="cbFiltroEstadoSolicitud" name="cbFiltroEstadoSolicitud" class="form-control" multiple="multiple">
+                                            <option value="1" selected>PENDIENTE</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs form-group pull-right">
+                                <div class="col-sm-12 col-xs-12 col-md-12">
+                                    <div class="col-sm-4 col-xs-4 col-md-4">
+                                        <button id="btnRechazar" name="btnRechazar" type="button" class="btn btn-primary" data-loading-text="Procesando..." onclick="irRechazar()">Rechazar</button>
+                                    </div>
+                                    <div class="col-sm-4 col-xs-4 col-md-4">
+                                        <button id="btnBuscar" name="btnBuscar" type="button" class="btn btn-primary" data-loading-text="Procesando..." onclick="buscar()">Buscar</button>
+                                    </div>
+                                    <div class="col-sm-4 col-xs-4 col-md-4">
+                                        <button id="btnProcesar" name="btnProcesar" type="button" class="btn btn-primary btn-width-custom" data-loading-text="Procesando..." onclick="irProcesar()">Aprobar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Listado de servidores a eliminar</strong>
+                </div>
+                <div class="card-body">
+                    <form id="formBajaServidores">
+                        <table id="tblServidores" class="table" data-mobile-responsive="true" data-unique-id="Id" data-row-style="rowStyle" style="font-size: 11px !important;">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowformatCheckbox2" data-checkbox="true" data-halign="center" data-valign="middle" data-align="center"></th>
+                                    <th data-field="Id" data-halign="center" data-valign="middle" data-align="center" hidden="hidden">ID Procesar<br /> Baja</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center">Nombre <br />Servidor</th>
+                                    <th data-field="Ticket" data-halign="center" data-valign="middle" data-align="center">Ticket</th>
+                                    <th data-field="FechaCargarArchivoBajaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Fecha de Solicitud<br /> de Baja</th>
+                                    <th data-field="EstadoServidorStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Estado <br />Servidor</th>
+                                    <th data-field="AplicacionesRelacionadasStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Aplicaciones Relacionadas</th>
+                                    <th data-field="DominioServidor" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Dominio <br />Servidor</th>
+                                    <th data-field="EstadoProcesoBajaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Estado de<br />Solicitud</th>
+                                    <th data-field="AprobadoPor" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Aprobado <br /> Por</th>
+                                    <th data-field="FechaAprobadoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Fecha de<br /> Aprobación</th>
+                                    <th data-field="RechazadoPor" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Rechazado <br /> Por</th>
+                                    <th data-field="FechaRechazadoBajaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Fecha de<br /> Rechazo</th>
+                                    <th data-field="CreadoPor" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Solicitado <br /> Por</th>
+                                    <th data-field="FechaCreacionBajaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Fecha de<br /> Solicitud</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/procesarBajaServidores.js?v1.1.1"></script>

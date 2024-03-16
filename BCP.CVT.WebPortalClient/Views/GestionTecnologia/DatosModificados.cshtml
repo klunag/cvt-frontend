@@ -1,0 +1,255 @@
+﻿@{
+    ViewBag.Title1 = "Flujo de Actualización - CVT";
+    ViewBag.Title2 = "Gestión de las Tecnologías";
+    ViewBag.Title3 = "Flujo de Actualización";
+}
+
+<script src="~/app/Tecnologia/FlujoActualizacion.js"></script>
+<style>
+    a.tip {
+        border-bottom: 1px dashed;
+        text-decoration: none
+    }
+
+        a.tip:hover {
+            cursor: helpdatosUserIT position: relative
+        }
+
+        a.tip span {
+            display: none
+        }
+
+        a.tip:hover span {
+            border: #c0c0c0 1px dotted;
+            padding: 5px 20px 5px 5px;
+            display: block;
+            z-index: 100;
+            font-family: Roboto,sans-serif;
+            /*background: url(../images/status-info.png) #f0f0f0 no-repeat 100% 5%;*/
+            background: #F2F4F8;
+            left: 0px;
+            margin: 10px;
+            width: 250px;
+            position: absolute;
+            top: 10px;
+            text-decoration: none;
+            color: #002A8D;
+            text-align: left;
+        }
+
+    .stepwizard-step p {
+        margin-top: 0px;
+        color: #666;
+    }
+
+    .stepwizard-row {
+        display: table-row;
+    }
+
+    .stepwizard {
+        display: table;
+        width: 100%;
+        position: relative;
+    }
+
+    .stepwizard-step button[disabled] {
+        /*opacity: 1 !important;
+    filter: alpha(opacity=100) !important;*/
+    }
+
+    .stepwizard .btn.disabled, .stepwizard .btn[disabled], .stepwizard fieldset[disabled] .btn {
+        opacity: 1 !important;
+        color: #bbb;
+    }
+
+    .stepwizard-row:before {
+        top: 14px;
+        bottom: 0;
+        position: absolute;
+        content: " ";
+        width: 100%;
+        height: 1px;
+        background-color: #ccc;
+        z-index: 0;
+    }
+
+    .stepwizard-step {
+        display: table-cell;
+        text-align: center;
+        position: relative;
+        font-family: Roboto,sans-serif;
+        font-size: 18px;
+    }
+
+    .btn-circle {
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        padding: 6px 0;
+        font-size: 12px;
+        line-height: 1.428571429;
+        border-radius: 15px;
+    }
+</style>
+
+<span style="display:none;" value="@ViewBag.IdSolicitud" id="str_idSolicitud">@ViewBag.IdSolicitud</span>
+<span style="display:none;" value="@ViewBag.IdTecnologia" id="str_idTecnologia">@ViewBag.IdTecnologia</span>
+<span style="display:none;" value="@ViewBag.Usuario" id="user_app">@ViewBag.Usuario</span>
+<span style="display:none;" value="@ViewBag.IdProducto" id="str_idProducto">@ViewBag.IdProducto</span>
+<span style="display:none;" value="@ViewBag.IdTipoSolicitud" id="str_idTipoSolicitud">@ViewBag.IdTipoSolicitud</span>
+<span style="display:none;" value="@ViewBag.TipoSolicitud" id="str_tipoSolicitud">@ViewBag.TipoSolicitud</span>
+
+<div class="row">
+    <div class="col-md-10">
+        <span style="font-size:14px;">Es importante que todos los datos de tu aplicación se encuentren actualizados. </span>
+    </div>
+    <div class="col-md-2 text-right">
+        <a id="btnAgregar"
+           class="btn btn-primary btn-width-custom"
+           href="@Url.Content(string.Format("~/GestionTecnologia/BandejaFlujosAprobacion"))" />
+        <span class="icon icon-arrow-left"></span>
+        <span class="count-text">Volver</span>
+        </a>
+    </div>
+</div>
+
+<div class="row gutter-xs" style="margin-top:5px;">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-search">
+                    <fieldset class="fieldset">
+                        <legend class="legend">Datos Generales</legend>
+                        <div class="card-search-box">
+
+                            <form id="formAddOrEditApp">
+                                <div class="row">
+                                    <div id="divApp" class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-4">
+                                                    Código de Producto
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           maxlength="4"
+                                                           id="txtCodProduct"
+                                                           name="txtCodProduct"
+                                                           disabled="disabled" />
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-4" id="lblClaveTecnologia">
+                                                    Clave de la Tecnología
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           id="txtClaveTecnologia"
+                                                           name="txtClaveTecnologia"
+                                                           disabled="disabled" />
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-md-4">
+                                                    Número de Solicitud
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           maxlength="4"
+                                                           id="txtNumSolicitud"
+                                                           name="txtNumSolicitud"
+                                                           disabled="disabled" />
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                            <div class="col-md-6 divUnidadContainer">
+                                                <div class="col-md-4">
+                                                    Tipo de Solicitud
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           maxlength="4"
+                                                           id="txtTipoSolicitud"
+                                                           name="txtTipoSolicitud"
+                                                           disabled="disabled" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs" style="margin-top:5px;">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-search">
+                    <fieldset class="fieldset">
+                        <legend class="legend">Datos de la custodia</legend>
+                        <div class="card-search-box">
+                            <form id="formDatosCustodia">
+                                <div class="row">
+                                    <div id="divDataCustodia" class="form-group">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-7"></div>
+    <div class="col-md-5 text-right">
+        <button id="btRechazar" name="btRechazar" class="btn btn-primary" type="button" style="width:100px;" onclick="openPopupRejection();"><i class="glyphicon glyphicon-remove"></i> Rechazar</button>
+        <button id="btnConfirmar" name="btnConfirmar" class="btn btn-success" type="button" data-loading-text="Procesando..." style="width:140px;"><i class="glyphicon glyphicon-check"></i> Confirmar</button>
+    </div>
+</div>
+
+<div id="mdl_reject_request" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mdl_reject_request" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="form_reject_request">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el motivo del rechazo de la solicitud</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados al rechazo de esta solicitud: </label>
+                                <textarea id="txtRechazoSolicitud" name="txtRechazoSolicitud" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnReject" class="btn btn-primary" type="button" data-loading-text="Procesando...">Aceptar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+

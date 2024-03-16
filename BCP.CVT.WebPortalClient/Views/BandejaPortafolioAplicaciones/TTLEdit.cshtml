@@ -1,0 +1,402 @@
+﻿@using BCP.CVT.WebPortalClient.Models
+@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Flujo de actualización - Technical Tribe Lead";
+	ViewBag.Title2 = "Solicitudes asignadas";
+	ViewBag.Title3 = "Flujo de actualización - Technical Tribe Lead";
+
+	int AplicacionId = (int)ViewBag.AppId;
+	int FlujoId = (int)ViewBag.FlowId;
+	int paginaActual = (int)ViewBag.PaginaActual;
+	int paginaTamanio = (int)ViewBag.PaginaTamanio;
+	string nombreApp = (string)ViewBag.Nombre_App;
+
+	int gestionado = (int)ViewBag.Gestionado;
+	int estadoApp = (int)ViewBag.EstadoApp;
+	int estadoSolicitud = (int)ViewBag.EstadoSolicitud;
+	int flujo = (int)ViewBag.Flujo;
+	string orderBy = (string)ViewBag.OrderBy;
+	string orderDirection = (string)ViewBag.OrderDirection;
+}
+
+@{
+    Usuario_Storage eUsuario = (Usuario_Storage)Session["Usuario"];
+    string eusername = eUsuario == null ? "" : eUsuario.UsuarioBCP_Dto.Name;
+}
+
+
+<style>
+    a.tip {
+        border-bottom: 1px dashed;
+        text-decoration: none
+    }
+
+        a.tip:hover {
+            cursor: help;
+            position: relative
+        }
+
+        a.tip span {
+            display: none
+        }
+
+        a.tip:hover span {
+            border: #c0c0c0 1px dotted;
+            padding: 5px 20px 5px 5px;
+            display: block;
+            z-index: 100;
+            font-family: Roboto,sans-serif;
+            /*background: url(../images/status-info.png) #f0f0f0 no-repeat 100% 5%;*/
+            background: #F2F4F8;
+            left: 0px;
+            margin: 10px;
+            width: 250px;
+            position: absolute;
+            top: 10px;
+            text-decoration: none;
+            color: #002A8D;
+            text-align: left;
+        }
+
+    .stepwizard-step p {
+        margin-top: 0px;
+        color: #666;
+    }
+
+    .stepwizard-row {
+        display: table-row;
+    }
+
+    .stepwizard {
+        display: table;
+        width: 100%;
+        position: relative;
+    }
+
+    .stepwizard-step button[disabled] {
+        /*opacity: 1 !important;
+    filter: alpha(opacity=100) !important;*/
+    }
+
+    .stepwizard .btn.disabled, .stepwizard .btn[disabled], .stepwizard fieldset[disabled] .btn {
+        opacity: 1 !important;
+        color: #bbb;
+    }
+
+    .stepwizard-row:before {
+        top: 14px;
+        bottom: 0;
+        position: absolute;
+        content: " ";
+        width: 100%;
+        height: 1px;
+        background-color: #ccc;
+        z-index: 0;
+    }
+
+    .stepwizard-step {
+        display: table-cell;
+        text-align: center;
+        position: relative;
+        font-family: Roboto,sans-serif;
+        font-size: 18px;
+    }
+
+    .btn-circle {
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        padding: 6px 0;
+        font-size: 12px;
+        line-height: 1.428571429;
+        border-radius: 15px;
+    }
+</style>
+<div class="row">
+    <div class="col-md-10">
+        <span style="font-size:14px;">Completar los datos que te corresponden como custodio. </span>
+    </div>
+    <div class="col-md-2 text-right">
+        <a id="btnAgregar" class="btn btn-primary btn-width-custom" href="@Url.Content(string.Format("~/BandejaPortafolioAplicaciones/Solicitudes?nom_App={0}&paginaActual={1}&paginaTamanio={2}&gestionado={3}&estadoApp={4}&estadoSolicitud={5}&flujo={6}&orderBy={7}&orderDirection={8}",nombreApp,paginaActual,paginaTamanio,gestionado,estadoApp,estadoSolicitud,flujo,orderBy,orderDirection))">
+            <span class="icon icon-arrow-left"></span>
+            <span class="count-text">Volver</span>
+        </a>
+    </div>
+</div>
+<hr>
+<div class="row gutter-xs" style="margin-top:5px;">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-search">
+                    <fieldset class="fieldset">
+                        <legend class="legend">Datos de la custodia</legend>
+                        <div class="card-search-box">
+                            <form id="formAddOrEditApp">
+                                <div class="row">
+                                    <div  id="divApp" class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-12">
+												<div class="col-md-2">
+													Código de la aplicación
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodigo"></span></a>
+												</div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" maxlength="4" id="txtCodigoAPT" name="txtCodigoAPT" disabled="disabled" />
+                                                    <input type="hidden" id="hdAplicacionId" name="hdAplicacionId" value="" />
+                                                    <input type="hidden" id="hdFlujoId" name="hdFlujoId" value="" />
+                                                </div>
+												<div class="col-md-2">
+													Nombre de la aplicación
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanNombre"></span></a>
+												</div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" id="txtNombre" name="txtNombre" maxlength="180" disabled="disabled" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+												<div class="col-md-2">
+													Descripción
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanDescripcion"></span></a>
+												</div>
+                                                <div class="col-md-9">
+                                                    <textarea class="form-control" rows="7" id="txtDescripcion" name="txtDescripcion" disabled="disabled"></textarea>
+                                                </div>
+                                                <div class="col-md-1"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="col-md-2">
+                                                    Rol asignado
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <select id="ddlRol" name="ddlRol" class="form-control" disabled="disabled">
+                                                        <option value="1">Technical Tribe Lead</option>
+                                                    </select>
+                                                </div>
+												<div class="col-md-2">
+													Tipo de activo de información
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanTipoActivo"></span></a>
+												</div>
+                                                <div class="col-md-4">
+                                                    <select id="ddlTipoActivo" name="ddlTipoActivo" class="form-control" disabled></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="col-md-2">
+                                                    <strong>Datos de la solicitud de modificación</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+												<div class="col-md-2">
+													<strong>Gestionado por actual de la aplicación</strong>
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanGestionado"></span></a>
+												</div>
+                                                <div class="col-md-4">
+                                                    <select id="ddlGestionadoActual" name="ddlGestionadoActual" class="form-control" disabled>
+                                                    </select>
+                                                </div>
+												<div class="col-md-2">
+													<strong>Gestionado por solicitado para la aplicación</strong>
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanGestionado"></span></a>
+												</div>
+                                                <div class="col-md-4">
+                                                    <select id="ddlGestionadoNuevo" name="ddlGestionadoNuevo" class="form-control" disabled>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+												<div class="col-md-2">
+													<strong>Equipo actual de la aplicación</strong>
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanEquipo"></span></a>
+												</div>
+                                                <div class="col-md-4">
+                                                    <select id="ddlEquipoActual" name="ddlEquipoActual" class="form-control" disabled>
+                                                    </select>
+                                                </div>
+												<div class="col-md-2">
+													<strong>Equipo solicitado para la aplicación</strong>
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanEquipo"></span></a>
+												</div>
+                                                <div class="col-md-4">
+                                                    <select id="ddlEquipoNuevo" name="ddlEquipoNuevo" class="form-control" disabled>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+											<div class="col-md-12">
+												<div class="col-md-2">
+													<strong id="txtSolAprobada"></strong>
+												</div>
+												<div class="col-md-4">
+													<input id="txtSolAprobadaFecha" name="txtSolAprobadaFecha" type="text" class="form-control" disabled="disabled" value="" />
+												</div>
+												<div class="col-md-2">
+													<strong id="txtAtendidaPor"></strong>
+												</div>
+												<div class="col-md-4">
+													<input id="txtAtendidaPorName" name="txtAtendidaPorName" type="text" class="form-control" disabled="disabled" value="" />
+												</div>
+											</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-9 text-right">
+                                    </div>
+                                    <div class="col-md-1 text-right">
+                                        <button id="btnTransferirApp" name="btnTransferirApp" class="btn btn-default" type="button" data-loading-text="Procesando...">Transferir</button>
+                                    </div>
+                                    <div class="col-md-1 text-right">
+                                        <button id="btnRechazarApp" name="btnRechazarApp" class="btn btn-warning" type="button" data-loading-text="Procesando...">Rechazar</button>
+                                    </div>
+                                    <div class="col-md-1 text-right">
+                                        <button id="btnRegistrarApp" name="btnRegistrarApp" class="btn btn-success" type="button" data-loading-text="Procesando...">Confirmar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="modalRechazar" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRechazar" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formRechazar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el comentario indicando el rechazo de la solicitud</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a este cambio de estado: </label>
+                                <textarea id="txtDescripcionRechazo" name="txtDescripcionRechazo" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnProcesarRechazo" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="modalTransferir" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalTransferir" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formTransferir">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Seleccione la persona al que vas a transferir la solicitud para su evaluación</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <span>Encargado de la aprobación</span>      <span class="etiquetaRoja">(*)</span>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtAutorizador" name="txtAutorizador" type="text" class="form-control" maxlength="120" />
+                            <input type="hidden" id="hAutorizadorId" value="" />
+                            <input type="hidden" id="hAutorizadorMatricula" value="" />
+                            <input type="hidden" id="hAutorizadorCorreo" value="" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table id="tblRegistro" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                                        <caption class="caption text-left">
+                                            <span>Nuevo Encargado como TTL de la aplicación</span>
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th data-field="managerName" data-halign="center" data-valign="middle" data-align="left">Responsable</th>
+                                                <th data-field="email" data-halign="center" data-valign="middle" data-align="left">Correo electrónico</th>
+                                                <th data-field="username" data-halign="center" data-valign="middle" data-align="left">Matrícula</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados: </label>
+                                <textarea id="txtDescripcionTransferencia" name="txtDescripcionTransferencia" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="control-label">Archivo Adjunto: </label>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="input-group">
+                                <input id="txtArchivo" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                <span class="input-group-btn">
+                                    <label class="btn btn-primary file-upload-btn">
+                                        <input id="flArchivo" class="file-upload-input inputArchivo" type="file" name="flArchivo">
+                                        <span class="glyphicon glyphicon-folder-open"></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnProcesarTransferencia" class="btn btn-primary" type="button" data-loading-text="Procesando...">Transferir</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    const APLICACION_ID = @AplicacionId;
+    const FLUJO_ID = @FlujoId;
+
+    const ACCION_REGISTRAR = 1;
+    const ACCION_RECHAZAR = 2;
+    const ACCION_TRANSFERIR = 3;
+
+    var nombre_app = '@nombreApp';
+    var PAGINA_ACTUAL = @paginaActual;
+    var PAGINA_TAMANIO = @paginaTamanio;
+
+    var GESTIONADO = @gestionado;
+    var ESTADO_APP =  @estadoApp;
+    var ESTADO_SOLICITUD = @estadoSolicitud;
+    var FLUJO = @flujo;
+    var ORDER_BY = '@orderBy';
+    var ORDER_DIRECTION = '@orderDirection';
+
+    const URL_BANDEJA = "@Url.Content("~/BandejaPortafolioAplicaciones/Solicitudes")";
+</script>
+<script src="~/app/BandejaPortafolio/ttlEdit.js?v=2.5.0"></script>

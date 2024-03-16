@@ -1,0 +1,244 @@
+﻿@{
+    ViewBag.Title1 = "Vista de tecnologías por owner";
+    ViewBag.Title2 = "Vista Owner";
+    ViewBag.Title3 = "Vista de tecnologías por owner";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <div class="panel-group" id="accordion-filtro" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default" style="overflow: inherit;">
+                    <a class="panel-heading" role="tab" id="heading-filtro" data-toggle="collapse" data-parent="#accordion-filtro" href="#collapse-filtro" aria-expanded="true" aria-controls="collapse-filtro" style="display: flex">
+                        <h4 class="panel-title">Filtro de búsqueda</h4>
+                    </a>
+                    <div id="collapse-filtro" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro">
+                        <div class="panel-body">
+                            <div class="card-search-box">
+                                <form action="javascript:void(0);">
+                                    <div class="row" style="margin-bottom: 0;">
+                                        <div class="col-sm-10">
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-md-6 col-xs-6 col-sm-6">
+                                                    <label>Dominio: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusDominioTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                                            <option value="-1">Todos</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-xs-6 col-sm-6">
+                                                    <label>SubDominio: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusSubDominioTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                                            <option value="-1">Todos</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-md-6 col-xs-6 col-sm-6">
+                                                    <label>Producto: </label>
+                                                    <div class="input-with-icon searchProductoContainer">
+                                                        <input id="txtBusNombreTecnologia" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Producto..." onkeydown="ValidaEnters(event)">
+                                                        <input id="hdBusNombreTecnologiaId" type="hidden">
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-xs-6 col-sm-6">
+                                                    <label>Tribu/Coe/Unidad Organizativa: </label>
+                                                    <div class="input-with-icon tribuCoeContainer">
+                                                        <input id="txtBusUnidadOrganizativaTecnologia" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Tribu/Coe/Unidad Organizativa..." onkeydown="ValidaEnters(event)">
+                                                        <input id="txtBusUnidadOrganizativaTecnologiaId" type="hidden">
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-md-6 col-xs-6 col-sm-6">
+                                                    <label>Squad: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusSquadTecnologia" class="form-control input-thick pill input-with-icon-search">
+                                                            <option value="-1">Todos</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-xs-6 col-sm-6">
+                                                    <label id="tieneOwner">Tiene Owner: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusFlagOwnerTecnologia" class="form-control input-thick pill input-with-icon-search">
+                                                            <option value="-1">Todos</option>
+                                                            <option value="1" selected>Sí</option>
+                                                            <option value="0">No</option>
+                                                        </select>
+                                                        <span id="icon" class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-sm-12">
+                                                    <label>&nbsp;</label>
+                                                    <div class="row">
+                                                        <button id="btnBusBuscar" class="btn btn-primary btn-width-custom" onclick="listarTecnologias()">Buscar</button>
+                                                    </div>
+                                                    <div class="row">
+                                                        <button id="btnBusExportar" class="btn btn-primary btn-width-custom" onclick="ExportarInfo()">Exportar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de Tecnologías</strong>
+            </div>
+            <div class="card-body">
+                <table id="tbl-lista" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="WorkerId" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DominioStr" data-width="10%">Dominio</th>
+                            <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="center" data-width="10%" data-sortable="true" data-sort-name="SubDominioStr">Subdominio</th>
+                            <th data-field="ProductoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="ProductoStr" data-width="20%">Producto</th>
+                            <th data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="ClaveTecnologia" data-width="20%">Tecnología</th>
+                            <th data-field="TipoTecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="TipoTecnologiaStr" data-width="20%">Tipo<br />Tecnología</th>
+                            <th data-field="TotalInstanciasServidores" data-formatter="linkFormatterVerEquiposTec" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="20%">Instancias<br />Servidores</th>
+                            <th data-field="TotalInstanciasServicioNube" data-formatter="linkFormatterVerEquiposTec" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%">Instancias<br />Servicio Nube</th>
+                            <th data-field="TotalInstanciasPcs" data-formatter="linkFormatterVerEquiposTec" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%">Instancias<br />Pc's</th>
+                            <th data-field="TotalAplicaciones" data-formatter="linkFormatterVerAplicacionesTec" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%"># de<br />Aplicaciones<br />Relacionadas</th>
+                            <th data-field="FechaCalculoValorTecStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-width="20%">Fecha Fin<br />Soporte</th>
+                            <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EstadoId" data-width="10%">Estado de obsolescencia</th>
+                            <th data-field="TribuCoeDisplayName" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%">Tribu/Coe/<br />Unidad Organizativa</th>
+                            <th data-field="TribuCoeDisplayNameResponsable" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%">Responsable Tribu/Coe/<br />Unidad Organizativa</th>
+                            <th data-field="SquadDisplayName" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%">Squad</th>
+                            <th data-field="SquadDisplayNameResponsable" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%">Responsable<br />Squad</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdAppsByTecnologia" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Detalle Aplicaciones relacionadas a la tecnología</h4>
+                <h4 class="modal-title" id="MdAppsByTecnologiaTitle"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAplicaciones">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group ui-widget aplicacionSingleContainer">
+                                @*<label class="control-label">Por favor agregue las aplicaciones permitidas para hacer uso de la tecnología: </label>*@
+                                <div class="col-sm-10">
+                                    <div class="row">
+                                        <div class="input-with-icon">
+                                            <input id="txtAplicacionTecnologiaSingle" class="form-control input-thick pill input-with-icon-search ui-autocomplete-input field-tecnologia-app" type="text" name="txtAplicacionTecnologiaSingle" placeholder="Buscar...">
+                                            <input type="hidden" id="hdAplicacionIdTecnologiaSingle" />
+                                            <span class="icon icon-search input-icon"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    &nbsp;
+                                    <button id="btnBusExportarAplicacion" class="btn btn-primary btn-width-custom" type="button" onclick="ExportarInfoAplicacion()">Exportar</button>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <table id="tbl-aplicaciones-single" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="AplicacionId" data-mobile-responsive="true" data-pagination="true">
+                                    <thead>
+                                        <tr>
+                                            <th data-field="Aplicacion.CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Código APT</th>
+                                            <th data-field="Aplicacion.Nombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Nombre del aplicativo</th>
+                                            @*<th data-field="Aplicacion.TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tipo de Activo</th>*@
+                                            @*<th data-field="Aplicacion.Owner_LiderUsuario_ProductOwner" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Usuario Líder</th>*@
+                                            <th data-field="Aplicacion.GestionadoPor" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Gestionado Por</th>
+                                            @*<th data-formatter="formatOpcAplicacionSingle" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>*@
+                                        </tr>
+                                    </thead>
+                                </table>
+                                <input type="text" id="msjValidTblSingle" name="msjValidTblSingle" class="form-control field-tecnologia" style="display:none;" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                @*    <button id="btnRegAplicaciones" type="button" class="btn btn-primary" onclick="guardarAplicaciones()" data-loading-text="Procesando...">Registrar</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdEquiposByTecnologia" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Detalle <text id="textTipoEquipo"></text> relacionadas a la tecnología</h4>
+                <h4 class="modal-title" id="MdEquiposByTecnologiaTitle"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formEquipos">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group ui-widget equipoSingleContainer">
+                                @*<label class="control-label">Por favor agregue las aplicaciones permitidas para hacer uso de la tecnología: </label>*@
+                                <div class="col-sm-10">
+                                    <div class="row">
+                                        <div class="input-with-icon">
+                                            <input id="txtEquipoTecnologiaSingle" class="form-control input-thick pill input-with-icon-search ui-autocomplete-input field-tecnologia-app" type="text" name="txtEquipoTecnologiaSingle" placeholder="Buscar...">
+                                            <input type="hidden" id="hdEquipoIdTecnologiaSingle" />
+                                            <span class="icon icon-search input-icon"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    &nbsp;
+                                    <button id="btnBusExportarEquipo" class="btn btn-primary btn-width-custom" type="button" onclick="ExportarInfoEquipo()">Exportar</button>
+                                </div>
+                            </div>
+                            <div class="form-group" id="divEquipoLista"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                @*    <button id="btnRegAplicaciones" type="button" class="btn btn-primary" onclick="guardarAplicaciones()" data-loading-text="Procesando...">Registrar</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/app/vistaOwnerTecnologia.js"></script>

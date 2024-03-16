@@ -1,0 +1,155 @@
+﻿@{
+    ViewBag.Title1 = "Registros de Justificación";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Registros de Justificación";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-xs-3 col-md-3 containerFiltroAplicacion">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Aplicación: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtAplicacion" id="txtAplicacion" class="form-control input-thick pill input-with-icon-search" value="" maxlength="180" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 containerFiltroTecnologia">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Tecnología: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtTecnologia" id="txtTecnologia" class="form-control input-thick pill input-with-icon-search" value="" maxlength="200" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="" id="hTecnologia" name="hTecnologia" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 containerFiltroProducto">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Producto: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtProducto" id="txtProducto" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="" id="hProducto" name="hProducto" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 containerFiltroEquipo">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Equipo: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtEquipo" id="txtEquipo" class="form-control input-thick pill input-with-icon-search" value="" maxlength="200" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="0" id="hEquipo" name="hEquipo" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xs-3 col-md-3 containerFiltroProceso">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Proceso: </label>
+                                    <div class="input-with-icon">
+                                        <input type="hidden" value="" id="hProceso" name="hProceso" />
+                                        <input type="text" name="txtProceso" id="txtProceso" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 containerFiltroPuerto">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Puerto: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtPuerto" id="txtPuerto" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="" id="hPuerto" name="hPuerto" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 containerFiltroProtocolo">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Protocolo: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtProtocolo" id="txtProtocolo" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="" id="hProtocolo" name="hProtocolo" />
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Fecha de Proceso: </label>
+                                    <div class="input-group date" id="divFechaFiltro">
+                                        <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xs-9 col-md-9">
+                                
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <button id="btnBusRegistro" class="btn btn-primary btn-width-custom" onclick="buscarRegistros()">Buscar</button>
+                                    <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarInfo()">
+                                        <span class="icon icon-external-link"></span>
+                                        <span class="count-text">Exportar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+        
+            <div class="card-body">
+                <table id="tblRegistros" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        Registros
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="CodigoApt" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="5%" data-sort-name="CodigoApt">App Origen</th>
+                            <th data-field="Equipo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Equipo" data-width="10%">Equipo Origen</th>
+                            <th data-field="IpOrigen" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="IpOrigen" data-width="5%">IP Origen</th>
+                            <th data-field="ProcesoOrigen" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="ProcesoOrigen" data-width="10%">Proceso Origen</th>
+                            <th data-field="CodigoAptDestino" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="5%" data-sort-name="CodigoAptDestino">App Destino</th>
+                            <th data-field="EquipoDestino" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EquipoDestino" data-width="10%">Equipo Destino</th>
+                            <th data-field="IpDestino" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="IpDestino" data-width="5%">IP Destino</th>
+                            <th data-field="ProcesoDestino" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%">Proceso Destino</th>
+                            <th data-field="Puerto" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%">Puerto Destino</th>
+                            <th data-field="Protocolo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%">Protocolo</th>
+                            <th data-field="Tecnologia" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Tecnologia" data-width="20%">Tecnologia</th>
+                            <th data-field="Accion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Accion" data-width="10%">Accion</th>
+                            <th data-field="TipoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Tipo" data-width="10%">Tipo</th>
+                            <th data-field="TipoProcesoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacionStr" data-width="10%">Proceso Aplica en</th>
+                            @*<th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacionStr" data-width="10%">Fecha Creacion</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/app/Motor/justificacion.js"></script>

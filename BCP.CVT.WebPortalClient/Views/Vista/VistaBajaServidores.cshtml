@@ -1,0 +1,114 @@
+﻿@{
+
+    ViewBag.Title1 = "Baja de Servidores";
+    ViewBag.Title2 = "Equipos y aplicaciones";
+    ViewBag.Title3 = "Baja de Servidores";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .btn-width-custom
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+</style>
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Carga de Archivo Excel</legend>
+                    <form id="formCargaFile">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="control-label">Archivo Adjunto: </label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <input id="txtArchivo" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                                <span class="input-group-btn">
+                                                    <label class="btn btn-primary file-upload-btn">
+                                                        <input id="flArchivo" class="file-upload-input inputArchivo" type="file" name="flArchivo">
+                                                        <span class="glyphicon glyphicon-folder-open"></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button id="btnProcesar" name="btnProcesar" type="button" class="btn btn-primary" style="display: none;">Cargar Archivo</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs form-group pull-right">
+                                <div class="col-sm-12 col-xs-12 col-md-12">
+                                    <div class="col-sm-6 col-xs-6 col-md-6">
+                                        <button id="btnCompletarProceso" name="btnCompletarProceso" type="button" class="btn btn-primary" style="display: none;" data-loading-text="Procesando...">Procesar</button>
+                                    </div>
+                                    <div class="col-sm-6 col-xs-6 col-md-6">
+                                        <button id="btnLimpiar" name="btnLimpiar" type="button" class="btn btn-primary btn-width-custom" style="display: none;" data-loading-text="Procesando..." onclick="LimpiarInfo()">Limpiar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card" id="cardTable" style="display: none;">
+                <div class="card-header">
+                    <strong>El archivo excel cargado contiene: <span id="cantidadRegistroExcel"></span> filas, se procesaran <span id="cantidadAProcesar"></span> filas</strong>
+                </div>
+                <br />
+                <div class="card-body">
+                    <form id="formBajaServidores">
+                        <table id="tblServidores" class="table" data-mobile-responsive="true" data-unique-id="Id" data-row-style="rowStyle" style="font-size: 11px !important;">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowformatCheckbox" data-checkbox="true" data-halign="center" data-valign="middle" data-align="center"></th>
+                                    <th data-field="Id" data-halign="center" data-valign="middle" data-align="center" hidden="hidden">ID Equipo</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center">Nombre <br />Servidor</th>
+                                    <th data-field="Ticket" data-halign="center" data-valign="middle" data-align="center">Ticket  <br /> de Baja</th>
+                                    <th data-field="NombreArchivo" data-halign="center" data-valign="middle" data-align="center">Nombre Archivo</th>
+                                    <th data-field="FechaCargarArchivoBajaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Fecha de carga<br />de Información</th>
+                                    <th data-field="EstadoServidorStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Estado Servidor</th>
+                                    <th data-field="AplicacionesRelacionadasStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Aplicaciones Relacionadas</th>
+                                    <th data-field="DominioServidor" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Dominio Servidor</th>
+                                    <th data-field="Observacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Observación</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/bajaServidores.js?v1.1.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>

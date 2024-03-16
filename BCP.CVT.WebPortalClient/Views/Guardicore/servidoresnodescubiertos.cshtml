@@ -1,0 +1,76 @@
+﻿
+@{
+    ViewBag.Title1 = "Servidores no descubiertos - Guardicore";
+    ViewBag.Title2 = "Integraciones";
+    ViewBag.Title3 = "Servidores no descubiertos - Guardicore";
+}
+
+<div class="card" style="margin-bottom:25px;">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row form-group">
+                            <div class="col-xs-5">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Ip o Nombre del servidor: </h5>
+                                    <div class="input-with-icon filAppContainer">
+                                        <input id="txtFilApp" name="txtFilApp" class="form-control input-thick pill input-with-icon-search" type="text">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                    <input type="hidden" id="hdFilAppId" name="hdFilAppId" value="" />
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado del servidor: </h5>
+                                    <select id="txtFilAplica" name="txtFilAplica" class="form-control">
+                                        <option value="-1">-- Todos --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <h5>&nbsp;</h5>
+                                <button id="btnBusEq" class="btn btn-primary btn-width-custom" onclick="buscarEquipo()">Buscar</button>
+                                <button id="btnExportar" class="btn btn-primary btn-width-custom" onclick="buscarEquipo()">Exportar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <div class="">
+                        <table id="tbRegistros" class="table" data-mobile-responsive="true" data-detail-view="false" data-detail-formatter="detailFormatter" data-row-style="rowStyle" style="font-size:11px !important;">
+                            <caption class="caption text-left">
+                                <span>Servidores</span>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-formatter="EstadoFormatter" data-field="estado" data-halign="center" data-valign="middle" data-align="center" data-width="40">Acción</th>
+                                    <th data-field="name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="object.name">IP</th>
+                                    <th data-field="guest_agent_details.os_details.os_display_name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="240" data-sort-name="guest_agent_details.os_details.os_display_name">Servidor</th>
+                                    <th data-field="guest_agent_details.os_details.os_display_name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="240" data-sort-name="guest_agent_details.os_details.os_display_name">Tipo de Origen</th>
+                                    <th data-field="guest_agent_details.os_details.os_display_name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="240" data-sort-name="guest_agent_details.os_details.os_display_name">Motivo</th>
+                                    <th data-field="last_guest_agent_details_update" data-formatter="formatearFecha" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="last_guest_agent_details_update" data-width="130">Fecha <br /> Scaneo</th>
+                                    <th data-field="labels" data-formatter="labelsFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="120">Estado</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

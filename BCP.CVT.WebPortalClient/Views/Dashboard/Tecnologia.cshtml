@@ -1,0 +1,187 @@
+﻿@{
+    ViewBag.Title1 = "Gráficos por Tecnologías";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Tecnología";
+    ViewBag.Title3 = "Evaluación de las tecnologías";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<style>
+    .btn-warning {
+        color: #fff;
+        background-color: #fbee4d;
+        border-color: #fbee4d;
+    }
+
+    .btn-danger {
+        color: #fff;
+        background-color: #dc6967;
+        border-color: #dc6967;
+    }
+
+    .btn-success {
+        color: #fff;
+        background-color: 7ddc67;
+        border-color: 7ddc67;
+    }
+
+
+    #reportHorizontalBar {
+        width: 100%;
+        height: 800px;
+    }
+
+    #reportPie {
+        width: 100%;
+        height: 400px;
+    }
+
+    .div-report {
+        display: none;
+    }
+     
+    .ui-state-hover {
+      border:none !important;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="form-group">
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Dominio: (*) </h5>
+                                        <select id="cbFilDominio" name="cbFilDominio" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Subdominio: (*) </h5>
+                                        <select id="cbFilSubdominio" name="cbFilSubdominio" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3 hidden">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Familia: </h5>
+                                        <select id="cbFilFamilia" name="cbFilFamilia" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Fabricante: </h5>
+                                        <select id="cbFilFabricante" name="cbFilFabricante" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Nombre Tecnología: </h5>
+                                        <select id="cbFilClaveTecnologia" name="cbFilClaveTecnologia" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row"></div>
+                            <div class="form-group">
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Tipo de Equipo: </h5>
+                                        <select id="cbFilTipoEquipo" name="cbFilTipoEquipo" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Subsidiaria (a nivel de equipos): </h5>
+                                        <select id="cbFilDominioRed" name="cbFilDominioRed" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Fecha de la consulta: (*)</h5>
+                                        <div class="input-group date" id="divFechaFiltro">
+                                            <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                            <!--<div class="input-group-addon">-->
+                                            @*<span class="glyphicon glyphicon-th"></span>*@
+                                            <!--<span class="icon icon-calendar"></span>
+                                            </div>-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="ActualizarGraficos()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Generar Gráficos</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header">
+                <strong>Estado de las tecnologías del Grupo</strong>
+            </div>
+            <div class="card-body">
+                <div id="reportPie"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header">
+                <strong>Estado y Cantidad de Equipos Instalados por Tecnología</strong>
+                <div class="text-left exportar-detalle-reporte" style="display:none">
+                    <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarInfo()">
+                        <span class="icon icon-external-link"></span>
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+                <div class="container" style="margin-top:15px;">
+                    <ul class="list-group">
+                        <li class="list-group-item-cust list-group-item">
+                            <span class="list-group-addon btn btn-success btn-circle"></span>
+                            Vigente
+                        </li>
+                        <li class="list-group-item-cust list-group-item">
+                            <span class="list-group-addon btn btn-danger btn-circle"></span>
+                            No vigente
+                        </li>
+                        <li class="list-group-item-cust list-group-item">
+                            <span class="list-group-addon btn btn-warning btn-circle"></span>
+                            Cerca de fin de soporte
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="reportHorizontalBar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/app/dashboardTecnologia.js?v=2.1.1"></script>
+
+<script>
+    const NO_VIGENTE = '@Html.Raw(BCP.CVT.Cross.Utilitarios.GetEnumDescription2(BCP.CVT.Cross.EDashboardEstadoTecnologia.NoVigente))';
+    const VIGENTE = '@Html.Raw(BCP.CVT.Cross.Utilitarios.GetEnumDescription2(BCP.CVT.Cross.EDashboardEstadoTecnologia.Vigente))';
+    const CERCA_FIN_SOPORTE = '@Html.Raw(BCP.CVT.Cross.Utilitarios.GetEnumDescription2(BCP.CVT.Cross.EDashboardEstadoTecnologia.CercaFinSoporte))';
+    const SIN_INFORMACION = '@Html.Raw(BCP.CVT.Cross.Utilitarios.GetEnumDescription2(BCP.CVT.Cross.EDashboardEstadoTecnologia.SinInformacion))';
+</script>

@@ -1,0 +1,110 @@
+﻿
+@{
+    ViewBag.Title1 = "Equipos sin relación con aplicaciones";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Equipos";
+    ViewBag.Title3 = "Equipos sin relaciones con aplicaciones";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height containerFiltroEquipo">
+                                    <h5>Equipo: </h5>
+                                    <input type="text" id="txtEquipo" name="txtEquipo" value="" maxlength="100" autocomplete="off" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo de equipo: </h5>
+                                    <select id="ddlTipoEquipo" name="ddlTipoEquipo" class="form-control" multiple="multiple"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height containerFiltroSO">
+                                    <h5>Sistema operativo: </h5>
+                                    <input type="text" id="txtSO" name="txtSO" value="" maxlength="100" autocomplete="off" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Fecha de la consulta: </h5>
+                                    <div class="input-group date" id="divFechaFiltro">
+                                        <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        @*<span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs form-group">
+                            <div class="col-md-12">
+                                <div class="text-right">
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+                                </div>
+                            </div>
+                            @*<div class="col-md-8 col-xs-8 col-sm-8">
+                                </div>
+                                <div class="col-md-2 col-xs-2 col-sm-2">
+                                    <button id="btnBuscar" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+                                </div>
+                                <div class="col-md-2 col-xs-2 col-sm-2">
+                                    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+                                        <span class="icon icon-external-link"></span>
+                                        <span class="count-text">Exportar</span>
+                                    </a>
+                                </div>*@
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    @*<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="RefrescarListado()">
+            <span class="count-text">Buscar</span>
+        </a>*@
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Reporte detallado de equipos sin relaciones con aplicaciones</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistro" class="table" data-show-columns="true" style="font-size:11px !important;">
+                    <thead>
+                        <tr>
+                            <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="TipoEquipo">Tipo de equipo</th>
+                            <th data-formatter="linkFormatterEquipo" data-field="Equipo" data-halign="center" data-valign="middle" data-align="left" data-width="200" data-sortable="true" data-sort-name="Equipo">Equipo</th>
+                            <th data-formatter="linkFormatterTecnologia" data-field="SistemaOperativo" data-halign="center" data-valign="middle" data-align="left" data-width="300" data-sortable="true" data-sort-name="SistemaOperativo">Sistema Operativo</th>
+                            @*<th data-field="TecnologiasInstaladas" data-halign="center" data-valign="middle" data-align="center" data-width="80" data-sortable="true" data-sort-name="TecnologiasInstaladas">Tecnologías instaladas</th>*@
+                            <th data-field="TemporalToString" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="FlagTemporal">Descubrimiento</th>
+                            <th data-field="UltimaActualizacion" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="UltimaActualizacion">Fecha de última actualización</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hdFiltro" id="hdFiltro" value="" />
+</div>
+
+<script src="~/app/sinrelaciones.js?v=2.1.0"></script>
+
+

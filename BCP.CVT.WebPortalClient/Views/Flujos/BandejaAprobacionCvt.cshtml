@@ -1,0 +1,369 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title1 = "Bandeja de aprobación CVT";
+    ViewBag.Title2 = "Flujos de aprobación";
+    ViewBag.Title3 = "Bandeja de aprobación CVT";
+
+
+    string esApplianceUsuario = (string)ViewBag.isUser;
+    if (String.IsNullOrWhiteSpace(esApplianceUsuario))
+    {
+        esApplianceUsuario = "0";
+    }
+
+}
+@using BCP.CVT.Cross
+
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    /* Chat containers */
+    .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    /* Darker chat container */
+    .darker {
+        border-color: #f7a033;
+        background-color: #ddd;
+    }
+
+    /* Clear floats */
+    .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    /* Style images */
+    .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+        /* Style the right image */
+        .container img.right {
+            float: right;
+            margin-left: 20px;
+            margin-right: 0;
+        }
+
+    /* Style time text */
+    .time-right {
+        float: right;
+        color: #aaa;
+    }
+
+    /* Style time text */
+    .time-left {
+        float: left;
+        color: #999;
+    }
+
+    .user-name {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row gutter-xs">
+                            <div class="col-xs-6 col-md-6">
+                                <div class="text-left" data-toggle="match-height">
+                                    <div class="input-with-icon containerFiltro">
+                                        <h5>Equipo: </h5>
+                                        <input id="txtCodigoFiltro" name="txtCodigoFiltro" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Búsqueda por nombre del equipo">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado de la solicitud: </h5>
+                                    <select id="ddlEstadoFiltro" name="ddlEstadoFiltro" class="form-control">
+                                        <option value="0" selected="selected">Todos</option>
+                                        <option value="1">Registrado</option>
+                                        <option value="2">Pendiente atención Owner</option>
+                                        <option value="3">Aprobado Owner</option>
+                                        <option value="4">Rechazado Owner</option>
+                                        <option value="5">Desestimada</option>
+                                        <option value="6">Pendiente atención CVT</option>
+                                        <option value="7">Aprobado CVT</option>
+                                        <option value="8">Rechazado CVT</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+
+                            </div>
+                        </div>
+                        <div class="form-group row gutter-xs">
+                            <div class="col-md-12">
+                                <div class="text-right">
+                                    <a id="btnBuscar" class="btn btn-primary" href="javascript: void(0)" title="Buscar">
+                                        <span class="icon icon-search"></span>
+                                        <span class="count-text">Buscar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;">
+
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs" style="margin-top:20px;">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tbl-solicitudes-pendientes-cvt" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true" style="font-size: 11px !important;">
+                    <caption class="caption text-left">
+                        <span>Registro de solicitudes</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            <th data-field="NombreEquipo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="NombreEquipo">Equipo</th>
+                            <th data-field="TipoSolicitud" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="TipoSolicitud">Tipo de solicitud</th>
+                            <th data-field="EstadoSolicitudToString" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="EstadoSolicitud">Estado de la solicitud</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion">Fecha de creación</th>
+                            <th data-field="TipoEquipoActualToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TipoEquipoActual">Tipo de equipo inicial</th>
+                            <th data-field="TipoEquipoSolicitadoToString" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="TipoEquipoSolicitado">Tipo de equipo final</th>
+                            <th data-field="NombreUsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreUsuarioCreacion">Creado por</th>
+                            <th data-field="FechaAprobacionRechazoToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaAprobacionRechazo">Fecha de aprobación/rechazo</th>
+                            <th data-field="NombreUsuarioAprobadoRechazo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreUsuarioAprobadoRechazo">Aprobado/rechazado por</th>
+                            <th data-field="FechaAprobacionRechazoCvtToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaAprobacionRechazoCVT">Fecha de Aprobacion/rechazo CVT</th>
+                            <th data-field="AprobadoRechazadoPorCVT" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="AprobadoRechazadoPorCVT">Aprobado/rechazado por CVT</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal eliminado-->
+
+<input type="hidden" name="hdSolicitudId" id="hdSolicitudId" value="0" />
+<input type="hidden" name="hdAccion" id="hdAccion" value="0" />
+
+<div id="modalEliminar" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEliminar" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <form id="formEliminar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Solicitud de cambio de tipo de equipo (Appliance)</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="row"></div>
+                                <div class="row">
+                                    <div>
+                                        <div>
+                                            <div class="col-md-3">
+                                                <label class="control-label">Equipo asociado a la solicitud: </label>
+                                            </div>
+                                            <div class="col-md-6 containerFiltro">
+                                                <input id="txtEquipo" name="txtEquipo" class="form-control" type="text">
+                                                <input type="hidden" name="hdEquipoId" id="hdEquipoId" value="0" />
+                                            </div>
+                                            <div class="col-md-3">
+                                                &nbsp;
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div>
+                                        <div>
+                                            <div class="col-md-3">
+                                                <label class="control-label">Aplicación a la que se relacionará el equipo: </label>
+                                            </div>
+                                            <div class="col-md-6 nombreAplicacionContainer">
+                                                <input type="text" id="txtAplicacion" name="txtAplicacion" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                                <input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+                                            </div>
+                                            <div class="col-md-3">
+                                                &nbsp;
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div>
+                                        <div class="col-md-3">
+                                            <label class="control-label">Evidencia asociada a la solicitud (contrato, entre otros): </label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <input id="txtArchivo" class="form-control" type="text">
+                                                <span class="input-group-btn">
+                                                    <label class="btn btn-primary file-upload-btn">
+                                                        <input id="flArchivo" class="file-upload-input inputArchivo" type="file" name="flArchivo">
+                                                        <span class="glyphicon glyphicon-folder-open"></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a id="btnDescargar" class="btn btn-primary btn-width-custom" style="display:none;" onclick="javascript:DescargarArchivo();">
+                                                <span class="icon icon-arrow-down"></span>
+                                                <span class="count-text">Descargar</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="control-label">Fecha de fin de contrato: </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group date" id="dpFecha-btn">
+                                            <input type="text" id="dpFecha" name="dpFecha" class="form-control" />
+                                            <span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div>
+                                            <label class="control-label">Comentarios del solicitante asociados a esta solicitud: </label>
+                                            <textarea id="txtComentarios" name="txtComentarios" rows="5" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" id="rowComentariosDesestimacion" style="display:none;">
+                                    <div class="col-md-12">
+                                        <div>
+                                            <label class="control-label">Comentarios del solicitante asociados a la desestimación: </label>
+                                            <textarea id="txtComentariosDesestimacion" name="txtComentariosDesestimacion" rows="5" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" id="rowComentariosRechazo" style="display:none;">
+                                    <div class="col-md-12">
+                                        <div>
+                                            <label class="control-label">Comentarios asociados al Rechazo: </label>
+                                            <textarea id="txtComentariosRechazo" name="txtComentariosRechazo" rows="5" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" id="rowComentariosAprobador" style="display:none;">
+                                    <div class="col-md-12">
+                                        <div>
+                                            <label class="control-label">Comentarios del aprobador: </label>
+                                            <textarea id="txtComentariosAprobacionRechazo" name="txtComentariosAprobacionRechazo" rows="5" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnGuardar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Enviar solicitud</button>
+                    <button id="btnAprobar" class="btn btn-success" type="button" data-loading-text="Procesando..." style="display:none;">Aprobar</button>
+                    <button id="btnRechazar" class="btn btn-danger" type="button" data-loading-text="Procesando..." style="display:none;">Rechazar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+ 
+<div id="modalRechazarSolicitante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRechazarSolicitante" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formRechazarSolicitante">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el comentario indicando la desestimación de la solicitud</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a esta desestimación: </label>
+                                <textarea id="txtDescripcionRechazoSolicitante" name="txtDescripcionRechazoSolicitante" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnProcesarRechazoSolicitante" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalAprobarRechazar" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalAprobarRechazar" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formAprobarRechazar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese un comentario</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a esta solicitud: </label>
+                                <textarea id="txtDescripcionAprobador" name="txtDescripcionAprobador" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnProcesarAprobador" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/app/Flujos/aprobacionCvtAppliance.js?v=1.2.0"></script>

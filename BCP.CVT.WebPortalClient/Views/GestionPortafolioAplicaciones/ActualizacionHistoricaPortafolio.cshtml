@@ -1,0 +1,136 @@
+﻿@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Actualización Histórica";
+	ViewBag.Title2 = "Gestión de Portafolio";
+	ViewBag.Title3 = "Actualización Histórica";
+}
+@using BCP.CVT.Cross
+<style>
+	.opcionesStyle {
+		width: 600px;
+	}
+
+	.table {
+		font-size: 11px !important;
+	}
+</style>
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+@*<div class="card">
+	<div class="card-body">
+		<div class="card-search">
+			<fieldset class="fieldset">
+				<legend class="legend">Filtro de búsqueda</legend>
+				<div class="card-search-box">	
+					<div class="row gutter-xs">
+
+						<div class="col-md-9">
+							<div class="text-right">
+								<a id="btnUpdate" class="btn btn-primary" href="javascript: void(0)" title="Actualizar aplicaciones">
+									<span class="icon icon-upload"></span>
+									<span class="count-text">Actualizar</span>
+								</a>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>*@
+
+<div class="col-xs-12">
+	<form id="formImportar">
+		<div class="form-group">
+			<a id="btnDescarApps" href="javascript:void(0)" title="Descargar aplicaciones">
+				[Descargar aplicaciones]
+			</a>
+		</div>
+		<div class="form-group">
+			<label class="control-label">
+				Archivo excel:
+				<span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="La aplicación carga los registros que se encuentren en la primera hoja del archivo MS Excel."></span>
+			</label>
+			<div class="input-group">
+				<input id="txtArchivo" name="txtArchivo" class="form-control" type="text" value="Ningún archivo seleccionado" readonly>
+				<span class="input-group-btn">
+					<label class="btn btn-primary file-upload-btn">
+						<input id="flArchivo" name="flArchivo" class="file-upload-input inputfile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+						<span class="glyphicon glyphicon-folder-open"></span>
+					</label>
+				</span>
+			</div>
+		</div>
+
+		@*<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>*@
+		<button id="btnActualizar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Actualizar</button>
+	</form>
+</div>
+<br/>
+<div class="col-xs-12">
+    <form id="formEliminarApps">
+        <div class="form-group">
+            <label class="control-label">
+                Eliminar todas las aplicaciones del portafolio
+            </label>
+        </div>
+        <button id="btnEliminar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Eliminar portafolio</button>
+    </form>
+</div>
+
+	<!--Modal Results (Gestion Aplicacion)-->
+	<div id="mdResults" tabindex="-1" role="dialog" class="modal fade">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header bg-primary">
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">×</span>
+						<span class="sr-only">Close</span>
+					</button>
+					<h4 class="modal-title">Resultados de la actualización masiva</h4>
+				</div>
+				<div class="modal-body">
+					<form id="formResults">
+						<div class="form-group">
+							<p id="pDetalleCarga"></p>
+						</div>
+						<div class="form-group">
+							<div class="row">
+								<div class="col-md-6">
+									<label class="control-label">Registros procesados: </label>
+									<input type="text" id="txtTotal" name="txtTotal" class="form-control" disabled />
+								</div>
+								<div class="col-md-6">
+									<label class="control-label">Registros actualizados: </label>
+									<input type="text" id="txtTotalUpdate" name="txtTotalUpdate" class="form-control" disabled />
+								</div>
+							</div>
+						</div>
+						<div class="form-group error-div">
+							<label class="control-label">Errores encontrados: </label>
+						</div>
+						<div class="form-group error-div">
+							<table id="tblResults" class="table" data-unique-id="Id" data-mobile-responsive="true">
+								<thead>
+									<tr>
+										<th data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="2%">#</th>
+										<th data-field="TipoErrorIdStr" data-halign="center" data-valign="middle" data-align="center" data-width="15%">Tipo error</th>
+										<th data-field="Detalle" data-halign="center" data-valign="middle" data-align="center">Evidencia, detalle o entidad</th>
+										<th data-field="FilaExcel" data-halign="center" data-valign="middle" data-align="center" data-width="4%">Fila en archivo excel</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+						<div class="error-div">
+							<a id="btnExportarValidacionCargaMasiva">Descargar Validaciones</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Modal Results (Gestion Aplicacion)-->
+
+	<script src="~/app/GestionPortafolio/actualizacionHistoricaPortafolio.js?v=2.0.0"></script>

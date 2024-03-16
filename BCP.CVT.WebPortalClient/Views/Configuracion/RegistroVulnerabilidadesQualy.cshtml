@@ -1,0 +1,402 @@
+﻿
+@{
+    ViewBag.Title1 = "Registro de Vulnerabilidades - Qualys";
+    ViewBag.Title2 = "Integraciones";
+    ViewBag.Title3 = "Registro de Vulnerabilidades - Qualys";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<ul class="nav nav-tabs nav-justified">
+    <li class="active">
+        <a href="#VulnAsignadas" data-toggle="tab">Vulnerabilidades Asignadas</a>
+    </li>
+    <li>
+        <a href="#VulnNoAsignadas" data-toggle="tab">Vulnerabilidades No Asignadas</a>
+    </li>
+</ul>
+<div class="tab-content table-bordered">
+    <div class="tab-pane fade active in" id="VulnAsignadas">
+        <div class="col-sm-12">
+            <div class="row"></div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-search">
+                        <div class="panel-group" id="accordion-filtro-asignadas" role="tablist" aria-multiselectable="true">
+                            <div class="panel panel-default" style="overflow: inherit;">
+                                <a class="panel-heading" role="tab" id="heading-filtro-asignadas" data-toggle="collapse" data-parent="#accordion-filtro-asignadas" href="#collapse-filtro-asignadas" aria-expanded="true" aria-controls="collapse-filtro-asignadas" style="display: flex">
+                                    <h4 class="panel-title">
+                                        Filtro de búsqueda
+                                    </h4>
+                                </a>
+                                <div id="collapse-filtro-asignadas" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro-asignadas">
+                                    <div class="panel-body">
+                                        <div class="card-search-box">
+                                            <form action="javascript:void(0);">
+                                                <div class="row" style="margin-bottom: 0;">
+                                                    <div class="col-sm-10">
+                                                        <div class="row" style="margin-bottom: 0;">
+                                                            <div class="col-sm-4">
+                                                                <label>QID: </label>
+                                                                <input id="txtBusIdQualyAsignadas" class="form-control input-thick pill" type="text" placeholder="QID...">
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <label>Título: </label>
+                                                                <input id="txtBusTituloQualyAsignadas" class="form-control input-thick pill" type="text" placeholder="Título...">
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <label>Nivel Severidad: </label>
+                                                                <div class="input-with-icon">
+                                                                    <select id="cbBusNivelSeveridadQualyAsignadas" class="form-control input-thick pill input-with-icon-search" style="width: 100%">
+                                                                        <option value="-1">Todos</option>
+                                                                        <option value="1">Nivel 1</option>
+                                                                        <option value="2">Nivel 2</option>
+                                                                        <option value="3">Nivel 3</option>
+                                                                        <option value="4">Nivel 4</option>
+                                                                        <option value="5">Nivel 5</option>
+                                                                    </select>
+                                                                    <span class="icon icon-search input-icon"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row" style="margin-bottom: 0;">
+                                                            <div class="col-sm-6">
+                                                                <label>Producto: </label>
+                                                                <div class="input-with-icon productoContainer">
+                                                                    <input id="txtBusProductoStrQualyAsignadas" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Producto...">
+                                                                    <input id="hdnBusProductoIdQualyAsignadas" type="hidden">
+                                                                    <span class="icon icon-search input-icon"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <div class="row" style="margin-bottom: 0;">
+                                                            <div class="col-sm-12">
+                                                                <div class="row" style="margin-bottom: 0;">
+                                                                    <label>&nbsp;</label><div class="clear"></div>
+                                                                    <button id="btnBusBuscarAsignadas" class="btn btn-primary btn-width-custom" onclick="listarQualyAsignadas()">Buscar</button>
+                                                                </div>
+                                                                <div class="row" style="margin-bottom: 0;">
+                                                                    <label>&nbsp;</label><div class="clear"></div>
+                                                                    <button id="btnBusExportarAsignadas" class="btn btn-primary btn-width-custom" onclick="ExportarQualyAsignadas()">Exportar</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row gutter-xs">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong>Lista de registros</strong>
+                        </div>
+                        <div class="card-body">
+                            <table id="tbQualyAsignadas" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                <thead>
+                                    <tr>
+                                        <th data-formatter="rowNumFormatterServerAlt" data-field="tbQualyAsignadas" data-valign="middle" data-align="center" data-width="30">#</th>
+                                        <th data-formatter="linkFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="QualyId">QID</th>
+                                        <th data-field="TipoVulnerabilidad" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tipo<br />Vulnerabilidad</th>
+                                        <th data-field="NivelSeveridad" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Nivel<br />Severidad</th>
+                                        <th data-field="Categoria" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Categoría</th>
+                                        <th data-field="Titulo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Titulo</th>
+                                        <th data-field="Codigo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Código Producto</th>
+                                        <th data-field="Producto.Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Fabricante + ' ' + Nombre">Producto</th>
+                                        <th data-field="UsuarioModificacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="false">Usuario<br />Modificación</th>
+                                        <th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="false">Fecha<br />Modificación</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade in" id="VulnNoAsignadas">
+        <div class="col-sm-12">
+            <div class="row"></div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-search">
+                        <div class="panel-group" id="accordion-filtro-no-asignadas" role="tablist" aria-multiselectable="true">
+                            <div class="panel panel-default" style="overflow: inherit;">
+                                <a class="panel-heading" role="tab" id="heading-filtro-no-asignadas" data-toggle="collapse" data-parent="#accordion-filtro-no-asignadas" href="#collapse-filtro-no-asignadas" aria-expanded="true" aria-controls="collapse-filtro-no-asignadas" style="display: flex">
+                                    <h4 class="panel-title">
+                                        Filtro de búsqueda
+                                    </h4>
+                                </a>
+                                <div id="collapse-filtro-no-asignadas" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro-no-asignadas">
+                                    <div class="panel-body">
+                                        <div class="card-search-box">
+                                            <form action="javascript:void(0);">
+                                                <div class="row" style="margin-bottom: 0;">
+                                                    <div class="col-sm-10">
+                                                        <div class="row" style="margin-bottom: 0;">
+                                                            <div class="col-sm-4">
+                                                                <label>QID: </label>
+                                                                <input id="txtBusIdQualyNoAsignadas" class="form-control input-thick pill" type="text" placeholder="QID...">
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <label>Título: </label>
+                                                                <input id="txtBusTituloQualyNoAsignadas" class="form-control input-thick pill" type="text" placeholder="Título...">
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <label>Nivel Severidad: </label>
+                                                                <div class="input-with-icon">
+                                                                    <select id="cbBusNivelSeveridadQualyNoAsignadas" class="form-control input-thick pill input-with-icon-search" style="width: 100%">
+                                                                        <option value="-1">Todos</option>
+                                                                        <option value="1">Nivel 1</option>
+                                                                        <option value="2">Nivel 2</option>
+                                                                        <option value="3">Nivel 3</option>
+                                                                        <option value="4">Nivel 4</option>
+                                                                        <option value="5">Nivel 5</option>
+                                                                    </select>
+                                                                    <span class="icon icon-search input-icon"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <div class="row" style="margin-bottom: 0;">
+                                                            <div class="col-sm-12">                                                                
+                                                                <div class="row" style="margin-bottom: 0;">
+                                                                    <label>&nbsp;</label><div class="clear"></div>
+                                                                    <button id="btnBusBuscar" class="btn btn-primary btn-width-custom" onclick="listarQualyNoAsignadas()">Buscar</button>
+                                                                </div>
+                                                                <div class="row" style="margin-bottom: 0;">
+                                                                    <label>&nbsp;</label><div class="clear"></div>
+                                                                    <button id="btnBusExportar" class="btn btn-primary btn-width-custom" onclick="ExportarQualyNoAsignadas()">Exportar</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row gutter-xs">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong>Lista de registros</strong>
+                        </div>
+                        <div class="card-body">
+                            <table id="tbQualyNoAsignadas" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                <thead>
+                                    <tr>
+                                        <th data-formatter="rowNumFormatterServerAlt" data-field="tbQualyNoAsignadas" data-valign="middle" data-align="center" data-width="30">#</th>
+                                        <th data-formatter="linkFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="QualyId">QID</th>
+                                        <th data-field="TipoVulnerabilidad" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tipo<br />Vulnerabilidad</th>
+                                        <th data-field="NivelSeveridad" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Nivel<br />Vulnerabilidad</th>
+                                        <th data-field="Categoria" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Categoría</th>
+                                        <th data-field="Titulo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Titulo</th>                                        
+                                        <th data-field="FechaPublicacionStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaPublicacion">Fecha<br />Publicación</th>                                        
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Qualy)-->
+<div id="MdAddOrEditQualy" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormQualy">Registro de vulnerabilidades - Qualys</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditQualy">
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">QID: </label>
+                                <input id="txtQualyId" class="form-control field-qualy" type="text" name="txtQualyId" readonly>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Categoría: </label>
+                                <input id="txtCategoriaQualy" class="form-control field-qualy" type="text" name="txtCategoriaQualy" maxlength="50" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Tipo Vulnerabilidad: </label>
+                                <input id="txtTipoVulnerabilidadQualy" class="form-control field-qualy" type="text" name="txtTipoVulnerabilidadQualy" maxlength="250" readonly>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Nivel Severidad: </label>
+                                <input id="txtNivelSeveridadQualy" class="form-control field-qualy" type="text" name="txtNivelSeveridadQualy" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label">Título: </label>
+                                <input id="txtTituloQualy" class="form-control field-qualy" type="text" name="txtTituloQualy" maxlength="250" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 0; display: none;">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Fecha Publicación: </label>
+                                <div class="input-group date" id="divFechaPublicacionQualy">
+                                    <input id="txtFechaPublicacionQualy" class="form-control field-qualy" type="text" name="txtFechaPublicacionQualy" readonly />
+                                    <span id="txtFechaPublicacionQualy-btn" class="input-group-addon">
+                                        <span class="icon icon-calendar"></span>
+                                    </span>
+                                </div>                                
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Lista Software: </label>
+                                <input id="txtListaSoftwareQualy" class="form-control field-qualy" type="text" name="txtListaSoftwareQualy" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 0; display: none;">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label">Diagnóstico: </label>
+                                <textarea id="txtDiagnosticoQualy" class="form-control field-qualy" name="txtDiagnosticoQualy" rows="3" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label">Solución: </label>
+                                <textarea id="txtSolucionQualy" class="form-control field-qualy" name="txtSolucionQualy" rows="10" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="row" style="margin-bottom: 0;">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Referencia Vendedor: </label>
+                                <input id="txtReferenciaVendedorQualy" class="form-control field-qualy" type="text" name="txtReferenciaVendedorQualy" readonly>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Malware Asociado: </label>
+                                <input id="txtMalwareAsociadoQualy" class="form-control field-qualy" type="text" name="txtMalwareAsociadoQualy" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">PCI Vuln: </label>
+                                <input id="txtPCIVulnQualy" class="form-control field-qualy" type="text" name="txtPCIVulnQualy" readonly>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Explotabilidad: </label>
+                                <textarea id="txtExplotabilidadQualy" class="form-control field-qualy" name="txtExplotabilidadQualy" rows="3" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Amenaza: </label>
+                                <textarea id="txtAmenazaQualy" class="form-control field-qualy" name="txtAmenazaQualy" rows="3" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Impacto: </label>
+                                <textarea id="txtImpactoQualy" class="form-control field-qualy" name="txtImpactoQualy" rows="3" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>*@
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label">Producto: </label>
+                                <div class="input-with-icon productoModalContainer">
+                                    <input id="txtProductoQualy" class="form-control input-thick pill input-with-icon-search field-qualy" type="text" name="txtProductoQualy">
+                                    <input type="hidden" id="hdnProductoIdQualy" value="0" />
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="row" style="margin-bottom: 0;">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label">Lista de Tecnologías asociadas: </label>
+                                <div class="input-with-icon tecnologiaModalContainer">
+                                    <input id="txtTecnologiaQualy" class="form-control input-thick pill input-with-icon-search field-tecnologia-qualy" type="text" name="txtTecnologiaQualy">
+                                    <input type="hidden" id="hdnTecnologiaIdQualy" />
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                                <div class="row"></div>
+                                <table id="tbTecnologiaQualy" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="QualyTecnologiaId" data-mobile-responsive="true">
+                                    <thead>
+                                        <tr>
+                                            <th data-formatter="rowNumFormatter" data-field="tbTecnologiaQualy" data-valign="middle" data-align="center" data-width="30">#</th>
+                                            <th data-field="Tecnologia.ClaveTecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tecnología</th>                                            
+                                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="CreadoPor">Creado por</th>
+                                            <th data-formatter="opcionesTecnologiaQualy" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>*@
+                </form>
+                <input type="hidden" name="hdQualyId" id="hdQualyId" value="" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegQualy" class="btn btn-primary" onclick="guardarAddOrEditQualy()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/qualys.js"></script>

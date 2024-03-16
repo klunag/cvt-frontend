@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.Title1 = "Nuevas relaciones - Guardicore";
+    ViewBag.Title2 = "Integraciones";
+    ViewBag.Title3 = "Nuevas relaciones - Guardicore";
+}
+
+<div class="card" style="margin-bottom:25px;">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row form-group">
+                            <div class="col-xs-5">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Codigo de Aplicación: </h5>
+                                    <div class="input-with-icon filAppContainer">
+                                        <input id="txtFilApp" name="txtFilApp" class="form-control input-thick pill input-with-icon-search" type="text">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                    <input type="hidden" id="hdFilAppId" name="hdFilAppId" value="" />
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado: </h5>
+                                    <select id="txtFilAplica" name="txtFilAplica" class="form-control">
+                                        <option value="-1">-- Todos --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <h5>&nbsp;</h5>
+                                <button id="btnBusEq" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+                                <button id="btnExportar" class="btn btn-primary btn-width-custom" onclick="buscarEquipo()">Exportar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<table id="tblRegistro" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+    <thead>
+        <tr>
+            <th data-field="codigoapp" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationId">Codigo de la aplicacion</th>
+            <th data-field="cantSiEsta" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Nombre de la aplicacion</th>
+            <th data-field="cantNoEsta" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="managedBy">Gestionado Por</th>
+            <th data-field="fechaescaneo" data-formatter="formatearFecha" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="last_guest_agent_details_update" data-width="130">Fecha <br /> Scaneo</th>
+        </tr>
+    </thead>
+</table>
+
+<script src="~/app/Guardicore/nuevasrelaciones.js"></script>

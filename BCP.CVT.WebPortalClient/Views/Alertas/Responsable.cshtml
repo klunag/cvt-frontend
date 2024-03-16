@@ -1,0 +1,44 @@
+﻿
+@{
+    ViewBag.Title1 = "Responsables portafolio";
+    ViewBag.Title2 = "Alertas";
+    ViewBag.Title3 = "Responsables portafolio";
+}
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Indicadores</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblAplicaciones" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" style="font-size:11px !important;"  data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center">#</th>
+                            <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Código aplicación</th>
+                            <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Nombre</th>
+                            <th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tipo Activo</th>
+                            <th data-field="EstadoAplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Estado</th>
+                            <th data-formatter="formatterTtl" data-valign="middle" data-align="center" data-width="10%">Indicador TTL</th>
+                            <th data-formatter="formatterJde" data-valign="middle" data-align="center" data-width="10%">Indicador JdE/PO</th>
+                            <th data-formatter="formatterBroker" data-valign="middle" data-align="center" data-width="10%">Indicador Broker</th>
+                            <th data-formatter="formatterOwner" data-valign="middle" data-align="center" data-width="10%">Indicador Owner</th>
+                            <th data-formatter="formatterExperto" data-valign="middle" data-align="center" data-width="10%">Indicador Experto</th>
+                            <th data-formatter="formatterGestor" data-valign="middle" data-align="center" data-width="10%">Indicador Gestor</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/alertasResponsables.js?v=1.1.0"></script>

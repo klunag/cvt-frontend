@@ -1,0 +1,542 @@
+﻿var $table = $('#table');
+var URL_API_VISTA = URL_API + "/Tecnologia";
+var DATA_EXPORTAR = {};
+var LIST_SUBDOMINIO = [];
+var columns = [
+    { field: 'SoportadoPor', title: 'Soportado Por', width: '40%' },
+    { field: 'ObsoletoKPI', title: 'Obsoleto<br/>KPI <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="(Instancias Serv + Azure)"></span>', width: '10%', align: 'right', footerFormatter: totalFormatter },
+    { field: 'PorcentajeObsoletoKPI', title: '%', width: '10%', align: 'right', formatter: porcentajeFormatter, footerFormatter: totalFormatter },
+    { field: 'VigenteKPI', title: 'Vigente<br/>KPI <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="(Instancias Serv + Azure)"></span>', width: '10%', align: 'right', footerFormatter: totalFormatter },
+    { field: 'PorcentajeVigenteKPI', title: '%', width: '10%', align: 'right', formatter: porcentajeFormatter, footerFormatter: totalFormatter },
+    { field: 'TotalKPI', title: 'Total<br/>KPI <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="(Instancias Serv + Azure)"></span>', width: '10%', align: 'right', footerFormatter: totalFormatter },
+    { field: 'PorcentajeTotalKPI', title: 'Total %', width: '10%', align: 'right', formatter: porcentajeFormatter, footerFormatter: totalFormatter },
+]
+
+var DATA_DETAILS = [];
+
+$(function () {
+    InitAutocompletarAplicacion($("#txtBusAplicacionTecnologia"), $("#hdBusAplicacionTecnologiaId"), $(".searchAplicacionContainer"));
+    InitAutocompletarGestionadoPor($("#txtBusGestionadoPorTecnologia"), $("#hdBusGestionadoPorTecnologiaId"), '.searchGestionadoPorContainer');
+
+    ListarCombos(() => {
+        $("#cbBusDominioTecnologia").change(CargarSubDominioBusqueda);
+        $("#btnBusBuscar").trigger("click");
+    });
+});
+
+function listar() {
+    DATA_EXPORTAR.dominioIds = ($("#cbBusDominioTecnologia").val() || []).join(',');
+    DATA_EXPORTAR.subDominioIds = ($("#cbBusSubDominioTecnologia").val() || []).join(',');
+    DATA_EXPORTAR.aplicacionStr = $("#txtBusAplicacionTecnologia").val();
+    DATA_EXPORTAR.gestionadoPor = $("#txtBusGestionadoPorTecnologia").val();
+    DATA_EXPORTAR.nivel = 1;
+    DATA_EXPORTAR.ownerParentIds = '';
+
+    listarDatosIniciales();
+}
+
+function listarDatosIniciales() {
+    var data = [];
+    var { dominioIds, subDominioIds, aplicacionStr, gestionadoPor } = DATA_EXPORTAR;
+    let nivel = 1;
+
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    $.ajax({
+        url: `${URL_API_VISTA}/ListadoConsolidadoSoportadoPorObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&aplicacionStr=${aplicacionStr}&gestionadoPor=${gestionadoPor}&nivel=${nivel}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            if (result != null) {
+                data = result;
+                buildTableInicial(data);
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+            data = [];
+            waitingDialog.hide();
+        },
+        complete: function (data) {
+            waitingDialog.hide();
+        },
+        async: true
+    });
+}
+
+function buildTableInicial(data) {
+    let columnasTotalizadas = columns.map((x) => {
+        let data_add = x.field.toLowerCase() == 'soportadopor' ? { footerFormatter: totalTextFormatter } : x.field.toLowerCase().startsWith('porcentaje') ? { footerFormatter: totalPorcentajeFormatter } : { footerFormatter: totalFormatter };
+        return Object.assign({ ...x }, data_add);
+    });
+
+    $table.bootstrapTable('destroy');
+    $table.bootstrapTable({
+        columns: columnasTotalizadas,
+        data: data,
+        detailView: true,
+        showFooter: true,
+        //pagination: true,
+        onExpandRow: function (index, row, $detail) {
+            expandTable2($detail, row);
+        },
+        //footerStyle: function () {
+        //    console.log(this);
+        //}
+    });
+
+    $("[data-toggle=tooltip]").tooltip();
+}
+
+function expandTable2($detail, item) {
+    var data = [];
+    var { dominioIds, subDominioIds, aplicacionStr, gestionadoPor } = DATA_EXPORTAR;
+    let nivel = 2;
+    let soportadoPorIds = [item.SoportadoPorId];
+    let soportadoPorParents = soportadoPorIds.join(',');
+
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    $.ajax({
+        url: `${URL_API_VISTA}/ListadoConsolidadoSoportadoPorObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&aplicacionStr=${aplicacionStr}&gestionadoPor=${gestionadoPor}&nivel=${nivel}&soportadoPorParents=${soportadoPorParents}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            if (result != null) {
+                data = result;
+                buildTable2($detail.html('<table class="table-responsive"></table>').find('table'), data, soportadoPorIds);
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+            data = [];
+            waitingDialog.hide();
+        },
+        complete: function (data) {
+            waitingDialog.hide();
+        },
+        async: true
+    });
+}
+
+function buildTable2($el, data, soportadoPorIds) {
+    $el.bootstrapTable({
+        columns: columns,
+        data: data,
+        detailView: true,
+        showHeader: false,
+        //pagination: true,
+        onExpandRow: function (index, row, $detail) {
+            expandTable3($detail, row, soportadoPorIds);
+        }
+    });
+}
+
+function expandTable3($detail, item, soportadoPorIds) {
+    var data = [];
+    var { dominioIds, subDominioIds, aplicacionStr, gestionadoPor } = DATA_EXPORTAR;
+    let nivel = 3;
+    soportadoPorIds.push(item.SoportadoPorId);
+    let soportadoPorParents = soportadoPorIds.join(',');
+
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    $.ajax({
+        url: `${URL_API_VISTA}/ListadoConsolidadoSoportadoPorObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&aplicacionStr=${aplicacionStr}&gestionadoPor=${gestionadoPor}&nivel=${nivel}&soportadoPorParents=${soportadoPorParents}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            if (result != null) {
+                data = result;
+                buildTable3($detail.html('<table class="table-responsive"></table>').find('table'), data, soportadoPorIds);
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+            data = [];
+            waitingDialog.hide();
+        },
+        complete: function (data) {
+            waitingDialog.hide();
+
+        },
+        async: true
+    });
+}
+
+function buildTable3($el, data, soportadoPorIds) {
+    $el.bootstrapTable({
+        columns: columns,
+        data: data,
+        detailView: true,
+        showHeader: false,
+        //pagination: true,
+        onExpandRow: function (index, row, $detail) {
+            expandTable4($detail, row, soportadoPorIds);
+        }
+    });
+}
+
+function expandTable4($detail, item, soportadoPorIds) {
+    var data = [];
+    var { dominioIds, subDominioIds, aplicacionStr, gestionadoPor } = DATA_EXPORTAR;
+    let nivel = 4;
+    soportadoPorIds.push(item.SoportadoPorId);
+    let soportadoPorParents = soportadoPorIds.join(',');
+
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    $.ajax({
+        url: `${URL_API_VISTA}/ListadoConsolidadoSoportadoPorObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&aplicacionStr=${aplicacionStr}&gestionadoPor=${gestionadoPor}&nivel=${nivel}&soportadoPorParents=${soportadoPorParents}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            if (result != null) {
+                data = result;
+                buildTable4($detail.html('<table class="table-responsive" data-pagination="true"></table>').find('table'), data, soportadoPorIds);
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+            data = [];
+            waitingDialog.hide();
+        },
+        complete: function (data) {
+            waitingDialog.hide();
+
+        },
+        async: true
+    });
+}
+
+function buildTable4($el, data, soportadoPorIds) {
+    $el.bootstrapTable({
+        columns: columns,
+        data: data,
+        detailView: true,
+        showHeader: false,
+        //pagination: true,
+        onExpandRow: function (index, row, $detail) {
+            expandTable5($detail, row, soportadoPorIds);
+        }
+    });
+}
+
+function expandTable5($detail, item, soportadoPorIds) {
+    var data = [];
+    var { dominioIds, subDominioIds, aplicacionStr, gestionadoPor, correo, perfilId } = DATA_EXPORTAR;
+    let nivel = 5;
+    soportadoPorIds = [soportadoPorIds[0], soportadoPorIds[1], soportadoPorIds[2]];
+    soportadoPorIds.push(item.SoportadoPorId);
+    let soportadoPorParents = soportadoPorIds.join(',');
+
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    $.ajax({
+        url: `${URL_API_VISTA}/ListadoConsolidadoSoportadoPorObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&aplicacionStr=${aplicacionStr}&gestionadoPor=${gestionadoPor}&nivel=${nivel}&soportadoPorParents=${soportadoPorParents}&correoOwner=${correo}&perfilId=${perfilId}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            if (result != null) {
+                data = result;
+                buildTable5($detail.html('<table class="table-responsive" data-pagination="true"></table>').find('table'), data, soportadoPorIds);
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+            data = [];
+            waitingDialog.hide();
+        },
+        complete: function (data) {
+            waitingDialog.hide();
+
+        },
+        async: true
+    });
+}
+
+function buildTable5($el, data, soportadoPorIds) {
+    $el.bootstrapTable({
+        columns: columns,
+        data: data,
+        detailView: true,
+        showHeader: false,
+        //pagination: true,
+        onExpandRow: function (index, row, $detail) {
+            expandTable6($detail, row, soportadoPorIds);
+        }
+    });
+}
+
+function expandTable6($detail, item, soportadoPorIds) {
+    var data = [];
+    var { dominioIds, subDominioIds, aplicacionStr, gestionadoPor, correo, perfilId } = DATA_EXPORTAR;
+    let nivel = 6;
+    soportadoPorIds = [soportadoPorIds[0], soportadoPorIds[1], soportadoPorIds[2], soportadoPorIds[3]];
+    soportadoPorIds.push(item.SoportadoPorId);
+    let soportadoPorParents = soportadoPorIds.join(',');
+
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    $.ajax({
+        url: `${URL_API_VISTA}/ListadoConsolidadoSoportadoPorObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&aplicacionStr=${aplicacionStr}&gestionadoPor=${gestionadoPor}&nivel=${nivel}&soportadoPorParents=${soportadoPorParents}&correoOwner=${correo}&perfilId=${perfilId}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            if (result != null) {
+                data = result;
+                buildTable6($detail.html('<table class="table-responsive" data-pagination="true"></table>').find('table'), data);
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+            data = [];
+            waitingDialog.hide();
+        },
+        complete: function (data) {
+            waitingDialog.hide();
+
+        },
+        async: true
+    });
+}
+
+function buildTable6($el, data) {
+    let columnResize = columns.map(x => x);
+    columnResize.unshift({});
+
+
+    $el.bootstrapTable({
+        columns: columnResize,
+        data: data,
+        detailView: false,
+        pagination: true,
+        showHeader: false,
+    });
+}
+
+function totalTextFormatter() {
+    console.log(this);
+    return '<strong>Total General</strong>';
+}
+
+function totalFormatter(data) {
+    var field = this.field;
+    var suma = data.map(function (row) {
+        return +row[field];
+    }).reduce(function (sum, i) {
+        return sum + i;
+    }, 0);
+
+    return '<strong>' + suma + '</strong>';
+}
+
+function totalPorcentajeFormatter(data) {
+    var fieldTotal = 'TotalKPI';
+
+    var field = this.field.replace("Porcentaje", "");
+    var suma = data.map(function (row) {
+        return +row[field];
+    }).reduce(function (sum, i) {
+        return sum + i;
+    }, 0);
+
+    var sumaTotal = data.map(function (row) {
+        return +row[fieldTotal];
+    }).reduce(function (sum, i) {
+        return sum + i;
+    }, 0);
+
+    var porcentaje = sumaTotal == 0 ? 0 : (suma * 100) / sumaTotal;
+
+    return '<strong>' + porcentaje.toFixed(2) + '%</strong>';
+}
+
+function porcentajeFormatter(data) {
+    return '<strong>' + data.toFixed(2) + '%</strong>';
+}
+
+function nombreReporteFormatter(value, row, index) {
+    return `<a href="javascript:MostrarGraficoLineaTiempo('${value}')" title="Ver gráfico">${value}</a>`;
+}
+
+function verMasFormatter(data, row) {
+    let text = (data || '');
+    let item = { text: data };
+    let itemStr = JSON.stringify(item);
+
+    if (text.length >= 50) {
+        text = text.substr(0, 50);
+        text += `...<a href='javascript:verMas(${row.Fila}, "${this.field}", "${this.title}", ${row.FlagEquipoAsignado}, ${row.FlagProductoTecnologiaAsignado})'>Ver más</a>`;
+    }
+    return text;
+
+}
+
+function verMas(fila, field, title, flagEquipoAsignado, flagProductoTecnologiaAsignado) {
+    let data = DATA_DETAILS.find(x => x.FlagEquipoAsignado == flagEquipoAsignado && x.FlagProductoTecnologiaAsignado == flagProductoTecnologiaAsignado);
+    let item = data.Resultados.rows.find(x => x.Fila == fila);
+    $("#MdVerMas").modal('show');
+    $("#titleFormVerMas").html(`${title} de ${item.NetBIOS}`);
+    $("#MdVerMas .modal-body").html(item[field]);
+}
+
+function ListarCombos(fn = null) {
+    $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: URL_API_VISTA + "/TecnologiaSoportadoPorConsolidadoObsolescencia/ListarCombos",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (dataObject, textStatus) {
+            if (textStatus == "success") {
+                if (dataObject != null) {
+                    LIST_SUBDOMINIO = dataObject.SubDominio;
+                    SetItemsMultiple(dataObject.Dominio, $("#cbBusDominioTecnologia"), TEXTO_TODOS, TEXTO_TODOS, true);
+                    SetItemsMultiple(LIST_SUBDOMINIO.map(x => x), $("#cbBusSubDominioTecnologia"), TEXTO_TODOS, TEXTO_TODOS, true);
+                    if (typeof fn == "function") fn();
+                }
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+        },
+        async: false
+    });
+}
+
+function CargarSubDominioBusqueda() {
+    let dominioId = $("#cbBusDominioTecnologia").val() || [];
+    let listSubDominio = LIST_SUBDOMINIO.filter(x => dominioId.some(y => y == x.TipoId) || dominioId.length == 0);
+    SetItemsMultiple(listSubDominio, $("#cbBusSubDominioTecnologia"), TEXTO_TODOS, TEXTO_TODOS, true);
+    //SetItems(listSubDominio, $("#cbBusSubDominioTecnologia"), TEXTO_TODOS);
+}
+
+function InitAutocompletarGestionadoPor($searchBox, $IdBox, $Container) {
+    $searchBox.autocomplete({
+        appendTo: $Container,
+        minLength: 3,
+        source: function (request, response) {
+            if ($.trim(request.term) !== "") {
+                $IdBox.val("");
+                //let dominioIds = ($("#cbBusDominioTecnologia").val() || []).join(',');
+                //let subDominioIds = ($("#cbBusSubDominioTecnologia").val() || []).join(',');
+
+                $.ajax({
+                    url: `${URL_API}/Aplicacion/GetGestionadoByFiltro?filtro=${request.term}`,
+                    //data: JSON.stringify({filtro: request.term,}),
+                    dataType: "json",
+                    type: "GET",
+                    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        //DATA_APLICACION = data;
+                        response($.map(data, function (item) {
+                            return item;
+                        }));
+                    },
+                    async: true,
+                    global: false
+                });
+            } else
+                return response(true);
+        },
+        focus: function (event, ui) {
+            $searchBox.val(ui.item.label);
+            return false;
+        },
+        select: function (event, ui) {
+            $IdBox.val(ui.item.Id);
+            $searchBox.val(ui.item.Descripcion);
+            return false;
+        }
+    }).autocomplete("instance")._renderItem = function (ul, item) {
+        return $("<li>")
+            .append("<a style='display: block'><font>" + item.Descripcion + "</font></a>")
+            .appendTo(ul);
+    };
+}
+
+function InitAutocompletarAplicacion($searchBox, $IdBox, $container, fn = null) {
+    $searchBox.autocomplete({
+        minLength: 3,
+        appendTo: $container,
+        source: function (request, response) {
+            if ($.trim(request.term) !== "") {
+
+                let urlControllerWithParams = `${URL_API}/Aplicacion/GetAplicacionByFiltro?filtro=${request.term}`;
+
+                if ($IdBox !== null) $IdBox.val("");
+                $.ajax({
+                    url: urlControllerWithParams,
+                    type: "GET",
+                    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return item;
+                        }));
+                    },
+                    async: true,
+                    global: false
+                });
+            } else
+                return response(true);
+        },
+        focus: function (event, ui) {
+            $searchBox.val(ui.item.Descripcion);
+
+
+            return false;
+        },
+        select: function (event, ui) {
+            if ($IdBox !== null) {
+                $IdBox.val(ui.item.Id);
+                //$searchBox.val(ui.item.Descripcion);
+                //$("#hdOwnerIdProducto").val(ui.item.CodigoPersonalResponsable);
+                //$("#txtOwnerDisplayNameProducto").val(ui.item.NombresPersonalResponsable);
+                //$("#hdOwnerMatriculaProducto").val(ui.item.MatriculaPersonalResponsable);
+                //cbTribuCoeIdProducto_Change();
+                if (typeof fn == "function") fn(ui.item);
+            }
+            return false;
+        }
+    }).autocomplete("instance")._renderItem = function (ul, item) {
+        return $("<li>").append("<a style='display: block'><font>" + item.value + "</font></a>").appendTo(ul);
+    };
+}
+
+function exportar() {
+    let _data = $table.bootstrapTable("getData") || [];
+    if (_data.length === 0) {
+        //bootbox.alert("No hay datos para exportar.");
+        bootbox.alert({
+            size: "small",
+            title: "Productos de Tecnologías",
+            message: "No hay datos para exportar.",
+            buttons: {
+                ok: {
+                    label: 'Aceptar',
+                    className: 'btn-primary'
+                }
+            }
+        });
+        return false;
+    }
+
+    var { dominioIds, subDominioIds, aplicacionStr, gestionadoPor, correo, perfilId  } = DATA_EXPORTAR;
+    let url = `${URL_API_VISTA}/ExportarListadoConsolidadoSoportadoPorObsolescencia?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&aplicacionStr=${aplicacionStr}&gestionadoPor=${gestionadoPor}&correoOwner=${correo}&perfilId=${perfilId}`;
+    window.location.href = url;
+}

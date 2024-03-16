@@ -1,0 +1,771 @@
+﻿var $table = $('#table');
+var URL_API_VISTA = URL_API + "/Tecnologia";
+var DATA_EXPORTAR = {};
+var LIST_SUBDOMINIO = [];
+var columns = [
+    { field: 'Owner', title: 'Owner', width: '20%' },
+    { field: 'ObsoletoKPI', title: 'Obsoleto<br/>KPI <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="(Instancias Serv + Azure)"></span>', width: '10%', align: 'right', footerFormatter: totalFormatter },
+    { field: 'PorcentajeObsoletoKPI', title: '%', width: '10%', align: 'right', formatter: porcentajeFormatter, footerFormatter: totalFormatter },
+    { field: 'VigenteKPI', title: 'Vigente<br/>KPI <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="(Instancias Serv + Azure)"></span>', width: '10%', align: 'right', footerFormatter: totalFormatter },
+    { field: 'PorcentajeVigenteKPI', title: '%', width: '10%', align: 'right', formatter: porcentajeFormatter, footerFormatter: totalFormatter },
+    { field: 'DeprecadoKPI', title: 'Deprecado<br/>KPI <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="(Instancias Serv + Azure)"></span>', width: '10%', align: 'right', footerFormatter: totalFormatter },
+    { field: 'PorcentajeDeprecadoKPI', title: '%', width: '10%', align: 'right', formatter: porcentajeFormatter, footerFormatter: totalFormatter },
+    { field: 'TotalKPI', title: 'Total<br/>KPI <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="(Instancias Serv + Azure)"></span>', width: '10%', align: 'right', footerFormatter: totalFormatter },
+    { field: 'PorcentajeTotalKPI', title: 'Total %', width: '10%', align: 'right', formatter: porcentajeFormatter, footerFormatter: totalFormatter },
+]
+
+var DATA_DETAILS = [];
+
+$(function () {
+    InitAutocompletarProductoSearch($("#txtBusNombreTecnologia"), $("#hdBusNombreTecnologiaId"), ".searchProductoContainer");
+    InitAutocompletarTecnologia($("#txtBusClaveTecnologia"), $("#hdBusClaveTecnologiaId"), $(".searchTecnologiaContainer"));
+    InitAutocompletarTribuCoeProducto($("#txtBusOwnerTecnologia"), $("#hdBusOwnerTecnologiaId"), '.searchOwnerContainer', (item) => { cbTribuCoeIdProducto_Change(item) });
+
+    ListarCombos(() => {
+        $("#cbBusDominioTecnologia").change(CargarSubDominioBusqueda);
+        $("#btnBusBuscar").trigger("click");
+    });
+});
+
+function listar() {
+    DATA_EXPORTAR.dominioIds = ($("#cbBusDominioTecnologia").val() || []).join(',');
+    DATA_EXPORTAR.subDominioIds = ($("#cbBusSubDominioTecnologia").val() || []).join(',');
+    DATA_EXPORTAR.productoStr = $("#txtBusNombreTecnologia").val();
+    DATA_EXPORTAR.tecnologiaStr = $("#txtBusClaveTecnologia").val();
+    DATA_EXPORTAR.ownerStr = $("#txtBusOwnerTecnologia").val();
+    DATA_EXPORTAR.squadId = $("#cbBusSquadTecnologia").val() == "-1" ? "" : $("#cbBusSquadTecnologia").val();
+    //DATA_EXPORTAR.estadoId = $("#cbBusEstadoTecnologia").val() == "-1" ? '' : $("#cbBusEstadoTecnologia").val();
+    DATA_EXPORTAR.nivel = 1;
+    DATA_EXPORTAR.ownerParentIds = '';
+
+    listarDatosIniciales();
+}
+
+function listarDatosIniciales() {
+
+    //el rol E195_OwnerKPI_LiderCOE puede ver todos los registros sin necesidad de llenar la tribu y el squad
+    if (USUARIO.UsuarioBCP_Dto.Perfil.includes("E195_OwnerKPI_LiderCOE")) {
+
+        var data = [];
+        var { dominioIds, subDominioIds, productoStr, tecnologiaStr, ownerStr, squadId } = DATA_EXPORTAR;
+        let nivel = 1;
+
+        waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+        $.ajax({
+            url: `${URL_API_VISTA}/ListadoConsolidadoObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&productoStr=${productoStr}&tecnologiaStr=${tecnologiaStr}&ownerStr=${ownerStr}&squadId=${squadId}&nivel=${nivel}`,
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json",
+            beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+            success: function (result) {
+                waitingDialog.hide();
+                if (result != null) {
+                    data = result;
+                    buildTableInicial(data);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+                data = [];
+                waitingDialog.hide();
+            },
+            complete: function (data) {
+                waitingDialog.hide();
+            },
+            async: true
+        });
+    }
+
+    // si el rol es E195_OwnerKPI_IngenieroTecnologia o E195_OwnerKPI_LiderSquad, validara que la tribu y el squad tengan un valor, de lo contrario no mostrara ningun registro
+
+    else if (USUARIO.UsuarioBCP_Dto.Perfil.includes("E195_OwnerKPI_IngenieroTecnologia") || USUARIO.UsuarioBCP_Dto.Perfil.includes("E195_OwnerKPI_LiderSquad") || USUARIO.UsuarioBCP_Dto.Perfil.includes("E195_MDR_Administrador")) {
+
+        if ($("#hdBusOwnerTecnologiaId").val() != "") {
+            if ($("#cbBusSquadTecnologia").val() != -1 && $('#cbBusSquadTecnologia option').length > 1) {
+                var data = [];
+                var { dominioIds, subDominioIds, productoStr, tecnologiaStr, ownerStr, squadId } = DATA_EXPORTAR;
+                let nivel = 1;
+
+                waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+                $.ajax({
+                    url: `${URL_API_VISTA}/ListadoConsolidadoObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&productoStr=${productoStr}&tecnologiaStr=${tecnologiaStr}&ownerStr=${ownerStr}&squadId=${squadId}&nivel=${nivel}`,
+                    type: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+                    success: function (result) {
+                        waitingDialog.hide();
+                        if (result != null) {
+                            data = result;
+                            buildTableInicial(data);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+                        data = [];
+                        waitingDialog.hide();
+                    },
+                    complete: function (data) {
+                        waitingDialog.hide();
+                    },
+                    async: true
+                });
+            }
+            else if ($("#cbBusSquadTecnologia").val() == -1 && $('#cbBusSquadTecnologia option').length == 1) {
+                var data = [];
+                var { dominioIds, subDominioIds, productoStr, tecnologiaStr, ownerStr, squadId } = DATA_EXPORTAR;
+                let nivel = 1;
+
+                waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+                $.ajax({
+                    url: `${URL_API_VISTA}/ListadoConsolidadoObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&productoStr=${productoStr}&tecnologiaStr=${tecnologiaStr}&ownerStr=${ownerStr}&squadId=${squadId}&nivel=${nivel}`,
+                    type: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+                    success: function (result) {
+                        waitingDialog.hide();
+                        if (result != null) {
+                            data = result;
+                            buildTableInicial(data);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+                        data = [];
+                        waitingDialog.hide();
+                    },
+                    complete: function (data) {
+                        waitingDialog.hide();
+                    },
+                    async: true
+                });
+            }
+            else {
+
+
+                $table.bootstrapTable('destroy');
+                $table.bootstrapTable();
+            }
+        }
+        else {
+            $table.bootstrapTable('destroy');
+            $table.bootstrapTable();
+        }
+    }
+    else {
+
+
+        $table.bootstrapTable('destroy');
+        $table.bootstrapTable();
+    }
+}
+
+function buildTableInicial(data) {
+    let columnasTotalizadas = columns.map((x) => {
+        let data_add = x.field.toLowerCase() == 'owner' ? { footerFormatter: totalTextFormatter } : x.field.toLowerCase().startsWith('porcentaje') ? { footerFormatter: totalPorcentajeFormatter } : { footerFormatter: totalFormatter };
+        return Object.assign({ ...x }, data_add);
+    });
+
+    $table.bootstrapTable('destroy');
+    $table.bootstrapTable({
+        columns: columnasTotalizadas,
+        data: data,
+        detailView: true,
+        showFooter: true,
+        //pagination: true,
+        onExpandRow: function (index, row, $detail) {
+            expandTable2($detail, row);
+        },
+        //footerStyle: function () {
+        //    console.log(this);
+        //}
+    });
+
+    $("[data-toggle=tooltip]").tooltip();
+}
+
+function expandTable2($detail, item) {
+    var data = [];
+    var { dominioIds, subDominioIds, productoStr, tecnologiaStr, ownerStr, squadId } = DATA_EXPORTAR;
+    let nivel = 2;
+    let ownerIds = [item.OwnerId];
+    let ownerParentIds = ownerIds.join(',');
+
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    $.ajax({
+        url: `${URL_API_VISTA}/ListadoConsolidadoObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&productoStr=${productoStr}&tecnologiaStr=${tecnologiaStr}&ownerStr=${ownerStr}&squadId=${squadId}&nivel=${nivel}&ownerParentIds=${ownerParentIds}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            if (result != null) {
+                data = result;
+                buildTable2($detail.html('<table class="table-responsive"></table>').find('table'), data, ownerIds);
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+            data = [];
+            waitingDialog.hide();
+        },
+        complete: function (data) {
+            waitingDialog.hide();
+        },
+        async: true
+    });
+}
+
+function buildTable2($el, data, ownerIds) {
+    $el.bootstrapTable({
+        columns: columns,
+        data: data,
+        detailView: true,
+        showHeader: false,
+        //pagination: true,
+        onExpandRow: function (index, row, $detail) {
+            expandTable3($detail, row, ownerIds);
+        }
+    });
+}
+
+function expandTable3($detail, item, ownerIds) {
+    var data = [];
+    var { dominioIds, subDominioIds, productoStr, tecnologiaStr, ownerStr, squadId } = DATA_EXPORTAR;
+    let nivel = 3;
+    ownerIds = [ownerIds[0]];
+    ownerIds.push(item.OwnerId);
+    let ownerParentIds = ownerIds.join(',');
+
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    $.ajax({
+        url: `${URL_API_VISTA}/ListadoConsolidadoObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&productoStr=${productoStr}&tecnologiaStr=${tecnologiaStr}&ownerStr=${ownerStr}&squadId=${squadId}&nivel=${nivel}&ownerParentIds=${ownerParentIds}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            if (result != null) {
+                data = result;
+                buildTable3($detail.html('<table class="table-responsive"></table>').find('table'), data, ownerIds);
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+            data = [];
+            waitingDialog.hide();
+        },
+        complete: function (data) {
+            waitingDialog.hide();
+
+        },
+        async: true
+    });
+}
+
+function buildTable3($el, data, ownerIds) {
+    $el.bootstrapTable({
+        columns: columns,
+        data: data,
+        detailView: true,
+        showHeader: false,
+        //pagination: true,
+        onExpandRow: function (index, row, $detail) {
+            expandTable4($detail, row, ownerIds);
+        }
+    });
+}
+
+function expandTable4($detail, item, ownerIds) {
+    var data = [];
+    var { dominioIds, subDominioIds, productoStr, tecnologiaStr, ownerStr, squadId } = DATA_EXPORTAR;
+    let nivel = 4;
+    ownerIds = [ownerIds[0], ownerIds[1]];
+    ownerIds.push(item.OwnerId);
+    let ownerParentIds = ownerIds.join(',');
+
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    $.ajax({
+        url: `${URL_API_VISTA}/ListadoConsolidadoObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&productoStr=${productoStr}&tecnologiaStr=${tecnologiaStr}&ownerStr=${ownerStr}&squadId=${squadId}&nivel=${nivel}&ownerParentIds=${ownerParentIds}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            if (result != null) {
+                data = result;
+                buildTable4($detail.html('<table class="table-responsive" data-pagination="true"></table>').find('table'), data, ownerIds);
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+            data = [];
+            waitingDialog.hide();
+        },
+        complete: function (data) {
+            waitingDialog.hide();
+
+        },
+        async: true
+    });
+}
+
+function buildTable4($el, data, ownerIds) {
+    $el.bootstrapTable({
+        columns: columns,
+        data: data,
+        detailView: true,
+        showHeader: false,
+        //pagination: true,
+        onExpandRow: function (index, row, $detail) {
+            expandTable5($detail, row, ownerIds);
+        }
+    });
+}
+
+function expandTable5($detail, item, ownerIds) {
+    var data = [];
+    var { dominioIds, subDominioIds, productoStr, tecnologiaStr, ownerStr, squadId } = DATA_EXPORTAR;
+    let nivel = 5;
+    ownerIds = [ownerIds[0], ownerIds[1], ownerIds[2]];
+    ownerIds.push(item.OwnerId);
+    let ownerParentIds = ownerIds.join(',');
+
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    $.ajax({
+        url: `${URL_API_VISTA}/ListadoConsolidadoObsolescenciaXNivel?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&productoStr=${productoStr}&tecnologiaStr=${tecnologiaStr}&ownerStr=${ownerStr}&squadId=${squadId}&nivel=${nivel}&ownerParentIds=${ownerParentIds}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            if (result != null) {
+                data = result;
+                buildTable5($detail.html('<table class="table-responsive" data-pagination="true"></table>').find('table'), data);
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+            data = [];
+            waitingDialog.hide();
+        },
+        complete: function (data) {
+            waitingDialog.hide();
+
+        },
+        async: true
+    });
+}
+
+function buildTable5($el, data) {
+    let columnResize = columns.map(x => x);
+    columnResize.unshift({});
+
+
+    $el.bootstrapTable({
+        columns: columnResize,
+        data: data,
+        detailView: false,
+        pagination: true,
+        showHeader: false,
+    });
+}
+
+function totalTextFormatter() {
+    console.log(this);
+    return '<strong>Total General</strong>';
+}
+
+function totalFormatter(data) {
+    var field = this.field;
+    var suma = data.map(function (row) {
+        return +row[field];
+    }).reduce(function (sum, i) {
+        return sum + i;
+    }, 0);
+
+    return '<strong>' + suma + '</strong>';
+}
+
+function totalPorcentajeFormatter(data) {
+    var fieldTotal = 'TotalKPI';
+
+    var field = this.field.replace("Porcentaje", "");
+    var suma = data.map(function (row) {
+        return +row[field];
+    }).reduce(function (sum, i) {
+        return sum + i;
+    }, 0);
+
+    var sumaTotal = data.map(function (row) {
+        return +row[fieldTotal];
+    }).reduce(function (sum, i) {
+        return sum + i;
+    }, 0);
+
+    var porcentaje = sumaTotal == 0 ? 0 : (suma * 100) / sumaTotal;
+
+    return '<strong>' + porcentaje.toFixed(2) + '%</strong>';
+}
+
+function porcentajeFormatter(data) {
+    return '<strong>' + data.toFixed(2) + '%</strong>';
+}
+
+function nombreReporteFormatter(value, row, index) {
+    return `<a href="javascript:MostrarGraficoLineaTiempo('${value}')" title="Ver gráfico">${value}</a>`;
+}
+
+function verMasFormatter(data, row) {
+    let text = (data || '');
+    let item = { text: data };
+    let itemStr = JSON.stringify(item);
+
+    if (text.length >= 50) {
+        text = text.substr(0, 50);
+        text += `...<a href='javascript:verMas(${row.Fila}, "${this.field}", "${this.title}", ${row.FlagEquipoAsignado}, ${row.FlagProductoTecnologiaAsignado})'>Ver más</a>`;
+    }
+    return text;
+
+}
+
+function verMas(fila, field, title, flagEquipoAsignado, flagProductoTecnologiaAsignado) {
+    let data = DATA_DETAILS.find(x => x.FlagEquipoAsignado == flagEquipoAsignado && x.FlagProductoTecnologiaAsignado == flagProductoTecnologiaAsignado);
+    let item = data.Resultados.rows.find(x => x.Fila == fila);
+    $("#MdVerMas").modal('show');
+    $("#titleFormVerMas").html(`${title} de ${item.NetBIOS}`);
+    $("#MdVerMas .modal-body").html(item[field]);
+}
+
+function ListarCombos(fn = null) {
+    $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: URL_API_VISTA + "/TecnologiaOwnerConsolidadoObsolescencia/ListarCombos",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (dataObject, textStatus) {
+            if (textStatus == "success") {
+                if (dataObject != null) {
+                    LIST_SUBDOMINIO = dataObject.SubDominio;
+                    SetItemsMultiple(dataObject.Dominio, $("#cbBusDominioTecnologia"), TEXTO_TODOS, TEXTO_TODOS, true);
+                    SetItemsMultiple(LIST_SUBDOMINIO.map(x => x), $("#cbBusSubDominioTecnologia"), TEXTO_TODOS, TEXTO_TODOS, true);
+                    SetItems(dataObject.Estado, $("#cbBusEstadoTecnologia"), TEXTO_SELECCIONE);
+
+                    if (typeof fn == "function") fn();
+                }
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            ControlarErrorAjax(xhr, ajaxOptions, thrownError);
+        },
+        async: false
+    });
+}
+
+function CargarSubDominioBusqueda() {
+    let dominioId = $("#cbBusDominioTecnologia").val() || [];
+    let listSubDominio = LIST_SUBDOMINIO.filter(x => dominioId.some(y => y == x.TipoId) || dominioId.length == 0);
+    SetItemsMultiple(listSubDominio, $("#cbBusSubDominioTecnologia"), TEXTO_TODOS, TEXTO_TODOS, true);
+    //SetItems(listSubDominio, $("#cbBusSubDominioTecnologia"), TEXTO_TODOS);
+}
+
+function InitAutocompletarProductoSearch($searchBox, $IdBox, $Container) {
+    $searchBox.autocomplete({
+        appendTo: $Container,
+        minLength: 3,
+        source: function (request, response) {
+            if ($.trim(request.term) !== "") {
+                $IdBox.val("");
+                let dominioIds = ($("#cbBusDominioTecnologia").val() || []).join(',');
+                let subDominioIds = ($("#cbBusSubDominioTecnologia").val() || []).join(',');
+
+                $.ajax({
+                    url: `${URL_API}/Producto/ListadoByDescripcion?descripcion=${request.term}&dominioIds=${dominioIds}&subDominioIds=${subDominioIds}`,
+                    //data: JSON.stringify({
+                    //    descripcion: ,
+                    //    id: ($("#hdTecnologiaId").val() === "" || $("#hdTecnologiaId").val() === "0") ? null : parseInt($("#hdTecnologiaId").val())
+                    //}),
+                    dataType: "json",
+                    type: "GET",
+                    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return item;
+                        }));
+                    },
+                    async: true,
+                    global: false
+                });
+            } else
+                return response(false);
+        },
+        focus: function (event, ui) {
+            $searchBox.val(ui.item.Fabricante + " " + ui.item.Nombre);
+            return false;
+        },
+        select: function (event, ui) {
+            $IdBox.val(ui.item.Id);
+            $searchBox.val(ui.item.Fabricante + " " + ui.item.Nombre);
+            return false;
+        }
+    })
+        .keyup(function (e) {
+            if ($searchBox.val() == "") $IdBox.val("");
+        })
+        .autocomplete("instance")._renderItem = function (ul, item) {
+            return $("<li>")
+                .append("<a style='display: block'><font>" + item.Fabricante + " " + item.Nombre + "</font></a>")
+                .appendTo(ul);
+        };
+}
+
+function InitAutocompletarTecnologia($searchBox, $IdBox, $Container) {
+    $searchBox.autocomplete({
+        appendTo: $Container,
+        minLength: 3,
+        source: function (request, response) {
+            if ($.trim(request.term) !== "") {
+                $IdBox.val("");
+                let dominioIds = ($("#cbBusDominioTecnologia").val() || []).join(',');
+                let subDominioIds = ($("#cbBusSubDominioTecnologia").val() || []).join(',');
+
+                $.ajax({
+                    url: URL_API_VISTA + "/GetTecnologiaByClaveById",
+                    data: JSON.stringify({
+                        filtro: request.term,
+                        dominioIds,
+                        subDominioIds
+                        //id: ($("#hdTecnologiaId").val() === "" || $("#hdTecnologiaId").val() === "0") ? null : parseInt($("#hdTecnologiaId").val())
+                    }),
+                    dataType: "json",
+                    type: "POST",
+                    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        //DATA_APLICACION = data;
+                        response($.map(data, function (item) {
+                            return item;
+                        }));
+                    },
+                    async: true,
+                    global: false
+                });
+            } else
+                return response(true);
+        },
+        focus: function (event, ui) {
+            $searchBox.val(ui.item.label);
+            return false;
+        },
+        select: function (event, ui) {
+            $IdBox.val(ui.item.Id);
+            $searchBox.val(ui.item.Descripcion);
+            return false;
+        }
+    })
+        .keyup(function (e) {
+            if ($searchBox.val() == "") $IdBox.val("");
+        })
+        .autocomplete("instance")._renderItem = function (ul, item) {
+            return $("<li>")
+                .append("<a style='display: block'><font>" + item.Descripcion + "</font></a>")
+                .appendTo(ul);
+        };
+}
+
+function InitAutocompletarTribuCoeProducto($searchBox, $IdBox, $container, fn = null) {
+    $searchBox.autocomplete({
+        minLength: 3,
+        appendTo: $container,
+        source: function (request, response) {
+            if ($.trim(request.term) !== "") {
+
+                let urlControllerWithParams = `${URL_API}/it-management/plataform-operations/v2/siga/unidadorganizativa/relaciontecnologiakpi/listarcomboxfiltro?filtro=${request.term}`;
+
+                if ($IdBox !== null) $IdBox.val("");
+                $.ajax({
+                    url: urlControllerWithParams,
+                    type: "GET",
+                    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return item;
+                        }));
+                    },
+                    async: true,
+                    global: false
+                });
+            } else
+                return response(true);
+        },
+        focus: function (event, ui) {
+            $searchBox.val(ui.item.Descripcion);
+
+
+            return false;
+        },
+        select: function (event, ui) {
+            if ($IdBox !== null) {
+                $IdBox.val(ui.item.Id);
+                //$searchBox.val(ui.item.Descripcion);
+                //$("#hdOwnerIdProducto").val(ui.item.CodigoPersonalResponsable);
+                //$("#txtOwnerDisplayNameProducto").val(ui.item.NombresPersonalResponsable);
+                //$("#hdOwnerMatriculaProducto").val(ui.item.MatriculaPersonalResponsable);
+                //cbTribuCoeIdProducto_Change();
+                if (typeof fn == "function") fn(ui.item);
+            }
+            return false;
+        }
+    })
+        .keyup(function (e) {
+            if ($searchBox.val() == "") {
+                $IdBox.val("");
+                SetItemsCustomField([], $("#cbBusSquadTecnologia"), TEXTO_TODOS, "Id", "Descripcion");
+            }
+        })
+        .autocomplete("instance")._renderItem = function (ul, item) {
+            return $("<li>").append("<a style='display: block'><font>" + item.value + "</font></a>").appendTo(ul);
+        };
+}
+
+function cbTribuCoeIdProducto_Change(item, fn = null) {
+    let urlControllerWithParams = `${URL_API}/it-management/plataform-operations/v2/siga/squad/relaciontecnologiakpi/listarcomboxfiltro?codigoUnidad=${item.Id}`;
+    $.ajax({
+        url: urlControllerWithParams,
+        type: "GET",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer' + localStorage.getItem('token')); },
+        success: function (data) {
+            LIST_SQUAD = data;
+            //SetItemsCustomField(LIST_SQUAD, $("#"))
+            SetItemsCustomField(LIST_SQUAD.map(x => x), $("#cbBusSquadTecnologia"), TEXTO_TODOS, "Id", "Descripcion");
+            if (typeof fn == "function") fn();
+        },
+        async: false,
+        global: false
+    });
+}
+
+function exportar() {
+
+    if (USUARIO.UsuarioBCP_Dto.Perfil.includes("E195_OwnerKPI_LiderCOE")) {
+        let _data = $table.bootstrapTable("getData") || [];
+        if (_data.length === 0) {
+            //bootbox.alert("No hay datos para exportar.");
+            bootbox.alert({
+                size: "small",
+                title: "Productos de Tecnologías",
+                message: "No hay datos para exportar.",
+                buttons: {
+                    ok: {
+                        label: 'Aceptar',
+                        className: 'btn-primary'
+                    }
+                }
+            });
+            return;
+        }
+        var { dominioIds, subDominioIds, productoStr, tecnologiaStr, ownerStr, squadId } = DATA_EXPORTAR;
+        let url = `${URL_API_VISTA}/ExportarListadoConsolidadoObsolescencia?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&productoStr=${productoStr}&tecnologiaStr=${tecnologiaStr}&ownerStr=${ownerStr}&squadId=${squadId}`;
+        window.location.href = url;
+    }
+    else if (USUARIO.UsuarioBCP_Dto.Perfil.includes("E195_OwnerKPI_IngenieroTecnologia") || USUARIO.UsuarioBCP_Dto.Perfil.includes("E195_OwnerKPI_LiderSquad")) {
+        if ($("#hdBusOwnerTecnologiaId").val() != "") {
+            if ($("#cbBusSquadTecnologia").val() != -1 && $('#cbBusSquadTecnologia option').length > 1) {
+                let _data = $table.bootstrapTable("getData") || [];
+                if (_data.length === 0) {
+                    //bootbox.alert("No hay datos para exportar.");
+                    bootbox.alert({
+                        size: "small",
+                        title: "Productos de Tecnologías",
+                        message: "No hay datos para exportar.",
+                        buttons: {
+                            ok: {
+                                label: 'Aceptar',
+                                className: 'btn-primary'
+                            }
+                        }
+                    });
+                    return;
+                }
+                var { dominioIds, subDominioIds, productoStr, tecnologiaStr, ownerStr, squadId } = DATA_EXPORTAR;
+                let url = `${URL_API_VISTA}/ExportarListadoConsolidadoObsolescencia?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&productoStr=${productoStr}&tecnologiaStr=${tecnologiaStr}&ownerStr=${ownerStr}&squadId=${squadId}`;
+                window.location.href = url;
+            }
+            else if ($("#cbBusSquadTecnologia").val() == -1 && $('#cbBusSquadTecnologia option').length == 1) {
+                let _data = $table.bootstrapTable("getData") || [];
+                if (_data.length === 0) {
+                    //bootbox.alert("No hay datos para exportar.");
+                    bootbox.alert({
+                        size: "small",
+                        title: "Productos de Tecnologías",
+                        message: "No hay datos para exportar.",
+                        buttons: {
+                            ok: {
+                                label: 'Aceptar',
+                                className: 'btn-primary'
+                            }
+                        }
+                    });
+                    return;
+                }
+                var { dominioIds, subDominioIds, productoStr, tecnologiaStr, ownerStr, squadId } = DATA_EXPORTAR;
+                let url = `${URL_API_VISTA}/ExportarListadoConsolidadoObsolescencia?dominioIds=${dominioIds}&subDominioIds=${subDominioIds}&productoStr=${productoStr}&tecnologiaStr=${tecnologiaStr}&ownerStr=${ownerStr}&squadId=${squadId}`;
+                window.location.href = url;
+            }
+            else {
+                bootbox.alert({
+                    size: "small",
+                    title: "Productos de Tecnologías",
+                    message: "No hay datos para exportar.",
+                    buttons: {
+                        ok: {
+                            label: 'Aceptar',
+                            className: 'btn-primary'
+                        }
+                    }
+                });
+                return;
+            }
+        }
+        else {
+            bootbox.alert({
+                size: "small",
+                title: "Productos de Tecnologías",
+                message: "No hay datos para exportar.",
+                buttons: {
+                    ok: {
+                        label: 'Aceptar',
+                        className: 'btn-primary'
+                    }
+                }
+            });
+            return;
+
+        }
+
+    }
+    else {
+        bootbox.alert({
+            size: "small",
+            title: "Productos de Tecnologías",
+            message: "No hay datos para exportar.",
+            buttons: {
+                ok: {
+                    label: 'Aceptar',
+                    className: 'btn-primary'
+                }
+            }
+        });
+        return;
+    }
+
+
+}

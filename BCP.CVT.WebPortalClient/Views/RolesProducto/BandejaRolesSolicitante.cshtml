@@ -1,0 +1,455 @@
+﻿
+@{ ViewBag.Title1 = "Bandeja de Aprobaciones de Roles";
+    ViewBag.Title2 = "Roles por producto - Función";
+    ViewBag.Title3 = "Bandeja de aprobaciones de roles"; }
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<style>
+    .bg-yellow, tr.bg-yellow:hover td {background-color: #F2F2A8 !important; }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+
+            <div class="panel-group" id="accordion-filtro" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default" style="overflow: inherit;">
+
+                    <a class="panel-heading" role="tab" id="heading-filtro" data-toggle="collapse" data-parent="#accordion-filtro" href="#collapse-filtro" aria-expanded="true" aria-controls="collapse-filtro" style="display: flex">
+                        <h4 class="panel-title">Filtro de búsqueda</h4>
+                    </a>
+                    <div id="collapse-filtro" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro">
+                        <div class="panel-body">
+                            <div class="card-search-box">
+                                <form action="javascript:void(0);">
+
+                                    <div class="row gutter-xs">
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Dominio: </h5>
+                                                <select id="ddlDominio" name="ddlDominio" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Subdominio: </h5>
+                                                <select id="ddlSubDominio" name="ddlSubDominio" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Producto: </h5>
+                                                <input id="txtProducto" name="txtProducto" class="form-control" type="text" placeholder="">
+                                                <input type="hidden" name="hdProd" id="hdProd" />
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Código: </h5>
+                                                <input id="txtCodigo" name="txtCodigo" class="form-control" type="text" placeholder="">
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="row gutter-xs">
+
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left divFiltro" data-toggle="match-height">
+                                                <h5>Estado de la asignación: </h5>
+                                                <select id="ddlEstado" name="ddlEstado" class="form-control" multiple="multiple"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-3">
+
+                                            <h5>Fecha de registro: </h5>
+                                            <div class="input-group date" id="dpFecConsulta-btn">
+                                                <span class="input-group-addon">
+                                                    <span class="icon icon-calendar"></span>
+                                                </span>
+                                                <input type="text" id="dpFecConsulta" name="dpFecConsulta" class="form-control" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-3">
+
+                                            <h5>Fecha de revisión: </h5>
+                                            <div class="input-group date" id="dpFecAtencion-btn">
+                                                <span class="input-group-addon">
+                                                    <span class="icon icon-calendar"></span>
+                                                </span>
+                                                <input type="text" id="dpFecAtencion" name="dpFecAtencion" class="form-control" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>&nbsp;</h5>
+                                                <button id="btnBuscar" class="btn btn-primary btn-width-custom" onclick="ListarRegistros()">Buscar</button>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*</fieldset>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+
+                    <table id="tblRegistros" class="table" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true" data-row-style="rowStyle">
+
+                        <caption class="caption text-left">
+                            <span>Solicitudes</span>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th data-field="IdTipoSolicitud" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="TipoSolicitudStr" data-width="10%" data-visible="false">TipoSolicitud</th>
+                                <th data-field="ProductoId" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="ProductoId" data-width="10%" data-visible="false">ProductoId</th>
+                                <th data-field="SolicitudId" data-valign="middle" data-align="center" data-width="5%">#</th>
+                                <th data-field="TipoSolicitudStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="TipoSolicitudStr" data-width="5%">Tipo de <br />Solicitud</th>
+                                @*<th data-formatter="situacionFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Situación de <br />Solicitud</th>*@
+                                <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Dominio" data-width="15%">Dominio</th>
+                                <th data-field="SubDominio" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="SubDominio" data-width="15%">Subdominio</th>
+                                <th data-field="Codigo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Codigo" data-width="8%">Cód. de <br />Producto</th>
+                                @*<th data-field="Fabricante" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Fabricante" data-width="10%">Fabricante</th>*@
+                                <th data-field="Producto" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Producto" data-width="20%">Producto</th>
+                                @*<th data-field="CantRoles" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="CantRoles" data-width="10%">Roles</th>*@
+                                <th data-field="EstadoSolicitudStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="EstadoSolicitudStr" data-width="10%">Estado</th>
+                                @*<th data-field="FechaRevisionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaRevisionStr" data-width="10%">Fecha de <br /> revisión</th>
+                                <th data-field="RevisadoPor" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="RevisadoPor" data-width="20%">Revisado por</th>*@
+
+                                <th data-field="OwnerNombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="OwnerNombre" data-width="14%">Owner</br>de Producto</th>
+                                <th data-field="SeguridadNombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="SeguridadNombre" data-width="13%">Analista </br> de Seguridad</th>
+
+                                <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            </tr>
+                        </thead>
+                    </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalFunciones" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalFunciones" aria-hidden="true">
+    <div class="modal-dialog modal-lg " role="document">
+        <form id="formEli4">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Funciones Relacionadas al Rol</h5>
+                </div>
+                <div class="modal-body">
+
+                    <table id="tblFunciones" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                        <caption class="caption text-left">
+                            <span>Funciones</span>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                <th data-field="Producto" data-halign="center" data-valign="middle" data-align="left" data-width="30%" data-visible="false">Producto</th>
+                                <th data-field="Tribu" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Tribu/COE</th>
+                                <th data-field="Chapter" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Chapter</th>
+                                <th data-field="Funcion" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Funcion</th>
+                                <th data-field="EstadoFuncionStr" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Estado</th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div id="modalHistorial" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalHistorial" aria-hidden="true">
+    <div class="modal-dialog modal-lg " role="document">
+        <form id="formEli5">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Historial de la Solicitud</h5>
+                </div>
+                <div class="modal-body">
+
+                    <table id="tblHistorial" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                        <caption class="caption text-left">
+                            <span>Solicitudes</span>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="5%">#</th>
+                                <th data-field="EstadoSolicitudStr" data-halign="center" data-valign="middle" data-align="left" data-width="20%">Estado de la Solicitud</th>
+                                <th data-field="Responsable" data-halign="center" data-valign="middle" data-align="left" data-width="30%">Responsable</th>
+                                <th data-field="FechaRevisionStr" data-halign="center" data-valign="middle" data-align="left" data-width="20%">Fecha de Revisión</th>
+                                <th data-field="Comentario" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Comentario</th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div id="modalResponsables" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalResponsables" aria-hidden="true">
+    <div class="modal-dialog modal-lg " role="document">
+        <form id="formEli4">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Responsables de Aprobación de la Solicitud</h5>
+                </div>
+                <div class="modal-body">
+
+                    <table id="tblResponsables" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                        <caption class="caption text-left">
+                            <span>Responsables</span>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                <th data-formatter="estadoFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Estado de Aprobación</th>
+                                <th data-field="Responsable" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Responsable</th>
+                                <th data-field="ResponsableStr" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Rol</th>
+                                <th data-field="BuzonResponsable" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Correo</th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button id="btnCerrarFunciones" type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div id="modalSolicitud" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalSolicitud" aria-hidden="true">
+    <div class="modal-dialog modal-lg " role="document" style="width: 1200px;">
+        <form id="formAprobarSolicitud">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Información de la Solicitud</h5>
+                </div>
+                <div class="modal-body" style="padding-bottom: 0 !important;">
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label class="control-label">Número de Solicitud: </label>
+                            <input id="txtNroSolicitud" class="form-control" type="text" name="txtNroSolicitud" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="control-label">Código de Producto: </label>
+                            <input id="txtCodigoProducto" class="form-control" type="text" name="txtCodigoProducto" readonly>
+                            @*<input type="hidden" name="hIdProducto" id="hIdProducto" value="0" />*@
+                        </div>
+                        <div class="col-md-8">
+                            <label class="control-label">Producto: </label>
+                            <input id="txtNombreProducto" class="form-control" type="text" name="txtNombreProducto" readonly>
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="margin-bottom: 0 !important;">
+                        <div class="col-md-12">
+
+                            <table id="tblRegistroSolicitud" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true" style="font-size: 11px;">
+                                <caption class="caption text-left">
+                                    <span style="font-size: 14px !important;">Roles y Funciones por Producto</span>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                        <th data-field="Rol" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Rol" data-width="15%">Rol</th>
+                                        <th data-field="DescripcionRol" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Rol" data-width="15%">Descripción del Rol</th>
+                                        <th data-field="TipoCuentaStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="TipoCuentaStr" data-width="15%">Tipo de Cuenta</th>
+                                        <th data-formatter="ambientesFormatter" data-field="Ambientes" data-halign="left" data-valign="middle" data-align="left">Ambiente : Grupo de Red</th>
+                                        @*<th data-field="GrupoRed" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="GrupoRed" data-width="15%">Grupo de Red</th>*@
+                                        <th data-field="Tribu" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Tribu" data-width="15%">Tribu/COE</th>
+                                        <th data-field="Chapter" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Chapter" data-width="20%">Chapter</th>
+                                        <th data-field="Funcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Funcion" data-width="20%">Función</th>
+                                        @*<th data-field="EstadoFuncionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EstadoFuncionStr" data-width="15%">Estado</th>*@
+                                    </tr>
+                                </thead>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button id="btnAprobarSolOwner" class="btn btn-primary" type="button" data-loading-text="Procesando...">Aprobar</button>
+                    <button id="btnObservarSolOwner" class="btn btn-primary" type="button" data-loading-text="Procesando...">Observar</button>
+
+                    <button id="btnAprobarSolSeguridad" class="btn btn-primary" type="button" data-loading-text="Procesando...">Aprobar</button>
+                    <button id="btnObservarSolSeguridad" class="btn btn-primary" type="button" data-loading-text="Procesando...">Observar</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div id="modalObservarOwner" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalObservarOwner" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formRecOw">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el motivo de la observación de la solicitud</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a la observación de esta solicitud: </label>
+                                <textarea id="txtRechazoOwner" name="txtRechazoOwner" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnObservacionOwner" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalObservarSeguridad" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalObservarSeguridad" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formRecSeg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el motivo de la observación de la solicitud</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a la observación de esta solicitud: </label>
+                                <textarea id="txtRechazoSeguridad" name="txtRechazoSeguridad" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnObservacionSeguridad" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalAprobarOwner" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalAprobarOwner" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formRecOw_Aprobar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el motivo de la aprobación de la solicitud</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a la aprobación de esta solicitud: </label>
+                                <textarea id="txtAprobacionOwner" name="txtAprobacionOwner" rows="5" class="form-control" placeholder="Sin comentario"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnAprobacionOwner" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalAprobarSeguridad" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalAprobarSeguridad" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formRecSeg_Aprobar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el motivo de la aprobación de la solicitud</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a la aprobación de esta solicitud: </label>
+                                <textarea id="txtAprobacionSeguridad" name="txtAprobacionSeguridad" rows="5" class="form-control" placeholder="Sin comentario"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnAprobacionSeguridad" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<input type="hidden" name="hdProductoId" id="hdProductoId" value="0" />
+<input type="hidden" name="hdRolProductoId" id="hdRolProductoId" value="0" />
+<input type="hidden" name="hdSolCabeceraId" id="hdSolCabeceraId" value="0" />
+
+
+<script src="~/app/RolesProducto/bandejaRolesSolicitante.js?v=2.6.0"></script>

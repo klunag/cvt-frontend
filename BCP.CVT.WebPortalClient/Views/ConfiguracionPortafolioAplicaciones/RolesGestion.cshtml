@@ -1,0 +1,168 @@
+﻿@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Roles de Gestión";
+    ViewBag.Title2 = "Configuración de Portafolio";
+    ViewBag.Title3 = "Roles de Gestión";
+}
+
+@using BCP.CVT.Cross
+
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    /*.table {
+        font-size: 11px !important;
+    }*/
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-7 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusAct" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre de Roles de Gestion...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusAct" class="btn btn-primary btn-width-custom" onclick="buscarRolesGestion()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">    
+    <a id="btnNuevo" class="btn btn-primary btn-width-custom" href="javascript: void(0)" title="Nuevo registro">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tbl-roles" class="table" data-unique-id="WorkerId" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Configuración de Roles de Gestión</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="10">#</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="30">Acciones</th>
+                            <th data-field="Id" data-halign="center" data-visible="false" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Id">Código</th>
+                            <th data-formatter="linkFormatter" data-field="Name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Name">Nombre</th>
+                            <th data-field="Username" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Username">Matricula</th>
+                            <th data-field="RoleDetail" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="RoleId">Rol</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="UsuarioModificacion" data-width="70">Creado por</th>
+                            <th data-field="FechaCreacion" data-formatter="dateFormat" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="UsuarioModificacion" data-width="70">Fecha de creación</th>
+                            <th data-field="UsuarioModificacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="UsuarioModificacion" data-width="70">Modificado por</th>
+                            <th data-field="FechaModificacion" data-formatter="dateFormat" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaModificacion" data-width="70">Fecha de <br />Última modificación</th>                            
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Roles)-->
+<div id="MdAddOrEditAct" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormAct">Nuevo registro</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditRG">
+                    
+                    <div class="form-group all rolesGestion">
+
+                        <label class="control-label">Nombre: </label>
+
+                        <input id="txtReponsable" name="txtReponsable" class="form-control all rolesGestion" type="text">
+                        <input id="hdReponsable1" name="hdReponsable1" class="form-control all rolesGestion" type="hidden">
+                        <input id="hdRegistroID" name="hdRegistroID" class="form-control all rolesGestion" type="hidden" value="0">
+                        <span class="input-group-btn hidden">
+                            <button id="btnValidarMatricula" class="btn btn-primary" type="button" title="Validar matrícula">
+                                <span id="spIconButton" class="glyphicon glyphicon-question-sign"></span>
+                            </button>
+                        </span>
+
+                    </div>
+                    <div class="form-group all rolesGestion">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Correo: </label>
+                                    <input id="txtCorreo" name="txtCorreo" class="form-control all rolesGestion" type="text" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Nombres: </label>
+                                    <input id="txtNombreResponsable" name="txtNombreResponsable" class="form-control all rolesGestion" type="text" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Matrícula: </label>
+                                    <input id="txtMatriculaResponsable" name="txtMatriculaResponsable" class="form-control all rolesGestion" type="text" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Roles</label>
+                                    <select id="cbRoles" name="cbRoles" class="form-control"></select>
+                                    
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @*<div class="form-group">
+            <label class="control-label">
+                Flujo de Registro:
+                <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Flujo de registro que van a seguir las aplicaciones relacionadas al tipo de activo."></span>
+            </label>
+            <select id="ddlFlujoRegistro" class="form-control" name="ddlFlujoRegistro"></select>
+        </div>*@
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegRG" class="btn btn-primary" onclick="guardarAddOrEditRG()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    const ENTIDAD_MANTENIMIENTO = @Html.Raw((int)EConfiguracionPortafolio.RolGestion)
+</script>
+<script src="~/app/ConfiguracionPortafolio/rolesGestion.js?v=2.0.0"></script>
+
+

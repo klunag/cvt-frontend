@@ -1,0 +1,798 @@
+﻿@using BCP.CVT.WebPortalClient.Models
+@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Datos Generales";
+	ViewBag.Title2 = "Mis aplicaciones";
+	ViewBag.Title3 = "Datos Generales";
+	int AplicacionId = (int)ViewBag.AplicacionId;
+	string nombreApp = (string)ViewBag.Nombre_App;
+	int paginaActual = (int)ViewBag.PaginaActual;
+	int paginaTamanio = (int)ViewBag.PaginaTamanio;
+
+
+}
+
+@{
+    Usuario_Storage eUsuario = (Usuario_Storage)Session["Usuario"];
+    string eusername = eUsuario == null ? "" : eUsuario.UsuarioBCP_Dto.Name;
+}
+
+<style>
+	a.tip {
+		border-bottom: 1px dashed;
+		text-decoration: none
+	}
+
+		a.tip:hover {
+			cursor: helpdatosUserIT position: relative
+		}
+
+		a.tip span {
+			display: none
+		}
+
+		a.tip:hover span {
+			border: #c0c0c0 1px dotted;
+			padding: 5px 20px 5px 5px;
+			display: block;
+			z-index: 100;
+			font-family: Roboto,sans-serif;
+			/*background: url(../images/status-info.png) #f0f0f0 no-repeat 100% 5%;*/
+			background: #F2F4F8;
+			left: 0px;
+			margin: 10px;
+			width: 250px;
+			position: absolute;
+			top: 10px;
+			text-decoration: none;
+			color: #002A8D;
+			text-align: left;
+		}
+
+	.stepwizard-step p {
+		margin-top: 0px;
+		color: #666;
+	}
+
+	.stepwizard-row {
+		display: table-row;
+	}
+
+	.stepwizard {
+		display: table;
+		width: 100%;
+		position: relative;
+	}
+
+	.stepwizard-step button[disabled] {
+		/*opacity: 1 !important;
+	filter: alpha(opacity=100) !important;*/
+	}
+
+	.stepwizard .btn.disabled, .stepwizard .btn[disabled], .stepwizard fieldset[disabled] .btn {
+		opacity: 1 !important;
+		color: #bbb;
+	}
+
+	.stepwizard-row:before {
+		top: 14px;
+		bottom: 0;
+		position: absolute;
+		content: " ";
+		width: 100%;
+		height: 1px;
+		background-color: #ccc;
+		z-index: 0;
+	}
+
+	.stepwizard-step {
+		display: table-cell;
+		text-align: center;
+		position: relative;
+		font-family: Roboto,sans-serif;
+		font-size: 18px;
+	}
+
+	.btn-circle {
+		width: 30px;
+		height: 30px;
+		text-align: center;
+		padding: 6px 0;
+		font-size: 12px;
+		line-height: 1.428571429;
+		border-radius: 15px;
+	}
+    .etiquetaRoja {
+        color: #dc3545;
+        font-weight: bold !important;
+    }
+</style>
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="row">
+	<div class="col-md-10">
+        <span style="font-size:14px;">
+            Es importante que todos los datos de tu aplicación se encuentren completos, mantenlos actualizados.
+            <br />Los campos con  <span class="etiquetaRoja">(*)</span> requieren completarse.
+        </span>
+	</div>
+	<div class="col-md-2 text-right">
+		<a id="btnAgregar" class="btn btn-primary btn-width-custom" href="@Url.Content(string.Format("~/RegistroPortafolioAplicaciones/BandejaAplicaciones?nom_App={0}&paginaActual={1}&paginaTamanio={2}",nombreApp,paginaActual,paginaTamanio))" />
+		<span class="icon icon-arrow-left"></span>
+		<span class="count-text">Volver</span>
+		</a>
+	</div>
+</div>
+<hr>
+<div class="row gutter-xs" style="margin-top:5px;">
+
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-body">
+				<div class="card-search">
+					<fieldset class="fieldset">
+						<legend class="legend">Datos Generales de la aplicación</legend>
+						<div class="card-search-box">
+
+							<ul class="nav nav-tabs nav-justified otros">
+								<li class="active tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datGen" data-toggle="tab">Datos que requieren aprobación del portafolio o custodios</a></li>
+								<li class="tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datGen2" data-toggle="tab">Datos que no requieren aprobación</a></li>
+							</ul>
+
+							<div class="tab-content">
+								<div class="tab-pane fade active in" id="datGen">
+									<form id="formAddOrEditApp">
+										<div class="row">
+											<div id="divApp" class="form-group">
+												<div class="row">
+													&nbsp;
+												</div>
+												<div class="row">
+													<div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Código de la aplicación
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodigo"></span></a>
+                                                        </div>
+														<div class="col-md-7">
+															<input type="text" class="form-control" maxlength="4" id="txtCodigoAPT" name="txtCodigoAPT" disabled="disabled" />
+															<input type="hidden" value="0" id="hdAplicacionId" name="hdAplicacionId" />
+															<input type="hidden" value="0" id="hdTipoActivo" name="hdTipoActivo" />
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+													<div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Nombre de la aplicación
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanNombre"></span></a>
+                                                        </div>
+														<div class="col-md-7">
+															<input type="text" class="form-control" id="txtNombre" name="txtNombre" maxlength="180" />
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Descripción
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanDescripcion"></span></a>
+                                                        </div>
+														<div class="col-md-7">
+															<textarea class="form-control" rows="7" id="txtDescripcion" name="txtDescripcion"></textarea>
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+													<div class="col-md-6 divUnidadContainer">
+														<div class="col-md-4">
+															Código de aplicación padre
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodigoPadre"></span></a>
+														</div>
+														<div class="col-md-7 containerPadreAplicacion">
+															<input id="txtCodigoAppPadre" name="txtCodigoAppPadre" type="text" class="form-control" maxlength="200" />
+															<input type="hidden" id="hCodigoPadre" name="hCodigoPadre" value="" />
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Tipo de implementación
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanTipoImplementacion"></span></a>
+                                                        </div>
+														<div class="col-md-7">
+															<select id="ddlTipoImplementacion" name="ddlTipoImplementacion" class="form-control">
+															</select>
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+													<div class="col-md-6 divUnidadContainer">
+                                                        <div class="col-md-4">
+                                                            Estado de la aplicación
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanEstado"></span></a>
+                                                        </div>
+														<div class="col-md-7">
+															<select id="ddlEstadoAplicacion" name="ddlEstadoAplicacion" class="form-control">
+																<option value="-1">-- Seleccione --</option>
+																<option value="1">En desarrollo</option>
+																<option value="2">Vigente</option>
+																<option value="3">No Vigente</option>
+															</select>
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Gestionado por
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanGestionado"></span></a>
+                                                        </div>
+														<div class="col-md-7">
+															<select id="ddlGestionadoPor" name="ddlGestionadoPor" class="form-control">
+															</select>
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+													<div class="col-md-6 divInterfaz">
+														<div class="col-md-4">
+															Requiere de un código de interfaz
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodigoInterfaz"></span></a>
+														</div>
+														<div class="col-md-2">
+															<div class="input-group" id="divFlagInterface"></div>
+														</div>
+														<div class="col-md-5">
+															<input id="txtCodigoInterfaz" class="form-control" type="text" name="txtCodigoInterfaz" disabled="disabled" />
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col-md-6">
+														<div class="col-md-4">
+															Gerencia
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanGerencia"></span></a>
+														</div>
+														<div class="col-md-7">
+															<input type="text" class="form-control" id="txtGerencia" name="txtGerencia" disabled="disabled" />
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+													<div class="col-md-6">
+														<div class="col-md-4">
+															Área
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanArea"></span></a>
+														</div>
+														<div class="col-md-7">
+															<input type="text" class="form-control" id="txtArea" name="txtArea" disabled="disabled" />
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col-md-6">
+														<div class="col-md-4">
+															División
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanDivision"></span></a>
+														</div>
+														<div class="col-md-7">
+															<input type="text" class="form-control" id="txtDivision" name="txtDivision" disabled="disabled" />
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+													<div class="col-md-6 divUnidadContainer">
+                                                        <div class="col-md-4">
+                                                            Unidad dueña de la aplicación
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanUnidad"></span></a>
+                                                        </div>
+														<div class="col-md-7">
+															<input id="txtUnidad" name="txtUnidad" type="text" class="form-control" maxlength="120" />
+															<input type="hidden" id="hdUnidadId" value="" />
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+
+												</div>
+												<div class="row">
+
+													<div class="col-md-6 unidadResponsable">
+														<div class="col-md-4">
+															Responsable
+
+														</div>
+														<div class="col-md-7">
+															<label id="txtResponsableUnidad" name="txtResponsableUnidad" />
+
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+
+													<div class="col-md-6 divOwner">
+														<div class="col-md-4">
+															Búsqueda por Owner
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"></a>
+														</div>
+														<div class="col-md-2">
+															<div class="input-group" id="divFlagOwner"></div>
+														</div>
+														<div class="col-md-5">
+															<input id="txtOwner" class="form-control" type="text" name="txtOwner" />
+															<input type="hidden" id="hdOwnerId" value="" />
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+												</div>
+												<div class="row divRowOwner">
+													<div class="col-md-6">
+													</div>
+													<div class="col-md-6">
+														<div class="col-md-4">
+															Unidades del Owner
+														</div>
+														<div class="col-md-5">
+															<select id="ddlUnidadesOwner" name="ddlUnidadesOwner" class="form-control">
+															</select>
+														</div>
+
+													</div>
+												</div>
+												<div class="row">
+													<div class="col-md-6">
+														<div class="col-md-4">
+															Equipo/Squad
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanEquipo"></span></a>
+														</div>
+														<div class="col-md-7">
+															<select id="ddlEquipo" name="ddlEquipo" class="form-control">
+																<option value="-1">-- Seleccione --</option>
+															</select>
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+													<div class="col-md-6">
+														<div class="col-md-4">
+															Modelo de entrega
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanModeloEntrega"></span></a>
+														</div>
+														<div class="col-md-7">
+															<select id="ddlModeloEntrega" name="ddlModeloEntrega" class="form-control">
+															</select>
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+												</div>
+												<div class="row datosUserIT">
+													<div class="col-md-6">
+														<div class="col-md-4">
+															Nivel de cumplimiento de seguridad
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanComplianceLevel"></span></a>
+														</div>
+														<div class="col-md-7">
+															<input id="txtComplianceLevel" name="txtComplianceLevel" type="text" class="form-control" maxlength="300" />
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+													<div class="col-md-6">
+														<div class="col-md-4">
+															Resumen de lineamientos de seguridad
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanSummaryStandard"></span></a>
+														</div>
+														<div class="col-md-7">
+															<textarea class="form-control" rows="7" id="txtSummaryStandard" name="txtSummaryStandard"></textarea>
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+
+												</div>
+												<div class="row datosUserIT">
+													<div class="col-md-6">
+														<div class="col-md-4">
+															Adjuntar correo de conformidad del OFICIAL DE SEGURIDAD sobre la MES de la aplicación.
+															<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanSecurityFile"></span></a>
+														</div>
+														<div class="col-md-7">
+															<div class="input-group">
+																<input id="hdArchivoId" name="hdArchivoId" class="form-control" type="hidden" value="">
+																<input id="txtArchivo" name="txtArchivo" class="form-control" type="text" value="Ningún archivo seleccionado" disabled>
+																<span class="input-group-btn">
+																	<label class="btn btn-primary file-upload-btn">
+																		<input id="flArchivo" class="file-upload-input inputfile" type="file" name="flArchivo">
+																		<span class="glyphicon glyphicon-folder-open"></span>
+																	</label>
+																</span>
+															</div>
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+													<div class="col-md-6">
+														<div class="col-md-4">
+															<a id="btnDescargar" class="btn btn-primary btn-width-custom">
+																<span class="icon icon-arrow-down"></span>
+																<span class="count-text">Descargar</span>
+															</a>
+														</div>
+														<div class="col-md-7">
+
+														</div>
+														<div class="col-md-1"></div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-10 text-right">
+												<button id="btnCancelar" name="btnCancelar" class="btn btn-primary" type="button" style="width:150px;">Cancelar</button>
+											</div>
+											<div class="col-md-2 text-right">
+												<button id="btnRegistrarApp" name="btnRegistrarApp" class="btn btn-primary" type="button" data-loading-text="Procesando..." style="width:150px;">Guardar</button>
+											</div>
+										</div>
+									</form>
+								</div>
+								<div class="tab-pane" id="datGen2">
+									<form id="formAddOrEditApp2">
+										<div class="row">
+                                            <div id="divApp2" class="form-group">
+                                                <div class="row">
+                                                    &nbsp;
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Código de aplicación reemplazada
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodAppReemplazada"></span></a>
+                                                        </div>
+                                                        <div class="col-md-7 containerReemplazoAplicacion">
+                                                            <input id="txtAplicacionReemplazada" name="txtAplicacionReemplazada" type="text" class="form-control" maxlength="120" />
+                                                            <input type="hidden" id="hCodigoReemplazada" name="hCodigoReemplazada" value="" />
+                                                            <input type="hidden" value="0" id="hdAplicacionId" name="hdAplicacionId" />
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Entidades usuarias
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanEntidades"></span></a>
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <select id="ddlEntidades" name="ddlEntidades" class="form-control" multiple="multiple">
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Tipo de desarrollo
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanTipoDesarrollo"></span></a>
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <select id="ddlTipoDesarrollo" name="ddlTipoDesarrollo" class="form-control">
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                    <div class="col-md-6 divUnidadContainer">
+                                                        <div class="col-md-4">
+                                                            Requiere un Proveedor
+                                                        </div>
+                                                        <div class="col-md-1">
+                                                            <div class="input-group" id="divFlagProveedorDesarrollo"></div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                    </div>
+                                                    <div class="col-md-6 divUnidadContainer">
+                                                        <div class="col-md-4">
+                                                            <span>Proveedor de desarrollo</span>  <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanProveedorDesarrollo"></span></a>
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <input id="txtProveedorDesarrollo" name="txtProveedorDesarrollo" type="text" class="form-control" maxlength="120" />
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Infraestructura de la aplicación
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanInfraestructura"></span></a>
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <select id="ddlInfraestructura" name="ddlInfraestructura" class="form-control">
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                    <div class="col-md-6 divUnidadContainer">
+                                                        <div class="col-md-4">
+                                                            Método de autenticación
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanMetodoAutenticacion"></span></a>
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <select id="ddlAutenticacion" name="ddlAutenticacion" class="form-control">
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Método de autorización
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanMetodoAutorizacion"></span></a>
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <select id="ddlAutorizacion" name="ddlAutorizacion" class="form-control">
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            Grupo Ticket Remedy
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanGrupoRemedy"></span></a>
+                                                        </div>
+                                                        <div class="col-md-7 containerGrupoRemedy">
+                                                            <input id="txtGrupoTicketRemedy" name="txtGrupoTicketRemedy" class="form-control" type="text" maxlength="200">
+                                                            <input type="hidden" id="hGrupoTicketRemedy" name="hGrupoTicketRemedy" value="" />
+
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-4">
+                                                            URL - Dominio web
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanDominio"></span></a>
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <input id="txtURL" name="txtURL" type="text" class="form-control" maxlength="300" />
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                    <div class="col-md-6">
+
+                                                        <div class="col-md-5">
+                                                            Tratamiento PCI DSS
+                                                            <span class="etiquetaRoja">(*)</span>
+                                                            <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanPCI"></span></a>
+                                                        </div>
+
+                                                        <div class="col-md-3">
+                                                            <select id="ddlPCI" name="ddlPCI" class="form-control" multiple="multiple">
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-1">
+                                                            ¿Aplica?
+                                                        </div>
+                                                        <div class="col-md-1">
+                                                            <div class="input-group" id="divFlagPCI"></div>
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                </div>
+
+                                                @*<div class="row datosUserIT">
+            <div class="col-md-6">
+                <div class="col-md-4">
+                    Archivo Adjunto de Seguridad
+                    <a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanSecurityFile"></span></a>
+                </div>
+                <div class="col-md-7">
+                    <div class="input-group">
+                        <input id="hdArchivoId" name="hdArchivoId" class="form-control" type="hidden" value="">
+                        <input id="txtArchivo" name="txtArchivo" class="form-control" type="text" value="Ningún archivo seleccionado" disabled>
+                        <span class="input-group-btn">
+                            <label class="btn btn-primary file-upload-btn">
+                                <input id="flArchivo" class="file-upload-input inputfile" type="file" name="flArchivo">
+                                <span class="glyphicon glyphicon-folder-open"></span>
+                            </label>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+            <div class="col-md-6">
+                <div class="col-md-4">
+                    <a id="btnDescargar" class="btn btn-primary btn-width-custom">
+                        <span class="icon icon-arrow-down"></span>
+                        <span class="count-text">Descargar</span>
+                    </a>
+                </div>
+                <div class="col-md-7">
+
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+        </div>*@
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-5">
+                                                            <b>Configuración de expertos</b>
+                                                        </div>
+                                                        <div class="col-md-7">
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-4">
+
+                                                        </div>
+                                                        <div class="col-md-7">
+
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12 divUsuarioExpertoContainer">
+                                                        <div class="col-md-2">
+                                                            Experto
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                            <input id="txtExperto" name="txtAutorizador" type="text" class="form-control" maxlength="120" />
+                                                            <input type="hidden" id="hExpertoId" value="" />
+                                                            <input type="hidden" id="hExpertoMatricula" value="" />
+                                                            <input type="hidden" id="hExpertoCorreo" value="" />
+                                                        </div>
+                                                        <div class="col-md-1"></div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-2">
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div id="msjUsuarioRepetido" display="none">
+                                                            @*<p style="color: #ff0000">Ya agrego al usuario buscado a la lista.</p>*@
+                                                            <label class="my-error-class">
+                                                                Ya agrego al usuario buscado a la lista.
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-1"></div>
+                                                </div>
+                                                <div class="row gutter-xs">
+                                                    <div class="col-md-1"></div>
+                                                    <div class="col-md-10">
+                                                        <div class="card">
+                                                            <div class="card-body">
+                                                                <table id="tblRegistro" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                                                                    <caption class="caption text-left">
+                                                                        <span>Registros configurados</span>
+                                                                    </caption>
+                                                                    <thead>
+                                                                        <tr>
+                                                                            @*<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>*@
+                                                                            @*<th data-field="applicationManagerIdDetail" data-halign="center" data-valign="middle" data-align="left">Rol</th>*@
+                                                                            <th data-field="managerName" data-halign="center" data-valign="middle" data-align="left">Responsable</th>
+                                                                            <th data-field="email" data-halign="center" data-valign="middle" data-align="left">Correo electrónico</th>
+                                                                            <th data-field="username" data-halign="center" data-valign="middle" data-align="left">Matrícula</th>
+                                                                            <th data-formatter="opcionesFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-1"></div>
+                                                </div>
+
+                                            </div>
+										</div>
+										<div class="row">
+											<div class="col-md-10 text-right">
+												<button id="btnCancelar2" name="btnCancelar2" class="btn btn-primary" type="button" style="width:150px;">Cancelar</button>
+											</div>
+											<div class="col-md-2 text-right">
+												<button id="btnRegistrarApp2" name="btnRegistrarApp2" class="btn btn-primary" type="button" data-loading-text="Procesando..." style="width:150px;">Guardar</button>
+											</div>
+										</div>
+									</form>
+								</div>
+
+
+
+
+
+							</div>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+
+<div id="modalInfraestructura" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalInfraestructura" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <form id="formEli2">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Alerta</h5>
+                </div>
+                <div class="modal-body">
+
+
+					Al guardar los datos se iniciará la <b> creación de grupos de red </b> asociados a tu aplicación para el  <b> acceso a la suscripción Microsoft Azure y herramientas de integración continua.	</b>
+
+					Por favor <b>confirmar</b> si  el  <b> Tipo de Infraestructura  </b> seleccionado es correcto.
+
+					Recibirá un correo de confirmación de creación.
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+
+				</div>
+			</div>
+
+
+		</form>
+	</div>
+</div>
+
+
+<div id="modalInfraestructura2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalInfraestructura" aria-hidden="true">
+	<div class="modal-dialog " role="document">
+		<form id="formEli3">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="titulo">Alerta</h5>
+				</div>
+				<div class="modal-body">
+
+
+					Al cambiar el tipo de infraestructura IaaS / PaaS a otro deberá gestionar la eliminación de los grupos de red creados para su aplicación
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    const APLICACION_ID = @AplicacionId;
+
+
+	var USER_IT_ID = 1;
+</script>
+<script src="~/app/RegistroPortafolio/datosGenerales.js?v=2.2.0"></script>

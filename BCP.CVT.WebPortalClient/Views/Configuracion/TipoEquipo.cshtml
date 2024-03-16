@@ -1,0 +1,90 @@
+﻿
+@{
+    ViewBag.Title1 = "Tipo de Activo";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Tipo de Activo";
+}
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Relación de Tipos de Activo configurados</strong>
+            </div>
+            <div class="card-body">
+                <table id="tbTipoEquipo" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                            <th data-formatter="linkFormatter" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Nombre</th>
+                            <th data-field="NombreCriterioObsolescencia" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreCriterioObsolescencia">Criterio de obsolescencia</th>
+                            <th data-formatter="excluirKPIFormatter" data-field="FlagExcluirKPI" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Excluir del cálculo KPI</th>
+                            <th data-field="NombreTipoCicloVida" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreTipoCicloVida">Tipo Ciclo Vida</th>
+                            <th data-formatter="incluirEnDiagramaInfra" data-field="FlagIncluirEnDiagramaInfra" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Incluir en Diagrama de Infraestructura</th>
+                            <th data-formatter="incluirHardwareKPIFormatter" data-field="FlagIncluirHardwareKPI" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Incluir en el cálculo<br />KPI Hardware</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdEditTipoEquipo" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormTipoEquipo">Actualización del Tipo de Activo</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formEditTipoEquipo">
+                    <div class="form-group">
+                        <label class="control-label">Nombre: </label>
+                        <input id="txtNombreTipoEquipo" class="form-control" type="text" name="txtNombreTipoEquipo" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Criterio de obsolescencia: </label>
+                        <input id="txtNombreCriterioObsolescencia" class="form-control" type="text" name="txtNombreCriterioObsolescencia" disabled>
+                    </div>
+                    <div class="form-group" id="divTipoCicloVida">
+                        <label class="control-label">Tipo de Ciclo de Vida: </label>
+                        <select id="cbTipoCicloVida" name="cbTipoCicloVida" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Excluir del cálculo KPI?
+                        </label>
+                        <div class="input-group" id="divActRegistro">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Incluir en Diagrama de Infraestructura?
+                        </label>
+                        <div class="input-group" id="divIncDiagramaInfra">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Incluir en el cálculo del KPI de Hardware?
+                        </label>
+                        <div class="input-group" id="divFlagHardware">
+                        </div>
+                    </div>
+                </form>
+                <input type="hidden" name="hdTipoEquipoId" id="hdTipoEquipoId" value="" />
+                <input type="hidden" name="hdCriterioObsolescenciaId" id="hdCriterioObsolescenciaId" value=""/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegTipoEquipo" class="btn btn-primary" onclick="guardarEditTipoEquipo()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/ConfiguracionPortafolio/tipoEquipo.js"></script>

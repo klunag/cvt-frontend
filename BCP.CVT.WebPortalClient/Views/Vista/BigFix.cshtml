@@ -1,0 +1,105 @@
+﻿@{
+    ViewBag.Title1 = "Interfaz CMDB-BigFix";
+    ViewBag.Title2 = "Equipos y aplicaciones";
+    ViewBag.Title3 = "Interfaz CMDB-BigFix";
+}
+<link rel="stylesheet" type="text/css" href="~/google-code-prettify/prettify.css" />
+<script type="text/javascript" src="~/google-code-prettify/run_prettify.js?lang=css" defer></script>
+<script type="text/javascript" src="~/google-code-prettify/lang_css.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <label class="control-label">Importante</label>
+        <p class="card-text">El tiempo máximo para ejecutar la transacción es de 10 minutos, por lo que una vez completada la tarea en el servidor involucrado el correo electrónico se enviará (siempre y en cuando los datos ingresados sean correctos) </p>
+        <p class="card-text">Se consideran datos correctos cuando: </p>
+        <p>- El servidor este funcionando correctamente </p>
+        <p>- El correo electrónico ingresado sea válido y bajo el dominio del banco. </p>
+        <p>- La ruta requerida exista</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formBigFix">
+                        @*<div class="form-group row">
+                                <div class="col-md-10 col-xs-8 col-sm-9">
+                                    <div class="input-with-icon">
+                                        <input id="txtBusTipo" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre o descripción del tipo...">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-xs-4 col-sm-3">
+                                    <button id="btnBusTipo" class="btn btn-primary btn-width-custom" onclick="buscarTipo()">Buscar</button>
+                                </div>
+                            </div>*@
+                        <div class="form-group">
+                            <label class="control-label">Nombre del servidor: </label>
+                            <input id="txtNomSer" class="form-control" type="text" name="txtNomSer" placeholder="Nombre del servidor">
+                            @*<input type="hidden" name="hIdTipo" id="hIdTipo" value="0" />*@
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Ruta a consultar (debe de estar dentro del equipo): </label>
+                            <input id="txtRutSer" class="form-control" type="text" name="txtRutSer" placeholder="Ruta del servidor">
+                        </div>
+                        <div class="form-group" style="margin-bottom:20px;">
+                            <label class="control-label">Relación de correos a los cuáles se enviará el correo electrónico (separados por comas ',' si fueran más de uno): </label>
+                            <textarea id="txtCorreos" class="form-control" rows="5" name="txtCorreos" placeholder="Correos electrónicos BCP"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <button id="btnSolicitar" type="button" class="btn btn-primary" onclick="solicitarInfoBigFix()" data-loading-text="Procesando...">Solicitar archivos vía BigFix</button>
+                            @*<button id="btnConsultar" type="button" class="btn btn-primary" onclick="irConsultarTransaccion()" data-loading-text="Procesando...">Consultar estado transacción</button>*@
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<!--Modal consultar transaccion-->
+<div id="mdConsultar" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Consulta de servicio IBM BigFix</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formConsultar">
+                    <div class="form-group">
+                        <label class="control-label">ID de transacción: </label>
+                        <input id="txtTransaccionId" name="txtTransaccionId" class="form-control" type="text" placeholder="ID de transacción">
+                        @*<input type="hidden" name="hIdTipo" id="hIdTipo" value="0" />*@
+                    </div>
+                    <div class="form-group">
+                        <button id="btnConsultarTransaccion" type="button" class="btn btn-primary" data-loading-text="Procesando..." onclick="consultarEstadoTransaccion()">Consultar estado</button>
+                    </div>
+                    <div class="form-group">
+                        <h5>Resultados: </h5>
+                        <div class="divResult"></div>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                @*<button id="btnRegTipo" class="btn btn-primary" onclick="GuardarAddOrEditTipo()" type="button" data-loading-text="Procesando...">Registrar</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal consultar transaccion-->
+
+
+
+
+
+<script src="~/app/bigFix.js"></script>

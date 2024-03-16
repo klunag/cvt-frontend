@@ -1,0 +1,260 @@
+﻿@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Solicitudes de eliminación de aplicaciones";
+    ViewBag.Title2 = "Portafolio de aplicaciones";
+    ViewBag.Title3 = "Solicitudes de eliminación";
+}
+
+<style>
+    .width-des {
+        min-width: 300px;
+    }
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    /* Chat containers */
+    .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    /* Darker chat container */
+    .darker {
+        border-color: #f7a033;
+        background-color: #ddd;
+    }
+
+    /* Clear floats */
+    .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    /* Style images */
+    .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+        /* Style the right image */
+        .container img.right {
+            float: right;
+            margin-left: 20px;
+            margin-right: 0;
+        }
+
+    /* Style time text */
+    .time-right {
+        float: right;
+        color: #aaa;
+    }
+
+    /* Style time text */
+    .time-left {
+        float: left;
+        color: #999;
+    }
+
+    .user-name {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .table {
+        font-size: 11px !important;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-8 col-md-8">
+                                <div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+                                    <h5>Aplicación (código) </h5>
+                                    <input type="text" id="txtAplicacionFiltro" name="txtAplicacionFiltro" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    <input type="hidden" name="hdAplicacionFiltroId" id="hdAplicacionFiltroId" value="0" />
+                                </div>
+                            </div>
+                            <div class="col-xs-2 col-md-2">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Estado</h5>
+                                    <select id="cbFilEstado" name="cbFilEstado" class="form-control">
+                                        <option value="-1" selected="selected">Todos</option>
+                                        <option value="1">Registrado</option>
+                                        <option value="2">En proceso de revisión</option>
+                                        <option value="3">Aprobado</option>
+                                        <option value="4">Observado</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="AddSolicitud()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nueva solicitud</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            @*<div class="card-header">
+                <strong>Mis solicitudes de eliminación</strong>
+            </div>*@
+            <div class="card-body">
+                <table id="tbl-solicitudes" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Mis solicitudes de eliminación</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            <th data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="10%">Solicitud</th>
+                            <th data-field="CodigoAplicacion" data-halign="center" data-valign="middle" data-align="left">Código aplicación</th>
+                            <th data-field="NombreAplicacion" data-formatter="nameAppFormatter" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                            <th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="center">Tipo activo información</th>
+                            <th data-field="EstadoSolicitudToString" data-halign="center" data-valign="middle" data-align="center">Estado de la solicitud</th>
+                            @*<th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center">Usuario</th>*@
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de registro</th>
+                            <th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de modificación</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Arquetipo)-->
+<div id="MdAddOrEditArq" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormArq"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditArq">
+                    <div class="form-group solicitud-app">
+                        <div class="text-left ui-widget containerFormAplicacion" data-toggle="match-height">
+                            <label class="control-label">Aplicación: </label>
+                            <input type="text" id="txtAplicacion" name="txtAplicacion" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                            <input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+                            <input type="hidden" name="hIdSolicitud" id="hIdSolicitud" value="0" />
+                        </div>
+                    </div>
+                    <div class="form-group solicitud-app ticket" style="display:none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group solicitud-app">
+                                    <label class="control-label">Ticket de eliminación: </label>
+                                    <input type="text" id="txtTE" name="txtTE" maxlength="100" class="form-control ticket" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group solicitud-app">
+                                    <label class="control-label">Ticket de conformidad de ratificación: </label>
+                                    <input type="text" id="txtTCR" name="txtTCR" maxlength="100" class="form-control ticket" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group solicitud-app">
+                        <label class="control-label">Motivo de la eliminación: </label>
+                        <textarea id="txtComentarios" class="form-control" rows="4" name="txtComentarios" maxlength="1000"></textarea>
+                    </div>
+                    <div class="form-group solicitud-app">
+                        <label id="lblFile" class="control-label"></label>
+                        <input id="hdArchivoId" name="hdArchivoId" class="form-control" type="text" value="0" style="display:none">
+                        <div class="input-group">
+                            <input id="txtNomArchivo" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                            <span class="input-group-btn">
+                                <label class="btn btn-primary file-upload-btn">
+                                    <input id="flArchivo" class="file-upload-input inputfile" type="file" name="flArchivo">
+                                    <span class="glyphicon glyphicon-folder-open"></span>
+                                </label>
+                            </span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a class="btn btn-secondary" id="btnDescargarFile" href="javascript:DescargarArchivo()" title="Descargar archivo">
+                                    <span class="glyphicon glyphicon-download-alt"></span>
+                                </a>
+                                <a class="btn btn-secondary" id="btnEliminarFile" href="javascript:EliminarArchivo()" title="Eliminar archivo">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group divObservacion" style="display:none;">
+                        <label class="control-label">Tus comentarios: </label>
+                        <textarea id="txtObservacionesElim" class="form-control" rows="5" name="txtObservacionesElim" maxlength="1000"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegistrarSol" class="btn btn-primary" onclick="guardarOEditarSolicitud()" type="button" data-loading-text="Procesando..." title="Registrar solicitud">Registrar</button>
+                <button id="btnConfirmarSol" class="btn btn-primary" onclick="confirmarSolicitud()" type="button" data-loading-text="Procesando..." title="Registrar y enviar">Registrar y enviar</button>
+                <button id="btnResponderSol" class="btn btn-primary" onclick="responderSolicitud()" type="button" data-loading-text="Procesando..." title="Responder y enviar">Responder y enviar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit (Arquetipo)-->
+<!--Modal comentarios (ELIMINACION)-->
+<div id="mdComentarios" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleMd">Comentarios y Observaciones</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formComentarios">
+                    <div class="form-group divComments">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal comentarios (ELIMINACION)-->
+
+<script src="~/app/solicitudeliminacionaplicacion.js?v=1.1.7"></script>

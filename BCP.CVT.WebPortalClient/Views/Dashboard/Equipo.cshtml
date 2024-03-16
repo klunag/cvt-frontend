@@ -1,0 +1,224 @@
+﻿@{
+    ViewBag.Title1 = "Gráficos por Equipo";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Equipos";
+    ViewBag.Title3 = "Gráficos por Equipo";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<script src="~/Scripts/plotly-latest.min.js"></script>
+<style>
+    #reportHorizontalBar {
+        width: 100%;
+        height: 800px;
+    }
+
+    #reportPie {
+        width: 100%;
+        height: 300px;
+    }
+
+    .div-report {
+        display: none;
+    }
+</style>
+
+<div class="row"></div>
+<div class="row">
+
+    <form id="formEquipo">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label>Tipo de Equipo: (*)</label>
+                    </div>
+                    <div class="col-md-8">
+                        <select id="cbFilTipoEquipo" name="cbFilTipoEquipo" class="form-control input-sm"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label>Equipo: (*)</label>
+                    </div>
+                    <div class="equipoContainer">
+                        <div class="col-md-8">
+                            <input type="text" id="txtEquipo" name="txtEquipo" class="form-control input-sm" />
+                        </div>
+                        <input type="hidden" id="hdEquipoId" name="hdEquipoId" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label>Ambiente:</label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" id="txtAmbiente" name="txtAmbiente" class="form-control input-sm" readonly />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-4"><label>Sistema Operativo:</label></div>
+                    <div class="col-md-8"><input type="text" id="txtSO" name="txtSO" class="form-control input-sm" readonly /></div>
+                </div>
+                <div class="col-md-12 hidden">
+                    <div class="col-md-4"><label>Característica:</label></div>
+                    <div class="col-md-8"><input type="text" id="txtCaracteristica" name="txtCaracteristica" class="form-control input-sm" readonly /></div>
+                </div>
+                <div class="col-md-12 hidden">
+                    <div class="col-md-4"><label>Gestionado Por:</label></div>
+                    <div class="col-md-8"><input type="text" id="txtGestionadoPor" name="txtGestionadoPor" class="form-control input-sm" readonly /></div>
+                </div>
+
+                <div class="col-md-6">
+                    <a class="btn btn-primary" href="javascript: void(0)" onclick="CargarReporte()">
+                        <span class="icon icon-external-link"></span>
+                        <span class="count-text">Generar Gráficos</span>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </form>
+    
+    <hr />
+    <div class="col-md-6">
+        <div class="col-md-12">
+            <strong>Aplicaciones que hacen uso del servidor:</strong>
+            <br />
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 text-center">
+                    <h5>Estado de la Aplicación: </h5>
+                    <select id="cbFilEstadoAplicacion" name="cbFilEstadoAplicacion" class="form-control"></select>
+                </div>
+            </div>
+            <div id="divSituacionActual">
+                <div class="row col-md-12">
+                    <div class="graph js-plotly-plot" style="width:100%" id="divPlotly">
+                    </div>
+                </div>
+                <div class="row col-md-12">
+                    <table id="tblAplicacion" class="table" data-unique-id="Id" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatter" data-field="tblAplicacion" data-valign="middle" data-align="center" data-width="5%">#</th>
+                                <th data-formatter="linkFormatterAplicacion" data-field="Id" data-halign="center" data-valign="middle" data-align="left" data-width="5%">Código</th>
+                                <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                                @*<th data-field="X" data-halign="center" data-valign="middle" data-align="right" data-width="8%">Riesgo por<br>Obsolesc.</th>
+                            <th data-field="Y" data-halign="center" data-valign="middle" data-align="right" data-width="8%">Índice de<br>Obsolesc.</th>*@
+                                <th data-field="Text" data-halign="center" data-valign="middle" data-align="right" data-width="14%">KPI <br>Obsolescencia</th>
+                                <th data-formatter="formatterEstadoObs" data-field="Value" data-halign="center" data-valign="middle" data-align="center" data-width="8%">Estado</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div id="divSituacionProyeccion1">
+                <div class="row col-md-12">
+                    <div class="graph js-plotly-plot" style="width:100%" id="divPlotlyProyeccion1">
+                    </div>
+                </div>
+                <div class="row col-md-12">
+                    <table id="tblAplicacionProyeccion1" class="table" data-unique-id="Id" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatter" data-field="tblAplicacion" data-valign="middle" data-align="center" data-width="5%">#</th>
+                                <th data-formatter="linkFormatterAplicacion" data-field="Id" data-halign="center" data-valign="middle" data-align="left" data-width="5%">Código</th>
+                                <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                                <th data-field="Text" data-halign="center" data-valign="middle" data-align="right" data-width="14%">KPI <br>Obsolescencia</th>
+                                <th data-formatter="formatterEstadoObs" data-field="Value" data-halign="center" data-valign="middle" data-align="center" data-width="8%">Estado</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div id="divSituacionProyeccion2">
+                <div class="row col-md-12">
+                    <div class="graph js-plotly-plot" style="width:100%" id="divPlotlyProyeccion2">
+                    </div>
+                </div>
+                <div class="row col-md-12">
+                    <table id="tblAplicacionProyeccion2" class="table" data-unique-id="Id" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatter" data-field="tblAplicacion" data-valign="middle" data-align="center" data-width="5%">#</th>
+                                <th data-formatter="linkFormatterAplicacion" data-field="Id" data-halign="center" data-valign="middle" data-align="left" data-width="5%">Código</th>
+                                <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                                <th data-field="Text" data-halign="center" data-valign="middle" data-align="right" data-width="14%">KPI <br>Obsolescencia</th>
+                                <th data-formatter="formatterEstadoObs" data-field="Value" data-halign="center" data-valign="middle" data-align="center" data-width="8%">Estado</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row col-md-6">
+        <div class="row col-md-12">
+            <div class="row">
+                <strong>Tecnologías instaladas:</strong>
+                <div class="row"> </div>
+                <strong>Estado de las tecnologías del Servidor</strong>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Dominio: </h5>
+                    <select id="cbFilDominio" name="cbFilDominio" class="form-control" multiple="multiple"></select>
+                </div>
+                <div class="col-md-6">
+                    <h5>Subdominio: </h5>
+                    <select id="cbFilSubdominio" name="cbFilSubdominio" class="form-control" multiple="multiple"></select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div id="reportPie"></div>
+        </div>
+        <div class="row">
+            <table id="tblTecnologia" class="table" data-unique-id="Id">
+                <thead>
+                    <tr>
+                        <th data-formatter="rowNumFormatter" data-field="tblTecnologia" data-valign="middle" data-align="center" data-width="5%">#</th>
+                        <th data-formatter="linkFormatterTecnologia" data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left">Tecnología</th>
+                        <th data-field="FechaStr" data-halign="center" data-valign="middle" data-align="center" data-width="15%">Fecha Fin <br /> Vigencia</th>
+                        <th data-field="TipoDescripcion" data-halign="center" data-valign="middle" data-align="center" data-width="16%">Estado</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <hr />
+        <div class="row col-md-12">
+            <div class="row">
+                <strong>Tecnologías no registradas:</strong>
+            </div>
+            <div class="row">
+                <table id="tblTecnologiaNoRegistrada" class="table" data-unique-id="Id">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatter" data-field="tblTecnologia" data-valign="middle" data-align="center" data-width="5%">#</th>
+                            <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left">Tecnología</th>
+                            <th data-field="FechaStr" data-halign="center" data-valign="middle" data-align="center" data-width="15%">Fecha Fin <br /> Vigencia</th>
+                            <th data-field="TipoDescripcion" data-halign="center" data-valign="middle" data-align="center" data-width="16%">Estado</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+<script src="~/app/dashboardEquipo.js?v=2.1.0"></script>

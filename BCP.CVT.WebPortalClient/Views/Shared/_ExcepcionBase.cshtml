@@ -1,0 +1,237 @@
+﻿@using BCP.CVT.Cross
+@{
+    int tipoExcepcionId = (int)ViewBag.TipoExcepcionId;
+    var titleTBL = (string)ViewBag.TitleTBL;
+    var titleSingular = (string)ViewBag.TitleSingular;
+    var nombreExportar = (string)ViewBag.NombreExportar;
+}
+
+@*<style>
+    .ui-autocomplete-loading {
+        background: white url('../../images/loading.gif') right center no-repeat;        
+        background-size: 25px 25px;
+    }
+
+    .ui-autocomplete {  
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+</style>*@
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left aplicacionFiltroContainer" data-toggle="match-height">
+                                <h5>Aplicación (código o nombre): </h5>
+                                <input id="txtFiltroAplicacion" name="txtFiltroAplicacion" class="form-control ui-autocomplete-input" type="text">
+                                <input type="hidden" id="hdFiltroAplicacionId" name="hdFiltroAplicacionId" class="form-control" value="0" />
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left tecnologiaFiltroContainer" data-toggle="match-height">
+                                <h5>Tecnología: </h5>
+                                <input id="txtFiltroTecnologia" name="txtFiltroTecnologia" class="form-control ui-autocomplete-input" type="text">
+                                <input type="hidden" id="hdFiltroTecnologiaId" name="hdFiltroTecnologiaId" class="form-control" value="0" />
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left equipoFiltroContainer" data-toggle="match-height">
+                                <h5>Equipo: </h5>
+                                <input id="txtFiltroEquipo" name="txtFiltroEquipo" class="form-control ui-autocomplete-input" type="text">
+                                <input type="hidden" id="hdFiltroEquipoId" name="hdFiltroEquipoId" class="form-control" value="0" />
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-xs-4 col-sm-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5 style="height: 12px;"></h5>
+                                <button id="btnBuscar" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary permiso-crear btn-width-custom" href="javascript: void(0)" onclick="OpenModal()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de @titleTBL</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistro" class="table" data-mobile-responsive="true" data-unique-id="Id">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="3%">#</th>
+                            <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%">Aplicación</th>
+                            @*<th data-field="EquipoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-width="10%" data-sort-name="EquipoStr">Equipo</th>*@
+                            <th data-field="TecnologiaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%" data-sort-name="TecnologiaStr">Tecnología</th>
+                            <th data-field="DominioStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%" data-sort-name="DominioStr">Dominio</th>
+                            <th data-field="SubdominioStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%" data-sort-name="SubdominioStr">Subdominio</th>
+                            <th data-field="TipoRiesgoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%" data-visible="false" data-sort-name="TipoRiesgoId">Tipo</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de creación</th>
+                            @*<th data-field="FechaFinExcepcionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaFinExcepcion" data-width="10%">Fecha de fin<br />de la excepción</th>*@
+                            <th data-formatter="opcionesFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hdFiltro" id="hdFiltro" value="" />
+</div>
+
+<!--Modal Add or Edit-->
+<div id="MdAddOrEditModal" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEdit">
+                    <input type="hidden" id="hdId" name="hdId" value="0" />
+                    <input type="hidden" id="hdTipoExcepcionId" name="hdTipoExcepcionId" value="@tipoExcepcionId" />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="col-md-12">
+                                <div class="form-group aplicacionContainer">
+                                    <label class="control-label">Aplicación</label>
+                                    <input id="txtAplicacion" name="txtAplicacion" class="form-control ui-autocomplete-input" type="text">
+                                    <input type="hidden" id="hdAplicacionId" name="hdAplicacionId" class="form-control" value="0" />
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group tecnologiaContainer">
+                                    <label class="control-label">Tecnologías relacionadas</label>
+                                    <input id="txtTecnologia" name="txtTecnologia" class="form-control ui-autocomplete-input" type="text">
+                                    <input type="hidden" id="hdTecnologiaId" name="hdTecnologiaId" class="form-control" value="0" />
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <table id="tblRegistroEquipo" class="table" data-mobile-responsive="true" data-unique-id="Id">
+                                        <thead>
+                                            <tr>
+                                                <th data-field="tblRegistroEquipo" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="3%">#</th>
+                                                <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-width="10%">Equipo</th>
+                                                <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-width="10%">Tipo de equipo</th>
+                                                <th data-field="Ambiente" data-halign="center" data-valign="middle" data-align="left" data-width="10%">Ambiente</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="col-md-12">
+                                <div class="form-group form-excepcion-riesgo">
+                                    <label class="control-label">Tipo</label>
+                                    <select id="cbTipoRiesgo" name="cbTipoRiesgo" class="form-control form-excepcion-riesgo"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group form-excepcion-riesgo">
+                                    <label class="control-label">Fecha de fin de la excepción</label>
+                                    <div class="input-group date" id="divFechaFinExcepcion">
+                                        <input type="text" id="FechaFinExcepcion" name="FechaFinExcepcion" class="form-control form-excepcion-riesgo" />
+                                        <span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group form-excepcion-tipo">
+                                    <label class="control-label">URL de información</label>
+                                    <input id="txtUrlInformacion" name="txtUrlInformacion" class="form-control form-excepcion-tipo" type="text" maxlength="120" />
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">Comentarios</label>
+                                    <textarea id="txtComentario" name="txtComentario" class="form-control" rows="5" maxlength="500"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group form-excepcion-riesgo">
+                                    <label class="control-label">Archivo</label>
+                                    <div class="input-group">
+                                        <input id="hdArchivoId" name="hdArchivoId" class="form-control" type="text" value="0" style="display:none">
+                                        <input id="txtArchivo" name="txtArchivo" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                        <span class="input-group-btn">
+                                            <label class="btn btn-primary file-upload-btn">
+                                                <input id="flArchivo" class="file-upload-input inputfile form-excepcion-riesgo" type="file" name="flArchivo">
+                                                @*<span>Examinar Archivo</span>*@
+                                                <span class="glyphicon glyphicon-folder-open"></span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                    <div class="input-group div-controls-file">
+                                        <span class="input-group-btn text-left">
+                                            <a id="linkDescarga" class="btn btn-success" href="javascript:DescargarArchivo()" title="Descargar archivo" style="display: inline-block;">
+                                                <span class="glyphicon glyphicon-download-alt"></span>
+                                            </a>
+                                            <a id="linkDelete" class="btn btn-danger" href="javascript:EliminarArchivo()" title="Eliminar archivo">
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                            </a>
+                                        </span>
+                                        @*<span class="input-group-btn text-right">
+                                            <a id="linkFullScreen" class="btn btn-primary" href="javascript:VistaPreviaArchivo()" title="Vista previa archivo">
+                                                <span class="glyphicon glyphicon-fullscreen"></span>
+                                            </a>
+                                        </span>*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegistrar" class="btn btn-primary" onclick="RegistrarAddOrEdit()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit-->
+<script>
+    var EXCECPCION_RIESGO = "@((int)ETipoExcepcion.Riesgo )"
+    var EXCECPCION_TIPO = "@((int)ETipoExcepcion.Tipo )"
+
+    var TITULO_MENSAJE = "@titleSingular";
+    var NOMBRE_EXPORTAR = "@nombreExportar"
+    //console.log(TITULO_MENSAJE);
+</script>
+<script src="~/app/excepcion.js"></script>

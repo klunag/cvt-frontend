@@ -1,0 +1,273 @@
+﻿@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Gestión de campos de aplicación";
+    ViewBag.Title2 = "Configuración de portafolio";
+    ViewBag.Title3 = "Gestión de campos de aplicación";
+}
+
+@using BCP.CVT.Cross
+
+<style>
+    .table {
+        font-size: 11px !important;
+    }
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    .card-body .caption {
+        padding: 8px;
+        background-color: #fff;
+        font-weight: 600;
+        font-size: 16px;
+        border-right: 1px solid #ddd;
+        border-top: 1px solid #ddd;
+        border-left: 1px solid #ddd;
+    }
+
+        .card-body .caption span {
+            margin-top: 5px;
+        }
+
+        .card-body .caption button {
+            margin-left: 20px;
+        }
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-4">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Nombre a mostrar: </h5>
+                                <select id="ddlFiltroNombre" name="ddlFiltroNombre" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-4">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Se edita: </h5>
+                                <select id="ddlFiltroEditar" name="ddlFiltroEditar" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-4">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Se visualiza/exporta: </h5>
+                                <select id="ddlFiltroVerExportar" name="ddlFiltroVerExportar" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gutter-xs">
+                        <div class="col-md-12">
+                            <div class="text-right">
+                                <a id="btnNew" class="btn btn-primary" href="javascript: void(0)">
+                                    <span class="icon icon-plus"></span>
+                                    <span class="count-text">Nuevo</span>
+                                </a>
+                                <a class="btn btn-primary" href="javascript: void(0)" onclick="RefrescarListado()">
+                                    <span class="icon icon-search"></span>
+                                    <span class="count-text">Buscar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset class="fieldset">
+                <legend class="legend">Configuración de estados para visualización</legend>
+                <div class="card-search-box">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-4 col-md-4">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Estados disponibles: </h5>
+                                <select id="ddlFiltroEstado" name="ddlFiltroEstado" class="form-control" multiple="multiple"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 col-md-4">
+                            <div class="text-right">
+                                <h5>&nbsp;</h5>
+                                <a id="btnConfigurarEstados" class="btn btn-primary" href="javascript: void(0)">
+                                    <span class="icon icon-plus"></span>
+                                    <span class="count-text">Configurar estados</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 col-md-4">
+                            &nbsp;
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs" style="margin-top:20px;">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="caption text-left">
+                    <span>Registro de campos de la entidad aplicación</span>                 
+                    <button id="btnReordenamiento" type="button" class="btn btn-primary btn-sm disabled" data-loading-text="Procesando..." disabled>Guardar reordenamiento</button>
+                    <br/>
+                    <span style="font-size:11px !important;">Los cambios en el orden solo se verán reflejados al guardar el reordenamiento</span>
+                </div>
+                <table id="tblColumnaAplicacion" class="table" data-unique-id="Id" data-mobile-responsive="true"
+                       data-use-row-attr-func="true" data-reorderable-rows="true">
+                    <thead>
+                        <tr>
+                            @*<th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="2%">#</th>*@
+                            <th data-field="OrdenColumnaStr" data-halign="center" data-valign="middle" data-align="left">Orden en  <br />publicación</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            @*<th data-formatter="nombreFakeFormatter" data-field="NombreBD" data-halign="center" data-valign="middle" data-align="left" data-width="10%">Nombre de campo</th>*@
+                            <th data-field="NombreExcel" data-halign="center" data-valign="middle" data-align="left">Nombre a mostrar</th>
+                            @*<th data-field="TablaProcedenciaIdStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="TablaProcedenciaId">Tabla procedencia</th>*@
+                            <th data-field="FlagEdicionStr" data-halign="center" data-valign="middle" data-align="left">Edición</th>
+                            <th data-field="FlagVerExportarStr" data-halign="center" data-valign="middle" data-align="left">Visualización / <br /> Exportación</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de registro</th>
+                            <th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de modificación</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Observar Solicitud-->
+<div id="mdOS" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h5 class="modal-title" id="title-modal">Editar registro</h5>
+            </div>
+            <div class="modal-body">
+                <form id="formOS">
+                    <div class="form-group all field-register field-edit">
+                        <label class="control-label">Nombre del campo</label>
+                        <textarea id="txtNombre" name="txtNombre" rows="2" class="form-control all field-register field-edit"></textarea>
+                    </div>
+                    <div class="form-group all field-register field-edit divFlagNuevo">
+                        <label class="control-label">Tipo de input</label>
+                        <div>
+                            <select id="ddlTipoInput" name="ddlTipoInput" class="form-control all field-register field-edit divFlagNuevo"></select>
+                        </div>
+                    </div>
+                    <div class="form-group divListBox" style="display:none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input id="txtItemListBox" name="txtItemListBox" type="text" class="form-control" placeholder="Debes ingresar un item">
+                                    <span class="input-group-btn">
+                                        <button id="btnAddItemListBox" class="btn btn-primary" type="button" title="Agregar item" disabled>
+                                            <span id="spIconButton" class="glyphicon glyphicon-plus"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <table id="tblDataListBox" 
+                                       class="table" 
+                                       data-unique-id="Id"
+                                       data-pagination="true"
+                                       data-page-size="5"
+                                       data-mobile-responsive="true">
+                                    <thead>
+                                        <tr>
+                                            <th data-formatter="actionFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="2%">Acciones</th>
+                                            <th data-field="Valor" data-halign="center" data-valign="middle" data-align="center">Item</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                <input type="hidden" id="msjTable" name="msjTable" class="form-control divListBox" style="display:none;" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group all field-register field-edit divFlagNuevo">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="control-label">Tipo de registro</label>
+                                <div>
+                                    <select id="ddlTipoFlujo" name="ddlTipoFlujo" class="form-control all field-register field-edit divFlagNuevo" multiple="multiple"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="control-label">Obligatorio</label>
+                                <div class="input-group" id="divObligatorio"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group all field-register field-edit">
+                        <label class="control-label">Tooltip</label>
+                        <textarea id="txtToolTip" name="txtToolTip" rows="4" class="form-control all field-register field-edit"></textarea>
+                    </div>
+                    <div class="form-group all field-edit">
+                        <label class="control-label">
+                            Activar la edición por parte del usuario final
+                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Para campos únicos no modificables esta opción se encuentra deshabilitada"></span>
+                        </label>
+                        <div class="divModificable">
+                            <div class="input-group" id="divEdicion"></div>
+                        </div>
+                    </div>
+                    <div class="form-group all field-edit">
+                        <label class="control-label">
+                            Activar la visualización/exportación por parte del usuario final
+                        </label>
+                        <div class="input-group" id="divVisualizacion"></div>
+                    </div>
+                    <div class="form-group all field-edit">
+                        <label class="control-label">Orden de publicación: </label>
+                        <input id="txtOrden" name="txtOrden" class="form-control all field-edit" type="text">
+                    </div>
+                    <input type="hidden" name="hdRegistroId" id="hdRegistroId" value="0" />
+                    <input type="hidden" name="hdOrdenActual" id="hdOrdenActual" value="0" />
+                    <input type="hidden" name="hdInfoCampoId" id="hdInfoCampoId" value="0" />
+                    <input type="hidden" name="hdTipoInputId" id="hdTipoInputId" value="0" />
+                    <input type="hidden" name="hdTablaProcedenciaId" id="hdTablaProcedenciaId" value="0" />
+                    <input type="hidden" name="hdMantenimentoPfId" id="hdMantenimentoPfId" value="0" />
+                    <input type="hidden" name="hdCodigoPr" id="hdCodigoPr" value="" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnOS" type="button" class="btn btn-primary" onclick="guardarAddOrEdit()" data-loading-text="Procesando..." title="Guardar observación">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Observar Solicitud-->
+
+<script>
+    const TABLA_PROCEDENCIA_ID = {
+        CVT_APLICACION: @Html.Raw((int)ETablaProcedenciaAplicacion.Aplicacion),
+        APP_APLICACIONDETALLE: @Html.Raw((int)ETablaProcedenciaAplicacion.AplicacionDetalle),
+        DATA_APLICACION: @Html.Raw((int)ETablaProcedenciaAplicacion.AplicacionData),
+        APP_INFOCAMPOAPLICACION: @Html.Raw((int)ETablaProcedenciaAplicacion.InfoCampoPortafolio)
+    };
+    const ENTIDAD_MANTENIMIENTO = @Html.Raw((int)EConfiguracionPortafolio.GestionCampo);
+    const TIPO_INPUT_ID = {
+        TextBox: @Html.Raw((int)ETipoInputHTML.TextBox),
+        ListBox: @Html.Raw((int)ETipoInputHTML.ListBox),
+        Otros: @Html.Raw((int)ETipoInputHTML.Otros)
+    };
+</script>
+
+
+<script src="/Scripts/jquery.tablednd.js"></script>
+<link href="/Content/bootstrap-table-reorder-rows.css" rel="stylesheet" />
+<script src="/Scripts/bootstrap-table-reorder-rows.js"></script>
+
+<script src="~/app/columnaAplicacionData.js?v=1.2.2"></script>

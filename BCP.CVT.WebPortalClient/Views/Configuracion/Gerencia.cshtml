@@ -1,0 +1,166 @@
+﻿@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Gerencia/División/Área/Unidad";
+    ViewBag.Title2 = "Configuración de Portafolio";
+    ViewBag.Title3 = "Gerencia/División/Área/Unidad";
+}
+
+@using BCP.CVT.Cross
+
+<style>
+    .opcionesStyle {
+        width: 500px;
+    }
+
+    .fondoAzul {
+        background-color: #013A81 !important;
+        color: #ffffff !important;
+        font-weight: bold;
+    }
+
+    .fondoGris {
+        background-color: #CCCCCC !important;
+        color: #013A81 !important;
+    }
+
+    .fondoBlanco {
+        background-color: white !important;
+        color: #013A81 !important;
+    }
+</style>
+
+<div class="row gutter-xs fondoBlanco">
+    <div class="col-md-3" style="display:none; margin:0px; padding-right:0px;">
+        <div id="toolbar1">
+            <button id="button1" onclick="showHideActions(@Html.Raw((int)EConfiguracionPortafolio.Gerencia))" class="btn btn-secondary">Mostrar acciones</button>
+        </div>
+        <table id="tblGerencia" data-unique-id="Id" data-mobile-responsive="true" data-toggle="table" data-show-pagination-switch="true" data-toolbar="#toolbar1">
+            <thead>
+                <tr>
+                    <th data-formatter="cogFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="3">
+                        <i class="glyphicon glyphicon-cog"></i>
+                    </th>
+                    <th data-formatter="nombreFormatter"
+                        data-field="Nombre"
+                        data-halign="center"
+                        data-width="20"
+                        data-valign="middle"
+                        data-cell-style="cellStyle"
+                        data-align="left">
+                        Gerencia  <a href="javascript:AddGerencia()" title="Nuevo registro"><i class="glyphicon glyphicon-plus-sign"></i></a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="col-md-3" style="display:none; margin:0px; padding-left:0px; padding-right:0px;">
+        <div id="toolbar2">
+            <button id="button2" onclick="showHideActions(@Html.Raw((int)EConfiguracionPortafolio.Division))" class="btn btn-secondary">Mostrar acciones</button>
+        </div>
+        <table id="tblDivision" data-unique-id="Id" data-mobile-responsive="true" data-toggle="table" data-show-pagination-switch="true" data-toolbar="#toolbar2">
+            <thead>
+                <tr>
+                    <th data-formatter="cogFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="3">
+                        <i class="glyphicon glyphicon-cog"></i>
+                    </th>
+                    <th data-formatter="nombreFormatter"
+                        data-field="Nombre"
+                        data-halign="center"
+                        data-width="20"
+                        data-valign="middle"
+                        data-cell-style="cellStyle"
+                        data-align="left">
+                        División  <a href="javascript:AddDivision()" title="Nuevo registro"><i class="glyphicon glyphicon-plus-sign"></i></a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="col-md-3" style="display:none; margin:0px; padding-left:0px; padding-right:0px;">
+        <div id="toolbar3">
+            <button id="button3" onclick="showHideActions(@Html.Raw((int)EConfiguracionPortafolio.Area))" class="btn btn-secondary">Mostrar acciones</button>
+        </div>
+        <table id="tblArea" data-unique-id="Id" data-mobile-responsive="true" data-toggle="table" data-show-pagination-switch="true" data-toolbar="#toolbar3">
+            <thead>
+                <tr>
+                    <th data-formatter="cogFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="3">
+                        <i class="glyphicon glyphicon-cog"></i>
+                    </th>
+                    <th data-formatter="nombreFormatter"
+                        data-field="Nombre"
+                        data-halign="center"
+                        data-width="20"
+                        data-valign="middle"
+                        data-cell-style="cellStyle"
+                        data-align="left">
+                        Área  <a href="javascript:AddArea()" title="Nuevo registro"><i class="glyphicon glyphicon-plus-sign"></i></a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="col-md-3" style="display:none; margin:0px; padding-left:0px;">
+        <div id="toolbar4">
+            <button id="button4" onclick="showHideActions(@Html.Raw((int)EConfiguracionPortafolio.Unidad))" class="btn btn-secondary">Mostrar acciones</button>
+        </div>
+        <table id="tblUnidad" data-unique-id="Id" data-mobile-responsive="true" data-toggle="table" data-show-pagination-switch="true" data-toolbar="#toolbar4">
+            <thead>
+                <tr>
+                    <th data-formatter="cogFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="3">
+                        <i class="glyphicon glyphicon-cog"></i>
+                    </th>
+                    <th data-formatter="nombreFormatter"
+                        data-field="Nombre"
+                        data-halign="center"
+                        data-width="20"
+                        data-valign="middle"
+                        data-cell-style="cellStyle"
+                        data-align="left">
+                        Unidad  <a href="javascript:AddUnidad()" title="Nuevo registro"><i class="glyphicon glyphicon-plus-sign"></i></a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!--Modal Add or Edit-->
+<div id="mdAddOrEditRegistro" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="title-form"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditRegistro">
+                    <div class="form-group">
+                        <label class="control-label">Nombre: </label>
+                        <input id="txtNombre" name="txtNombre" maxlength="200" class="form-control" type="text">
+                        <input type="hidden" name="hdRegistroId" id="hdRegistroId" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Descripción: </label>
+                        <textarea id="txtDescripcion" name="txtDescripcion" maxlength="500" rows="4" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Responsable: </label>
+                        <input id="txtReponsable" name="txtReponsable" class="form-control" type="text">
+                    </div>
+                </form>
+                <input type="hidden" name="hdMantenimientoId" id="hdMantenimientoId" value="0" />
+                <input type="hidden" name="hdEntidadRelacionId" id="hdEntidadRelacionId" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegistrar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit-->
+
+<script src="~/app/ConfiguracionPortafolio/gerenciaAreaDivision.js?v=1.0.7"></script>

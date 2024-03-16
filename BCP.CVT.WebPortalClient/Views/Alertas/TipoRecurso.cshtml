@@ -1,0 +1,111 @@
+﻿
+@{
+    ViewBag.Title1 = "Tipo de recursos - Azure";
+    ViewBag.Title2 = "Alertas";
+    ViewBag.Title3 = ViewBag.Title1;
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .tec {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div id="SearchContainer" class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row gutter-xs form-group ">
+                            <div class="col-md-8 col-xs-6 col-sm-8">
+                                <div class="input-with-icon">
+                                    <input id="txtBuscar" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre del recurso">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-3 col-sm-2">
+                                <button id="btnBusTecNoReg" class="btn btn-primary btn-width-custom" onclick="buscarRegistros()">Buscar</button>
+                            </div>
+                            <div class="col-md-2 col-xs-3 col-sm-2">
+                                <a id="btnExportarTypes" class="btn btn-primary" href="javascript: void(0)">
+                                    <span class="icon icon-file-excel-o"></span>
+                                    <span class="count-text">Exportar tipos</span>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div id="AsocContainer" class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <div class="row">
+        <div class="col-md-7">&nbsp;</div>
+        <div class="col-md-5 text-right">
+            @*<h5>Fecha de la consulta: (*)</h5>*@
+            <div class="input-group date" id="divFechaFiltro">
+                <span class="input-group-addon">
+                    <span class="icon icon-calendar"></span>
+                </span>
+                <input type="text" id="txtFechaFiltro" name="txtFechaFiltro" value="@DateTime.Now.ToString("dd/MM/yyyy")" class="form-control" />
+                <span class="input-group-btn">
+                    <button id="btnExportarData" class="btn btn-primary" type="button">
+                        <span class="icon icon-file-excel-o"></span>
+                        Exportar recursos descubiertos
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Recursos identificados</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistros" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="5%">#</th>
+                            <th data-field="Name" data-halign="center" data-valign="middle" data-align="left" data-width="30%" data-sortable="true" data-sort-name="Name">Tipo de recurso</th>
+                            <th data-field="StatusProcess" data-halign="center" data-valign="middle" data-align="left" data-width="20%" data-sortable="true" data-sort-name="IsActive">Estado</th>
+                            <th data-field="CreationDateISO" data-halign="center" data-valign="middle" data-align="center" data-width="15%" data-sortable="true" data-sort-name="CreationDate">Fecha de registro</th>
+                            <th data-field="ModifiedBy" data-halign="center" data-valign="middle" data-align="center" data-width="10%" data-sortable="true" data-sort-name="ModifiedBy">Modificado por</th>
+                            <th data-field="ModificationDateISO" data-halign="center" data-valign="middle" data-align="center" data-width="15%" data-sortable="true" data-sort-name="ModificationDate">Fecha de última modificación</th>
+                            <th data-formatter="virtualMachineFormatter" data-field="IsVirtualMachine" data-halign="center" data-valign="middle" data-align="center" data-width="20%">¿Es una máquina virtual?</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/tipoRecurso.js?v=1.0.2"></script>

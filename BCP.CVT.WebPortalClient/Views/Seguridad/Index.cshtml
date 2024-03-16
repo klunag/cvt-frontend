@@ -1,0 +1,88 @@
+﻿@{
+    ViewBag.Title1 = "API";
+    ViewBag.Title2 = "Seguridad";
+    ViewBag.Title3 = "API";
+}
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddRegistro()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+</div>
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+                <table id="tbl-registros" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="WorkerId" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="editKeyApplication" data-field="CodigoAplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%">Código</th>
+                            <th data-formatter="keyFormatter" data-field="ApiKey" data-halign="center" data-valign="middle" data-align="left" data-editable="false" data-editable-mode="inline" data-validate="validarEditar">Api Key</th>
+                            <th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="20%">Fecha de registro</th>
+                            @*<th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!--Modal Add or Edit ()-->
+<div id="MdAddOrEditRegistro" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormRegistro"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditRegistro">
+                        <input type="hidden" name="hdAuthId" id="hdAuthId" />
+                        <div class="form-group appContainer">
+                            <label class="control-label">Código de Aplicación: </label>
+                            <input id="txtCodigoAplicacion" class="form-control" type="text" name="txtCodigoAplicacion" onblur="txtCodigoAplicacionBlur()">
+                            <input type="text" name="hdId" id="hdId" value="" minlength="4" maxlength="10" style="display: none" />
+                        </div>
+                    <div class="form-group">
+                        <label class="control-label">Auth Key: </label>
+                        <div class="input-group">
+                            <input id="txtAuthKey" class="form-control" type="text" name="txtAuthKey" maxlength="24" readonly>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" onclick="generarKeyForAuthKey()"><i class="glyphicon glyphicon-refresh"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                  
+
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Activo?
+                        </label>
+                        <div class="input-group" id="divActRegistro">
+                        </div>
+                     </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnReg" class="btn btn-primary" onclick="guardarAddOrEditRegistro()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit -->
+
+
+<link href="/Content/bootstrap-editable.css" rel="stylesheet" />
+<script src="/Scripts/bootstrap-table-editable.js"></script>
+<script src="/Scripts/bootstrap-editable.js"></script>
+<script src="~/app/auth.js"></script>

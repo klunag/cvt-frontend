@@ -1,0 +1,314 @@
+﻿
+@{
+    ViewBag.Title1 = "Backup - Infraestructura Open - Resumen mensual";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Storage";
+    ViewBag.Title3 = "Backup - Infraestructura Open - Resumen mensual";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+
+    #chartdiv {
+        width: 100%;
+        height: 500px;
+    }
+
+    #chartdiv2 {
+        width: 100%;
+        height: 500px;
+    }
+</style>
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <form id="formFiltros">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Servidor: </h5>
+                                        <input type="text" name="txtServidor" id="txtServidor" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Mes: </h5>
+                                        <select class="form-control" id="ddlMes" name="ddlMes">
+                                            <option value="0" selected="selected">Seleccione</option>
+                                            <option value="1">Enero</option>
+                                            <option value="2">Febrero</option>
+                                            <option value="3">Marzo</option>
+                                            <option value="4">Abril</option>
+                                            <option value="5">Mayo</option>
+                                            <option value="6">Junio</option>
+                                            <option value="7">Julio</option>
+                                            <option value="8">Agosto</option>
+                                            <option value="9">Setiembre</option>
+                                            <option value="10">Octubre</option>
+                                            <option value="11">Noviembre</option>
+                                            <option value="12">Diciembre</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Año: </h5>
+                                        <input type="number" name="txtAnio" id="txtAnio" class="form-control" value="@DateTime.Now.Year" maxlength="4" />
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-xs-3 col-sm-3 text-right">
+                                    <h5>&nbsp;</h5>
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Buscar()">Buscar</button>
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Exportar()">Exportar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Resultado de la búsqueda</strong>
+                </div>
+                <div class="card-body">
+                    <table id="tblRegistro" class="table" data-mobile-responsive="true">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="20">#</th>
+                                <th data-field="serverName" data-formatter="linkAppsFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="100">Servidor</th>
+                                <th data-field="serverName" data-formatter="iconFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10"></th>
+                                <th data-field="Dia1" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="1">01</th>
+                                <th data-field="Dia2" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="2">02</th>
+                                <th data-field="Dia3" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="3">03</th>
+                                <th data-field="Dia4" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="4">04</th>
+                                <th data-field="Dia5" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="5">05</th>
+                                <th data-field="Dia6" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="6">06</th>
+                                <th data-field="Dia7" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="7">07</th>
+                                <th data-field="Dia8" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="8">08</th>
+                                <th data-field="Dia9" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="9">09</th>
+                                <th data-field="Dia10" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="10">10</th>
+                                <th data-field="Dia11" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="11">11</th>
+                                <th data-field="Dia12" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="12">12</th>
+                                <th data-field="Dia13" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="13">13</th>
+                                <th data-field="Dia14" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="14">14</th>
+                                <th data-field="Dia15" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="15">15</th>
+                                <th data-field="Dia16" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="16">16</th>
+                                <th data-field="Dia17" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="17">17</th>
+                                <th data-field="Dia18" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="18">18</th>
+                                <th data-field="Dia19" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="19">19</th>
+                                <th data-field="Dia20" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="20">20</th>
+                                <th data-field="Dia21" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="21">21</th>
+                                <th data-field="Dia22" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="22">22</th>
+                                <th data-field="Dia23" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="23">23</th>
+                                <th data-field="Dia24" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="24">24</th>
+                                <th data-field="Dia25" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="25">25</th>
+                                <th data-field="Dia26" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="26">26</th>
+                                <th data-field="Dia27" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="27">27</th>
+                                <th data-field="Dia28" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="28">28</th>
+                                <th data-field="Dia29" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="29">29</th>
+                                <th data-field="Dia30" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="30">30</th>
+                                <th data-field="Dia31" data-formatter="dayFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="10" data-day="31">31</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdAddOrEditModal" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Ejecuciones en el día</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hdId" name="hdId" value="0" />
+                <div class="form-group">
+                    <table id="tblRegistrosDetalle" data-mobile-responsive="true" data-check-on-init="true" data-pagination="true" data-page-size="10" data-page-list="[10, 20, 50, 100, 200]" style="font-size:11px !important;">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="zone" data-halign="center" data-valign="middle" data-align="left">zone</th>
+                                <th data-field="startdatetime" data-halign="center" data-valign="middle" data-align="left">startdatetime</th>
+                                <th data-field="finishdatetime" data-halign="center" data-valign="middle" data-align="left">finishdatetime</th>
+                                <th data-field="product" data-halign="center" data-valign="middle" data-align="left">product</th>
+                                <th data-field="backupserver" data-halign="center" data-valign="middle" data-align="left">backupserver</th>
+                                <th data-field="target" data-halign="center" data-valign="middle" data-align="left">target</th>
+                                <th data-field="levelbackup" data-halign="center" data-valign="middle" data-align="left">levelbackup</th>
+                                <th data-field="datatransferredkb" data-halign="center" data-valign="middle" data-align="left">datatransferredkb</th>
+                                <th data-field="outcome" data-formatter="semaforoFormatter" data-halign="center" data-valign="middle" data-align="left">outcome</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdAddOrEditModalApps" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Aplicaciones relacionadas al día de hoy</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hdId" name="hdId" value="0" />
+                <div class="form-group">
+                    <table id="tblRegistrosDetalleApps" data-mobile-responsive="true" data-check-on-init="true" data-pagination="true" data-page-size="10" data-page-list="[10, 20, 50, 100, 200]" style="font-size:11px !important;">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left">Código</th>
+                                <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left">Nombre</th>
+                                <th data-field="EstadoAplicacion" data-halign="center" data-valign="middle" data-align="left">Estado aplicación</th>
+                                <th data-field="Equipo" data-halign="center" data-valign="middle" data-align="left">Equipo</th>
+                                <th data-field="Ambiente" data-halign="center" data-valign="middle" data-align="left">Ambiente</th>
+                                <th data-field="EstadoRelacion" data-halign="center" data-valign="middle" data-align="left">Estado relación</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalGrafico" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Gráfico por servidor</h4>
+            </div>
+            <div class="modal-body">                
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item active">
+                        <a class="nav-link active" id="ejecuciones-tab" data-toggle="tab" href="#ejecuciones" role="tab" aria-controls="ejecuciones" aria-selected="true" onclick="setVisible(1);">Ejecuciones</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="transferencia-tab" data-toggle="tab" href="#transferencia" role="tab" aria-controls="transferencia" aria-selected="false" onclick="setVisible(0);">Transferencia (en MB)</a>
+                    </li>                    
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active in" id="ejecuciones" role="tabpanel" aria-labelledby="ejecuciones-tab">
+                        <div id="chartdiv"></div>
+                    </div>
+                    <div class="tab-pane fade" id="transferencia" role="tabpanel" aria-labelledby="transferencia-tab">
+                        <div id="chartdiv2"></div>
+                    </div>                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdAddOrEditModalPeriodo" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Periodos de ejecución</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hdId" name="hdId" value="0" />
+                <div class="form-group">
+                    <table id="tblRegistrosDetallePeriodo" data-mobile-responsive="true" data-check-on-init="true" data-pagination="true" data-page-size="10" data-page-list="[10, 20, 50, 100, 200]" style="font-size:11px !important;">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="DomainName" data-halign="center" data-valign="middle" data-align="left">DomainName</th>
+                                <th data-field="NodeName" data-halign="center" data-valign="middle" data-align="left">NodeName</th>
+                                <th data-field="ServerName" data-halign="center" data-valign="middle" data-align="left">ServerName</th>
+                                <th data-field="ScheduleName" data-halign="center" data-valign="middle" data-align="left">ScheduleName</th>
+                                <th data-field="StartTime" data-halign="center" data-valign="middle" data-align="left">StartTime</th>
+                                <th data-field="Options" data-halign="center" data-valign="middle" data-align="left">Options</th>
+                                <th data-field="Objects" data-halign="center" data-valign="middle" data-align="left">Objects</th>
+                                <th data-field="Period" data-halign="center" data-valign="middle" data-align="left">Period</th>
+                                <th data-field="PerUnits" data-halign="center" data-valign="middle" data-align="left">PerUnits</th>
+                                <th data-field="DayOfWeek" data-halign="center" data-valign="middle" data-align="left">DayOfWeek</th>
+                                <th data-field="EnhMonth" data-halign="center" data-valign="middle" data-align="left">EnhMonth</th>
+                                <th data-field="DayOfMonth" data-halign="center" data-valign="middle" data-align="left">DayOfMonth</th>
+                                <th data-field="WeekOfMonth" data-halign="center" data-valign="middle" data-align="left">WeekOfMonth</th>
+                                <th data-field="Site" data-halign="center" data-valign="middle" data-align="left">Site</th>
+
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const FECHA = '@DateTime.Now.ToString("dd/MM/yyyy")';
+</script>
+<script src="~/app/storagebackupopenresumen.js?v=2.1.0"></script>
+
+

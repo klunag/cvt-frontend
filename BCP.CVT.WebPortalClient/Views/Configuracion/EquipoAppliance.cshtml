@@ -1,0 +1,413 @@
+﻿@{
+    ViewBag.Title1 = "Appliance";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Appliance";
+}
+
+@*<link href="https://s3-us-west-2.amazonaws.com/colors-css/2.2.0/colors.min.css" rel="stylesheet">*@
+@*<link href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css" rel="stylesheet">*@
+
+<style>
+    .opcionesStyle {
+        min-width: 120px;
+    }
+    /*.bg-orange {
+        background-color: #FF851B !important;
+    }*/
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+
+    .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
+        background-color: transparent;
+    }
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+</style>
+<div class="card" style="margin-bottom:25px;">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row form-group">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon containerFiltro">
+                                    <input id="txtBusEq" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Búsqueda por nombre de la tecnología">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusEq" class="btn btn-primary btn-width-custom" onclick="buscarEquipo()">Buscar</button>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs form-group">
+                            @*<div class="col-xs-3 col-md-3">
+            <div class="text-left" data-toggle="match-height">
+                <h5>Tipo equipo: </h5>
+                <select id="cbFilTipoEq" name="cbFilTipoEq" class="form-control"></select>
+            </div>
+        </div>*@
+                            @*<div class="col-xs-3 col-md-3">
+            <div class="text-left" data-toggle="match-height">
+                <h5>Descubrimiento: </h5>
+                <select id="cbFilDes" name="cbFilDes" class="form-control">
+                    <option value="-1">-- Todos --</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-3 col-md-3">
+            <div class="text-left" data-toggle="match-height">
+                <h5>¿Excluido de cálculos?: </h5>
+                <select id="cbFilExCal" name="cbFilExCal" class="form-control"></select>
+            </div>
+        </div>*@
+                            <div class="col-xs-6 col-md-6 nombreEquipoContainer">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Nombre de equipo: </h5>
+                                    <input id="txtFiltroNombreEq" name="txtFiltroNombreEq" class="form-control" type="text">
+                                </div>
+                            </div>
+                            @*<div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado: </h5>
+                                    <select id="ddlEstado" name="ddlEstado" class="form-control"></select>
+                                </div>
+                            </div>*@
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <div class="col-xs-12 col-md-12">
+        <a id="btnExportarInfo" class="btn btn-primary" href="javascript: void(0)">
+            <span class="icon icon-external-link"></span>
+            <span class="count-text">Exportar</span>
+        </a>
+        <a class="btn btn-primary" href="~/Flujos/SolicitudEquipo?isUser=1" title="Genera una solicitud para configurar un equipo existente como Appliance/Activo TSI">
+            <span class="icon icon-external-link"></span>
+            <span class="count-text">Solicitud de cambio de tipo de equipo Appliance</span>
+        </a>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de los equipos</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblEquipo" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true" data-detail-view="false" data-detail-formatter="detailFormatter" data-row-style="rowStyle" style="font-size: 11px !important;">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="linkFormatter" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Equipo</th>
+                            <th data-field="EquipoSoftwareBase.Tecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="EquipoSoftwareBase.Tecnologia">Tecnología</th>
+                            @*<th data-field="EquipoSoftwareBase.TipoActivoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="EquipoSoftwareBase.TipoActivo">Tipo activo</th>
+                            <th data-field="EquipoSoftwareBase.IP" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="EquipoSoftwareBase.IP">IP</th>
+                            <th data-field="EquipoSoftwareBase.SedeStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="EquipoSoftwareBase.Sede">Sede</th>                            
+                            <th data-field="EquipoSoftwareBase.DimensionStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="EquipoSoftwareBase.Dimension">Dimension</th>*@
+                            <th data-field="EquipoSoftwareBase.VencimientoLicenciaStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="EquipoSoftwareBase.VencimientoLicencia">Fin de Contrato</th>
+                            <th data-formatter="estadoActualFormatter" data-field="EstadoActual" data-halign="center" data-valign="middle" data-align="center" data-width="100">Indicador actual</th>
+                            <th data-formatter="indicadorUnoFormatter" data-field="EstadoIndicador1" data-halign="center" data-valign="middle" data-align="center" data-width="100">Indicador 12 meses</th>
+                            <th data-formatter="indicadorDosFormatter" data-field="EstadoIndicador2" data-halign="center" data-valign="middle" data-align="center" data-width="100">Indicador 24 meses</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%" class="opcionesStyle">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal Asignar SO (Equipo)-->
+<div id="MdAsigSO" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Asignar sistema operativo</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAsigSO">
+                    <div class="form-group">
+                        <label class="control-label">Sistema operativo: </label>
+                        <select id="cbSO" class="form-control" name="cbSO">
+                            <option value="-1">-- Todos --</option>
+                        </select>
+                        <input type="hidden" name="hdEquipoTecnologiaId" id="hdEquipoTecnologiaId" value="0" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegAsigSO" class="btn btn-primary" onclick="guardarAsignarSO()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Asignar SO (Gestion equipo)-->
+<!--Modal Importar (Gestion equipo)-->
+<div id="mdImportar" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormImp"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formImportar">
+                    <div class="form-group onlyUpdate">
+                        <label class="control-label">Tipo de equipo: </label>
+                        <select id="cbTipoEquipoFil" name="cbTipoEquipoFil" class="form-control onlyUpdate"></select>
+                    </div>
+                    <div class="form-group onlyUpdate">
+                        <a id="" class="" href="javascript:descargarEquiposActualizar()" title="Descargar equipos">
+                            [Descargar equipos]
+                        </a>
+                        @*<button id="" class="btn btn-primary" onclick="descargarEquiposActualizar()" type="button">Descargar equipos</button>*@
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            Archivo excel:
+                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="La aplicación carga los registros que se encuentren en la primera hoja del archivo MS Excel."></span>
+                        </label>
+                        <a id="btnDescargarPlantilla" class="" href="javascript:descargarPlantillaEquipos()" title="Descargar plantilla">
+                            [Descargar plantilla]
+                        </a>
+                        <div class="input-group">
+                            <input id="txtArchivo" name="txtArchivo" class="form-control onlyImport" type="text" value="Ningún archivo seleccionado" readonly>
+                            <span class="input-group-btn">
+                                <label class="btn btn-primary file-upload-btn">
+                                    <input id="flArchivo" class="file-upload-input inputfile onlyImport" type="file" name="flArchivo" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    <span class="glyphicon glyphicon-folder-open"></span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnReg" class="btn btn-primary" onclick="CargarEquipos()" type="button" data-loading-text="Procesando...">Importar</button>
+                <button id="btnActualizar" class="btn btn-primary onlyUpdate" onclick="ActualizarEquipos()" type="button" data-loading-text="Procesando...">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Importar (Gestion equipo)-->
+<!--Modal Equipos desactivados (Gestion equipo)-->
+<div id="mdEquiposDes" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Equipos desactivados</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formEquiposDes">
+                    @*<div class="form-group">
+                            <label class="control-label">Tecnología: </label>
+                            <div class="form-group ui-widget tecContainer">
+                                <input id="txtTecnologia" name="txtTecnologia" class="form-control ui-autocomplete-input" type="text">
+                                <input type="hidden" name="hdTecnologiaId" id="hdTecnologiaId" value="0" />
+                            </div>
+                        </div>*@
+                    <div class="form-group">
+                        @*<button id="btnRegTec" type="button" class="btn btn-primary" onclick="guardarTecnologia()" data-loading-text="Procesando...">Registrar tecnología</button>*@
+                        <button id="btnExportar" type="button" class="btn btn-primary" onclick="ExportarEquiposDesactivados()">Exportar</button>
+                    </div>
+                    <div class="form-group">
+                        <table id="tblEquiposDes" data-locale="es-SP" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                                    <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="TipoEquipoId">Tipo equipo</th>
+                                    <th data-field="FechaUltimoEscaneoCorrectoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Fecha último escaneo correcto</th>
+                                    <th data-field="FechaUltimoEscaneoErrorStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Fecha último escaneo error</th>
+                                    <th data-field="FechaModificacionStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="FechaModificacion">Fecha modificación</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Equipos desactivados (Gestion equipo)-->
+<!--Modal Observar Solicitud-->
+<div id="mdOS" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title_modal"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formOS">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Motivo de la desactivación:
+                        </label>
+                        <textarea id="txtObs" name="txtObs" rows="8" class="form-control"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnOS" type="button" class="btn btn-primary" onclick="cambiarEstadoEquipo()" data-loading-text="Procesando..." title="Desactivar equipo">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Observar Solicitud-->
+<!--Modal Modulo-->
+<div id="MdAddOrEdit" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="titleForm"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEdit">
+                    <ul id="tabModulo" class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#tabm1" aria-controls="tabm1" role="tab" data-toggle="tab">
+                                <strong>Generales</strong>
+                            </a>
+                        </li>
+                       
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade in active" id="tabm1">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <div class="row" style="margin-top:10px;"></div>
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="col-md-5">
+                                                            Tecnología
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <textarea class="form-control" rows="4" id="txtTecnologiaEquipo" name="txtTecnologiaEquipo" maxlength="200"></textarea>
+                                                        </div>
+                                                        <input type="hidden" name="hdEquipoId" id="hdEquipoId" value="0" />
+                                                        <input type="hidden" name="hdEquipoSoftwareBaseId" id="hdEquipoSoftwareBaseId" value="0" />
+                                                        <input type="hidden" name="hdTipoEquipoId" id="hdTipoEquipoId" value="0" />
+                                                        <input type="hidden" name="hdSubdominioId" id="hdSubdominioId" value="0" />
+                                                        <input type="hidden" name="hdFlagDominioRed" id="hdFlagDominioRed" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="col-md-5">
+                                                            Fin de Contrato
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <div class="input-group date" id="dpVencimientoLicencia-btn">
+                                                                <input type="text" id="dpVencimientoLicencia" name="dpVencimientoLicencia" class="form-control" />
+                                                                <span class="input-group-addon">
+                                                                    <span class="icon icon-calendar"></span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegEq" class="btn btn-primary" onclick="guardarAddOrEditEquipo()" type="button" data-loading-text="Procesando...">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Modulo-->
+<!--Modal Búsqueda de Equipo Software Base-->
+<div id="MdSearchESB" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Búsqueda de equipos</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="display: flex">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Búsqueda</label>
+                            <input type="text" id="txtSearchESBNombre" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-3" style="margin-top: auto">
+                        <div class="form-group">
+                            <button class="btn" id="btnBuscarESB">
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <table id="tblEBS" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true" style="font-size: 11px !important;">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>                                
+                                <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="Nombre">Nombre</th>
+                                <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="TipoEquipo">Tipo de equipo</th>                                
+                                <th data-formatter="opcionesEBS" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%" class="opcionesStyle">Opciones</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Búsqueda de Equipo Software Base-->
+
+<script src="~/app/gestionEquipoAppliance.js?v1.3.8"></script>

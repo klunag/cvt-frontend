@@ -1,0 +1,99 @@
+﻿@{
+    ViewBag.Title1 = "Consulta de Aplicaciones validadas";
+    ViewBag.Title2 = "Relaciones y Formatos";
+    ViewBag.Title3 = "Consulta de Aplicaciones validadas";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Código Aplicación: </h5>
+                                    <input type="text" value="" maxlength="100" autocomplete="off" id="txtAplicacion" name="txtAplicacion" class="form-control" />
+                                    <input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-4">
+                                <h5>Dominio: </h5>
+                                <div class="input-with-icon">
+                                    <select id="cbBusDominioTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                        <option value="-1">Todos</option>
+                                    </select>
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-4">
+                                <h5>SubDominio: </h5>
+                                <div class="input-with-icon">
+                                    <select id="cbBusSubDominioTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                        <option value="-1">Todos</option>
+                                    </select>
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-md-4 col-xs-4">
+                                <h5>Jefe de Equipo: </h5>
+                                <div class="input-with-icon">
+                                    <select id="cbBusJefe" class="form-control input-thick pill input-with-icon-search" multiple>
+                                        <option value="-1">Todos</option>
+                                    </select>
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-4">
+                                <h5>Lider de Usuario: </h5>
+                                <div class="input-with-icon">
+                                    <select id="cbBusLider" class="form-control input-thick pill input-with-icon-search" multiple>
+                                        <option value="-1">Todos</option>
+                                    </select>
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-4">
+                                <h5>Gestionado por: </h5>
+                                <select id="cbSoportado" class="form-control"></select>
+                                <div class="text-right">
+                                    <h5>&nbsp;</h5>
+                                    <button id="btnExportar" type="button" class="btn btn-primary btn-width-custom" onclick="exportar()">Exportar</button>
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Listar()">Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs" style="margin-top: 12px">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistro" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationId">Código de Aplicación</th>
+                            <th data-field="NombreAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Aplicación</th>
+                            <th data-field="FechaValida" data-formatter="dateFormat2" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="registerDate">Fecha de ultima validación</th>
+                            <th data-field="UsuarioModificacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Usuario que validó</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/Relaciones/AplicacionesValidas.js"></script>

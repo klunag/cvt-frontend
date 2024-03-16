@@ -1,0 +1,171 @@
+﻿
+@{
+    string tipoUsuario = (string)ViewBag.TipoUsuario;
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusCodCis" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Código o descripción cis...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusCodCis" class="btn btn-primary btn-width-custom" onclick="buscarCodCis()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>            
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddCodCis()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de códigos CIS</strong>
+            </div>
+            <div class="card-body">
+                <table id="tbl-codcis" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="linkFormatter" data-field="CodigoTemporal" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="CodigoTemporal" data-width="20%">Código</th>
+                            <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Descripción</th>
+                            <th data-field="ServidoresAsociados" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="ServidoresAsociados" data-width="10%">Total de servidores</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion" data-width="10%">Creado Por</th>
+                            <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit(CodCis)-->
+<div id="MdAddOrEditCodCis" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormCodCis"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditCodCis">
+                    <input type="hidden" id="hdTipoUsuario" name="hdTipoUsuario" value="@tipoUsuario" />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="control-label">Servidores relacionados</label>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <table id="tblServidorRelacionado" class="table" data-mobile-responsive="true" data-unique-id="Id">
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="3%">#</th>
+                                                <th data-field="HostnameServidor" data-halign="center" data-valign="middle" data-align="left" data-width="10%">Hostname</th>
+                                                <th data-field="Servidor" data-halign="center" data-valign="middle" data-align="left" data-width="10%">Servidor</th>
+                                                <th data-field="Ambiente" data-halign="center" data-valign="middle" data-align="left" data-width="10%">Ambiente</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <table id="tblServidorNoRegistrado" class="table" data-mobile-responsive="true" data-unique-id="Id">
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="3%">#</th>
+                                                <th data-field="Servidor" data-halign="center" data-valign="middle" data-align="left" data-width="10%">Servidor no encontrado</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">Código temporal: </label>
+                                    <input id="txtCodCisTemp" class="form-control" type="text" name="txtCodCisTemp" readonly>
+                                    <input type="hidden" name="hdCodCisId" id="hdCodCisId" value="0" />
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">Descripción: </label>
+                                    <textarea id="txtDesCodCis" class="form-control" rows="5" name="txtDesCodCis"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        Archivo excel:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="La aplicación carga los registros que se encuentren en la columna A de la primera hoja del archivo MS Excel."></span>
+                                    </label>
+                                    <a id="btnDescargarPlantilla" class="" href="javascript:descargarPlantillaCIS()" title="Descargar plantilla">
+                                        [Descargar plantilla]
+                                    </a>
+                                    <div class="input-group">
+                                        <input id="hdArchivoId" name="hdArchivoId" class="form-control" type="text" value="0" style="display:none">
+                                        <input id="txtArchivo" name="txtArchivo" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                        <span class="input-group-btn">
+                                            <label class="btn btn-primary file-upload-btn" id="btnSubirArchivo">
+                                                <input id="flArchivo" class="file-upload-input inputfile" type="file" name="flArchivo">
+                                                <span class="glyphicon glyphicon-folder-open"></span>
+                                            </label>
+                                        </span>
+                                        <a id="btnDescargarFile" class="btn btn-success" href="javascript:DescargarArchivo()" title="Descargar archivo">
+                                            <span class="glyphicon glyphicon-download-alt"></span>
+                                        </a>
+                                        <a id="btnEliminarFile" class="btn btn-danger" href="javascript:EliminarArchivo()" title="Eliminar archivo">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </a>
+                                    </div>
+                                    <input type="text" id="msjFile" name="msjFile" class="form-control" style="display:none;" />
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        ¿Activo?
+                                    </label>
+                                    <div class="input-group" id="divActCodCis">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegCodCis" class="btn btn-primary" onclick="guardarAddOrEditCodCis()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit()-->
+
+<script src="~/app/codigoCIS.js"></script>

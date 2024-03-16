@@ -1,0 +1,141 @@
+﻿@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Estándar Portafolio";
+    ViewBag.Title2 = "Configuración de Portafolio";
+    ViewBag.Title3 = "Estándar Portafolio";
+}
+@using BCP.CVT.Cross
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <h5>Tipo tecnología: </h5>
+                                <select id="ddlTipoTecnologiaFiltro" name="ddlTipoTecnologiaFiltro" class="form-control"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Estado: </h5>
+                                <select id="ddlEstadoFiltro" name="ddlEstadoFiltro" class="form-control"></select>
+                            </div>
+                        </div>                       
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    @*<a id="btnNuevo" class="btn btn-primary" href="javascript: void(0)">
+            <span class="icon icon-plus"></span>
+            <span class="count-text">Nuevo</span>
+        </a>*@
+    <a id="btnExportar" class="btn btn-primary" href="javascript: void(0)">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+    <a id="btnBuscar" class="btn btn-primary" href="javascript: void(0)">
+        <span class="icon icon-search"></span>
+        <span class="count-text">Buscar</span>
+    </a>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-warning" role="alert" style="margin-left:15px; margin-right:10px;">
+            <strong>Leyenda</strong>
+            <p>
+                <strong>I) Puntuación 1</strong> : Estándar y Deprecado u Obsoleto <br />
+                <strong>II) Puntuación 0</strong> : Todas las opciones distintas al punto I
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistro" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption">
+                        <span>Estándares del portafolio</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                            <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Nombre</th>
+                            <th data-field="TipoEstandar" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="SubdominioId">Tipo Estándar</th>
+                            <th data-field="TipoTecnologiaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TipoTecnologiaId">Tipo Tecnología</th>
+                            <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EstadoId">Estado</th>
+                            <th data-field="PuntuacionServidor" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="PuntuacionServidor">Puntuación servidor</th>
+                            <th data-field="PuntuacionEstacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="PuntuacionEstacion">Puntuación estación</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaCreacion">Fecha de registro</th>
+                            @*<th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion">Creado por</th>*@
+                            @*<th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Acciones</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit-->
+<div id="mdRegistro" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="title-md"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditRegistro">
+                    <div class="form-group">
+                        <label class="control-label">Tipo estandar: </label>
+                        <select id="ddlTipoEstandar" name="ddlTipoEstandar" class="form-control"></select>
+                    </div>
+                    <div class="form-group divNombreEstandarContainer">
+                        <label class="control-label">Nombre: </label>
+                        <textarea id="txtNombre" name="txtNombre" rows="2" class="form-control"></textarea>
+                        <input type="hidden" name="hdRegistroId" id="hdRegistroId" value="0" />
+                        <input type="hidden" name="hdSubdominioListId" id="hdSubdominioListId" value="" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Descripción: </label>
+                        @*<input id="txtDescripcion" class="form-control" type="text" name="txtDescripcion" maxlength="300">*@
+                        <textarea id="txtDescripcion" name="txtDescripcion" rows="3" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="control-label">Puntuación Servidor: </label>
+                                <input id="txtPuntuacionServidor" class="form-control" type="text" name="txtPuntuacionServidor" maxlegth="10">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="control-label">Puntuación Estación: </label>
+                                <input id="txtPuntuacionEstacion" class="form-control" type="text" name="txtPuntuacionEstacion" maxlegth="10">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegistrar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit-->
+<script>
+    const ENTIDAD_MANTENIMIENTO = @Html.Raw((int)EConfiguracionPortafolio.Estandar)
+</script>
+
+<script src="~/app/ConfiguracionPortafolio/estandarPortafolio.js?v=1.0.2"></script>

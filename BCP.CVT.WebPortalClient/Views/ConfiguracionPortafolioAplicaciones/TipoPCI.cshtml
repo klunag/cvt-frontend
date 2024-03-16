@@ -1,0 +1,173 @@
+﻿@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Tipo de PCI DSS";
+	ViewBag.Title2 = "Configuración de Portafolio";
+	ViewBag.Title3 = "Tipo de PCI DSS";
+}
+
+@using BCP.CVT.Cross
+
+<style>
+	.bloq-element {
+		pointer-events: none;
+		opacity: 0.7;
+	}
+
+	/*.table {
+		font-size: 11px !important;
+	}*/
+</style>
+
+<div class="card">
+	<div class="card-body">
+		<div class="card-search">
+			<fieldset class="fieldset">
+				<legend class="legend">Filtro de búsqueda</legend>
+				<div class="card-search-box">
+					<form action="javascript:void(0);">
+						<div class="form-group row">
+							<div class="col-md-7 col-xs-8 col-sm-9">
+								<div class="input-with-icon">
+									<input id="txtBusPCI" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre de Tipo de PCI...">
+									<span class="icon icon-search input-icon"></span>
+								</div>
+							</div>
+
+							<div class="col-md-2 col-xs-4 col-sm-3">
+								<button id="btnBusPCI" class="btn btn-primary btn-width-custom" onclick="buscarPCI()">Buscar</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+	@*<a id="btnHistorico" class="btn btn-primary" href="javascript: void(0)" title="Ver histórico de cambios">
+			<span class="icon icon-history"></span>
+			<span class="count-text">Ver cambios</span>
+		</a>*@
+	<a id="btnNuevo" class="btn btn-primary btn-width-custom" href="javascript: void(0)" title="Nuevo registro">
+		<span class="icon icon-plus"></span>
+		<span class="count-text">Nuevo</span>
+	</a>
+</div>
+
+<div class="row gutter-xs">
+	<div class="col-xs-12">
+		<div class="card">
+			<div class="card-body">
+				<table id="tbl-pci" class="table" data-unique-id="WorkerId" data-mobile-responsive="true">
+					<caption class="caption text-left">
+						<span>PCI DSS configurados</span>
+					</caption>
+					<thead>
+						<tr>
+							<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="10">#</th>
+							<th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="30">Acciones</th>
+							<th data-field="Id" data-halign="center" data-visible="false" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Id">Código</th>
+							<th data-formatter="linkFormatter" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Nombre</th>
+							<th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Descripcion</th>
+							<th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="UsuarioCreacion" data-width="70">Creado por</th>
+							<th data-field="FechaCreacionPCI" data-formatter="dateFormat" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaCreacionPCI" data-width="70">Fecha de creación</th>
+							<th data-field="UsuarioModificacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="UsuarioModificacion" data-width="70">Modificado por</th>
+							<th data-field="FechaModificacion" data-formatter="dateFormat" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaModificacion" data-width="70">Fecha de <br />Última modificación</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--Modal Add or Edit (Activos)-->
+<div id="MdAddOrEditPCI" tabindex="-1" role="dialog" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title" id="titleFormPCI">Nuevo registro</h4>
+			</div>
+			<div class="modal-body">
+				<form id="formAddOrEditPCI">
+					<div class="form-group">
+						@*<label class="control-label">Código: </label>*@
+						@*<input id="txtCodPar" class="form-control" type="text" name="txtCodPar">*@
+						<input type="hidden" id="txtCodPCI" class="form-control" name="txtCodPCI">
+						<input type="hidden" name="hdPCIId" id="hdPCIId" value="0" />
+					</div>
+
+					<div class="form-group">
+						<label class="control-label">
+							Nombre:
+							<span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Nombre con el cual será definido el tipo de PCI."></span>
+						</label>
+						<input id="txtNombre" class="form-control" type="text" name="txtNombre">
+					</div>
+					<div class="form-group">
+						<label class="control-label">
+							Descripción:
+							<span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Breve descripción del tipo de PCI."></span>
+						</label>
+						@*<input id="txtDescripcion" class="form-control" type="text" name="txtDescripcion">*@
+						<textarea id="txtDescripcion" name="txtDescripcion" rows="4" class="form-control"></textarea>
+					</div>
+
+	
+
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				<button id="btnRegPCI" class="btn btn-primary" onclick="guardarAddOrEditPCI()" type="button" data-loading-text="Procesando...">Registrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--Modal BT-->
+<!--<div id="mdBT" tabindex="-1" role="dialog" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title">Histórico de cambios realizados</h4>
+			</div>
+			<div class="modal-body">
+				<form id="formBT">
+					<div class="form-group">
+						<table id="tblBT" class="table" data-unique-id="Id" data-mobile-responsive="true">
+							<thead>
+								<tr>
+									<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+									<th data-field="AccionStr" data-formatter="linkFormatterAudi" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="Accion">Acción</th>
+									<th data-field="Entidad" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Tipo activo información</th>
+									<th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de actualización</th>
+									<th data-field="Usuario" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Usuario</th>
+									<th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+			</div>
+		</div>
+	</div>
+</div>-->
+<!--End Modal BT-->
+
+<script>
+    const ENTIDAD_MANTENIMIENTO = @Html.Raw((int)EConfiguracionPortafolio.TAI)
+</script>
+<script src="~/app/ConfiguracionPortafolio/tipoPCI.js"></script>

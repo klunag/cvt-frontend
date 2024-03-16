@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title1 = "Validación de relaciones por aplicación";
+    ViewBag.Title2 = "Relaciones y Formatos";
+    ViewBag.Title3 = "Validación de relaciones por aplicación";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Código Aplicación: </h5>
+                                    <input type="text" value="" maxlength="100" autocomplete="off" id="txtAplicacion" name="txtAplicacion" class="form-control" />
+                                    <input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-4">
+                                <h5>Dominio: </h5>
+                                <div class="input-with-icon">
+                                    <select id="cbBusDominioTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                        <option value="-1">Todos</option>
+                                    </select>
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-4">
+                                <h5>SubDominio: </h5>
+                                <div class="input-with-icon">
+                                    <select id="cbBusSubDominioTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                        <option value="-1">Todos</option>
+                                    </select>
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="fAdmin" class="row gutter-xs">
+                            <div class="col-md-4 col-xs-4">
+                                <h5>Jefe de Equipo: </h5>
+                                <div class="input-with-icon">
+                                    <select id="cbBusJefe" class="form-control input-thick pill input-with-icon-search" multiple>
+                                        <option value="-1">Todos</option>
+                                    </select>
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-4">
+                                <h5>Lider de Usuario: </h5>
+                                <div class="input-with-icon">
+                                    <select id="cbBusLider" class="form-control input-thick pill input-with-icon-search" multiple>
+                                        <option value="-1">Todos</option>
+                                    </select>
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-4">
+                                <h5>Gestionado por: </h5>
+                                <select id="cbSoportado" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-12 text-right">
+                                <h5>&nbsp;</h5>
+                                <button id="btnExportar" type="button" class="btn btn-primary btn-width-custom" onclick="exportar()">Exportar</button>
+                                <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Listar()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs" style="margin-top: 12px">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistro" class="table" cellspacing="0" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acción</th>
+                            <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationId">Código de Aplicación</th>
+                            <th data-field="NombreAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Aplicación</th>
+                            <th data-field="FechaValida" data-formatter="dateFormat2" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="registerDate">Fecha de ultima validación</th>
+                            <th data-field="UsuarioModificacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Usuario que validó</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ModalInfo" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog  modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm"></h4>
+            </div>
+            <div class="modal-body">
+                <h5 class="modal-title" id="appSelect"></h5>
+                <p id="detalleInfo"></p>
+                <input id="txtBuscar" type="text" name="txtBuscar" placeholder="Buscar..." class="form-control" style="margin-bottom: 16px">
+                <table id="tblModal" data-detail-view="true" class="table table-striped table-nowrap" cellspacing="0" style="width:100%;">
+                    <thead>
+                        <tr></tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button id="btnRegistrar" class="btn btn-primary" onclick="confirmar()" type="button" data-loading-text="Procesando..."><strong>Confirmar Validación</strong></button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/Relaciones/InformacionAplicaciones.js"></script>

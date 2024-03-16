@@ -1,0 +1,452 @@
+﻿@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Solicitudes de modificación de aplicaciones";
+    ViewBag.Title2 = "Portafolio de aplicaciones";
+    ViewBag.Title3 = "Solicitudes de modificación";
+}
+
+<style>
+    .width-des {
+        min-width: 300px;
+    }
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    /* Chat containers */
+    .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    /* Darker chat container */
+    .darker {
+        border-color: #f7a033;
+        background-color: #ddd;
+    }
+
+    /* Clear floats */
+    .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    /* Style images */
+    .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+        /* Style the right image */
+        .container img.right {
+            float: right;
+            margin-left: 20px;
+            margin-right: 0;
+        }
+
+    /* Style time text */
+    .time-right {
+        float: right;
+        color: #aaa;
+    }
+
+    /* Style time text */
+    .time-left {
+        float: left;
+        color: #999;
+    }
+
+    .user-name {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .table {
+        font-size: 11px !important;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-8 col-md-8">
+                                <div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+                                    <h5>Aplicación (código) </h5>
+                                    <input type="text" id="txtAplicacionFiltro" name="txtAplicacionFiltro" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    <input type="hidden" name="hdAplicacionFiltroId" id="hdAplicacionFiltroId" value="0" />
+                                    <input type="hidden" name="hdIdsTipoFlujo" id="hdIdsTipoFlujo" value="" />
+                                </div>
+                            </div>
+                            <div class="col-xs-2 col-md-2">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Estado</h5>
+                                    <select id="cbFilEstado" name="cbFilEstado" class="form-control">
+                                        <option value="-1" selected="selected">Todos</option>
+                                        <option value="1">Registrado</option>
+                                        <option value="2">En proceso de revisión</option>
+                                        <option value="3">Aprobado</option>
+                                        <option value="4">Observado</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="AddSolicitud()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nueva solicitud</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tbl-solicitudes" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Mis solicitudes de modificación</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            <th data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="10%">Solicitud</th>
+                            <th data-field="CodigoAplicacion" data-halign="center" data-valign="middle" data-align="left">Código aplicación</th>
+                            <th data-field="NombreAplicacion" data-formatter="nameAppFormatter" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                            <th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="center">Tipo activo información</th>
+                            <th data-field="EstadoSolicitudToString" data-halign="center" data-valign="middle" data-align="center">Estado de la solicitud</th>
+                            @*<th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center">Usuario</th>*@
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de registro</th>
+                            <th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de modificación</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Arquetipo)-->
+<div id="MdAddOrEditArq" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormArq"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditArq">
+                    <ul id="tabModulo" class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">
+                                <strong>Información de la aplicación</strong>
+                            </a>
+                        </li>
+                        @*<li role="presentation">
+                            <a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">
+                                <strong>Información del módulo</strong>
+                            </a>
+                        </li>*@
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade in active" id="tab1">
+                            <div class="row" style="margin-top:10px;"></div>
+                            <div class="row">
+                                <div class="col-md-6 solicitud-app">
+                                    <div class="form-group">
+                                        <div class="text-left ui-widget containerFormAplicacion" data-toggle="match-height">
+                                            <label class="control-label">Aplicación: </label>
+                                            <input type="text" id="txtAplicacion" name="txtAplicacion" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                            <input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+                                            <input type="hidden" name="hdIdApp" id="hdIdApp" value="0" />
+                                            <input type="hidden" name="hIdSolicitud" id="hIdSolicitud" value="0" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Motivo de la modificación: </label>
+                                        <textarea id="txtComentarios" class="form-control" rows="6" name="txtComentarios" maxlength="1000"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Adjuntar algún sustento asociado a la solicitud de modificación:</label>
+                                        <input id="hdArchivoId" name="hdArchivoId" class="form-control" type="text" value="0" style="display:none">
+                                        <div class="input-group">
+                                            <input id="txtNomArchivo" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                            <span class="input-group-btn">
+                                                <label class="btn btn-primary file-upload-btn">
+                                                    <input id="flArchivo" class="file-upload-input inputfile" type="file" name="flArchivo">
+                                                    <span class="glyphicon glyphicon-folder-open"></span>
+                                                </label>
+                                            </span>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <a id="btnDescargarFile" class="btn btn-secondary" href="javascript:DescargarArchivo()" title="Descargar archivo">
+                                                    <span class="glyphicon glyphicon-download-alt"></span>
+                                                </a>
+                                                <a id="btnEliminarFile" class="btn btn-secondary" href="javascript:EliminarArchivo()" title="Eliminar archivo">
+                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group divObservacion" style="display:none;">
+                                        <label class="control-label">Tus comentarios: </label>
+                                        <textarea id="txtObservacionesElim" class="form-control" rows="5" name="txtObservacionesElim" maxlength="1000"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 solicitud-app divAtributoAplicacion">
+                                    <div class="form-group">
+                                        <div class="text-left ui-widget atributoAplicacion" data-toggle="match-height">
+                                            <label class="control-label">Atributo de la aplicación: </label>
+                                            <input type="text" id="txtAtributoApp" name="txtAtributoApp" value="" maxlength="300" autocomplete="on" class="form-control ui-autocomplete-input atributo-app" />
+                                            <input type="hidden" name="hdAtributoAppId" id="hdAtributoAppId" value="0" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group input-relaciones">
+                                        <div class="row rls01">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="control-label">Área de negocio BIAN: </label>
+                                                    <select id="ddlAreaBIAN" name="ddlAreaBIAN" class="form-control input-relaciones rls01 atributo-app">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="control-label">Dominio de Negocio BIAN: </label>
+                                                    <select id="ddlDominioBIAN" name="ddlDominioBIAN" class="form-control input-relaciones rls01 atributo-app">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row rls01">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="control-label">Plataforma de negocio BCP: </label>
+                                                    <select id="ddlPlataformaBCP" name="ddlPlataformaBCP" class="form-control input-relaciones rls01 atributo-app">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row rls02">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="control-label">Gerencia Central: </label>
+                                                    <select id="ddlGerenciaCentral" name="ddlGerenciaCentral" class="form-control input-relaciones rls02 atributo-app">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="control-label">División: </label>
+                                                    <select id="ddlDivision" name="ddlDivision" class="form-control input-relaciones rls02 atributo-app">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row rls02">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="control-label">Área: </label>
+                                                    <select id="ddlArea" name="ddlArea" class="form-control input-relaciones rls02 atributo-app">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group divUnidadContainer">
+                                                    <label class="control-label">Unidad orgánica / Tribu: </label>
+                                                    <input id="txtTribu" name="txtTribu" type="text" class="form-control input-relaciones rls02 atributo-app" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row rls03">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="control-label">Jefatura equipo ATI: </label>
+                                                    <select id="ddlJefaturaATI" name="ddlJefaturaATI" class="form-control input-relaciones rls03 atributo-app">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group all bdj1">
+                                                    <label class="control-label">Arquitecto TI: </label>
+                                                    <select id="ddlArquitectoTI" name="ddlArquitectoTI" class="form-control input-relaciones rls03 atributo-app">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group input-tb">
+                                        <div class="text-left" data-toggle="match-height">
+                                            <label class="control-label">Valor nuevo: </label>
+                                            <textarea id="txtValorNuevo" name="txtValorNuevo" class="form-control atributo-app" rows="6" maxlength="1000"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group input-tb-responsable">
+                                        <div class="text-left" data-toggle="match-height">
+                                            <div class="col-md-12">
+                                                <label class="control-label">Valor nuevo: </label>
+                                                <div class="input-group divM1">
+                                                    <input id="txtResponsable" name="txtResponsable" type="text" class="form-control input1 atributo-app">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-primary" type="button" onclick="ValidarMatricula1()">
+                                                            Validar matrícula
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                                <label id="lbl1" class="control-label"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group input-lb">
+                                        <div class="text-left" data-toggle="match-height">
+                                            <label class="control-label">Valor nuevo: </label>
+                                            <select id="ddlValorNuevo" name="ddlValorNuevo" class="form-control atributo-app">
+                                                <option value="-1">-- Seleccione --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="text-right add-button" data-toggle="match-height">
+                                        <button id="btnAddItem" class="btn btn-primary" type="button">
+                                            Agregar
+                                        </button>
+                                    </div>
+                                    <div class="panel" style="margin-top:10px;">
+                                        <table id="tblAtributoApp" class="table table-striped" data-unique-id="AtributoAplicacionId" data-mobile-responsive="true">
+                                            <thead>
+                                                <tr>
+                                                    <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Acciones</th>
+                                                    <th data-field="AtributoAplicacionStr" data-halign="left" data-valign="middle" data-align="center">Atributo a modificar</th>
+                                                    <th data-field="ValorNuevo" data-halign="left" data-valign="middle" data-align="center">Valor nuevo</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <input type="text" id="msjTable" name="msjTable" class="form-control" style="display:none;" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div role="tabpanel" class="tab-pane fade" id="tab2">
+                            <div class="row" style="margin-top:10px;"></div>
+                            <div class="row">
+                                <div class="col-md-6 solicitud-app">
+                                    <div class="form-group">
+                                        <div class="text-left" data-toggle="match-height">
+                                            <label class="control-label">Módulo: </label>
+                                            <select id="ddlModulo" name="ddlModulo" class="form-control atributo-mod">
+                                                <option value="-1" selected="selected">-- Seleccione --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="text-left ui-widget moduloContainer" data-toggle="match-height">
+                                            <label class="control-label">Atributo del módulo: </label>
+                                            <input type="text" id="txtAtributoMod" name="txtAtributoMod" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input atributo-mod" />
+                                            <input type="hidden" name="hdAtributoModId" id="hdAtributoModId" value="0" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="text-left" data-toggle="match-height">
+                                            <label class="control-label">Valor nuevo: </label>
+                                            <textarea id="txtValorNuevoMod" name="txtValorNuevoMod" class="form-control atributo-mod" rows="6" maxlength="1000"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="text-right" data-toggle="match-height">
+                                        <button class="btn btn-primary" type="button" onclick="addItemModulo()">
+                                            Agregar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 solicitud-app">
+                                    <div class="panel" style="margin-top:10px;">
+                                        <table id="tblAtributoMod" class="table table-striped" data-unique-id="AtributoModuloId" data-mobile-responsive="true">
+                                            <thead>
+                                                <tr>
+                                                    <th data-field="ModuloStr" data-halign="left" data-valign="middle" data-align="center">Módulo</th>
+                                                    <th data-field="AtributoModuloStr" data-halign="left" data-valign="middle" data-align="center">Atributo a modificar</th>
+                                                    <th data-field="ValorNuevo" data-halign="left" data-valign="middle" data-align="center">Valor nuevo</th>
+                                                    <th data-formatter="opcionesFormatterModulo" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>*@
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegistrarSol" class="btn btn-primary" onclick="guardarAddOrEdit()" type="button" data-loading-text="Procesando..." title="Registrar solicitud">Registrar</button>
+                <button id="btnConfirmarSol" class="btn btn-primary" onclick="confirmarSolicitud()" type="button" data-loading-text="Procesando..." title="Registrar y enviar">Registrar y enviar</button>
+                <button id="btnResponderSol" class="btn btn-primary" onclick="responderSolicitud()" type="button" data-loading-text="Procesando..." title="Responder y enviar">Responder y enviar</button>
+                @*<button id="btnIrModificar" class="btn btn-primary" onclick="irModificarAplicacion(event)" type="button" data-loading-text="Procesando..." title="Responder y enviar" style="display: none;" data-href="@Url.Action("ModificarAplicacion", "Configuracion")">Ir a modificar</button>*@
+                <button id="btnIrModificar" class="btn btn-primary" type="button" data-loading-text="Procesando..." title="Crear una solicitud">Ir a modificar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit (Arquetipo)-->
+<!--Modal comentarios (MODIFICACION)-->
+<div id="mdComentarios" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleMd">Comentarios y Observaciones</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formComentarios">
+                    <div class="form-group divComments">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal comentarios (MODIFICACION)-->
+
+<script src="~/app/solicitudmodificacionaplicacion.js?v=1.2.0"></script>

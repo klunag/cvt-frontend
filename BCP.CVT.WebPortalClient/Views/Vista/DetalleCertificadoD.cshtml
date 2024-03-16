@@ -1,0 +1,108 @@
+﻿@using BCP.CVT.WebPortalClient.Models;
+@{
+    var proyecciones = MetodosUtiles.ObtenerProyecciones();
+}
+@{
+    ViewBag.Title1 = "Detalle por Certificado Digital";
+    ViewBag.Title2 = "Equipos y aplicaciones";
+    ViewBag.Title3 = "Detalle por Certificado Digital";
+    int IdEquipo = (int)ViewBag.IdEquipo;
+}
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<style>
+    #reportPie {
+        width: 100%;
+        height: 350px;
+    }
+
+    #reportParticiones {
+        width: 100%;
+        height: 350px;
+    }
+</style>
+<div class="view-detalle col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+        <div class="row"></div>
+        <div class="x_title">
+            <div class="pull-right" style="display: inline-flex">
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row"></div>
+            <input type="hidden" id="hdId" name="hdId" value="0" />
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Nombre:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtEquipoNombre" name="txtEquipoNombre" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Ambiente:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtAmbiente" name="txtAmbiente" class="form-control" readonly /></div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Tipo de certificado:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtTipoCertificado" name="txtTipoCertificado" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Descripción de certificado:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtDescCertificado" name="txtDescCertificado" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Estado:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtFlagActivo" name="txtFlagActivo" class="form-control" readonly /></div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Fecha de creación:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtCreacionCert" name="txtCreacionCert" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Fecha de vencimiento:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtCalculoBase" name="txtCalculoBase" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Creado por:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtCreadoPor" name="txtCreadoPor" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"><label>Fecha de registro:</label></div>
+                            <div class="col-md-7"><input type="text" id="txtFechaCreacion" name="txtFechaCreacion" class="form-control" readonly /></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12" style="margin-bottom:15px;">
+                    <label class="control-label">Aplicaciones relacionadas: </label>
+                    <table id="tbl-aplicacionesRelacionadas" class="table" data-unique-id="Id">
+                        <thead>
+                            <tr>
+                                <th data-field="tbl-aplicacionesRelacionadas" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-formatter="AplicacionLink" data-field="Relacion.CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Código</th>
+                                <th data-field="Relacion.AplicacionStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Aplicación</th>
+                                @*<th data-field="Relacion.TipoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Relacion.TipoId">Tipo de Relación</th>*@
+                                <th data-field="Relacion.AmbienteStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Ambiente</th>
+                                <th data-field="Relacion.EstadoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Estado</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var IdEquipo = parseInt('@IdEquipo');
+</script>
+<script src="~/app/detalleCD.js?v0.1.5"></script>

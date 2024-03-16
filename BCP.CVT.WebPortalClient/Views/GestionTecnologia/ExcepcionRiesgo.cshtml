@@ -1,0 +1,9 @@
+﻿@using BCP.CVT.Cross
+@model dynamic
+@{
+    ViewBag.Title1 = "Gestión de la tecnología";
+    ViewBag.Title2 = "Gestión de la tecnología";
+    ViewBag.Title3 = "Excepción por riesgo";
+    //= "excepciones por riesgo";
+}
+@Html.Partial("_ExcepcionBase", null, new ViewDataDictionary { { "TipoExcepcionId", (int)ETipoExcepcion.Riesgo }, { "TitleTBL", "excepciones por riesgo" }, { "TitleSingular", "Excepción por riesgo" }, { "NombreExportar", "ExcepcionRiesgo" } })

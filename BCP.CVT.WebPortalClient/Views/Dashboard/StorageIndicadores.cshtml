@@ -1,0 +1,483 @@
+﻿@{
+
+    ViewBag.Title1 = "Indicadores Storage - Backups";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Storage";
+    ViewBag.Title3 = "Indicadores Storage - Backups";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+
+    #divChartTotal {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartAplicaciones {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartTotalT1 {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartTotalT2 {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartAplicacionesT1 {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartAplicacionesT2 {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartReplica {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartObsolescencia {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartPlataforma {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartAmbiente {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartPie {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartBackup_DistGlobal {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartBackup_DistAmbiente {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartBackup_Top10 {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartBackup_Top10Equipos {
+        width: 98%;
+        height: 600px;
+    }
+
+    #divChartBackup_TareasFallan {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartBackup_TareasRestore {
+        width: 98%;
+        height: 400px;
+    }
+
+    #divChartBackup_SO {
+        width: 98%;
+        height: 400px;
+    }
+    #divChartBackup_Infraestructura {
+        width: 98%;
+        height: 400px;
+    }
+</style>
+<ul class="nav nav-tabs nav-justified">
+    <li class="active tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#storage" data-toggle="tab">Storage</a></li>
+    @*<li class="tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#backups" data-toggle="tab">Backups</a></li>*@
+</ul>
+<div class="tab-content">
+    <div id="storage" class="tab-pane fade active in">
+        <div class="view-listado">
+            <div class="row gutter-xs">
+                <div class="text-center">
+                    <h4><strong>Capacidad total</strong></h4>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong></strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Capacidad total de almacenamiento del BCP (mes actual)</strong></h5>
+                                    </div>
+                                    <div class="card" id="divChartPie">
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Capacidad total de almacenamiento del BCP (histórico)</strong></h5>
+                                    </div>
+                                    <div class="card" id="divChartTotal">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs">
+                                <div class="col-xs-12 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Top 10 aplicaciones con mayor espacio asignado</strong></h5>
+                                    </div>
+
+                                    <div class="card" id="divChartAplicaciones">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs">
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Capacidad en réplica</strong></h5>
+                                    </div>
+
+                                    <div class="card" id="divChartReplica">
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Capacidad vigente vs obsoleta</strong></h5>
+                                    </div>
+                                    <div class="card" id="divChartObsolescencia">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="text-center">
+                    <h4><strong>Capacidad por TIER</strong></h4>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong></strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Top 10 aplicaciones con mayor espacio asignado TIER 1</strong></h5>
+                                    </div>
+
+                                    <div class="card" id="divChartAplicacionesT1">
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Capacidad total de almacenamiento del BCP TIER 1</strong></h5>
+                                    </div>
+                                    <div class="card" id="divChartTotalT1">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs">
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Top 10 aplicaciones con mayor espacio asignado TIER 2</strong></h5>
+                                    </div>
+
+                                    <div class="card" id="divChartAplicacionesT2">
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Capacidad total de almacenamiento del BCP TIER 2</strong></h5>
+                                    </div>
+                                    <div class="card" id="divChartTotalT2">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="text-center">
+                    <h4><strong>Disposición por plataforma y ambiente</strong></h4>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong></strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Por plataforma</strong></h5>
+                                    </div>
+
+                                    <div class="card" id="divChartPlataforma">
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Por ambiente</strong></h5>
+                                    </div>
+                                    <div class="card" id="divChartAmbiente">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="backups" class="tab-pane fade in">
+        <div class="view-listado">
+            <div class="row gutter-xs">
+                <div class="text-center">
+                    <h4><strong>Distribución del backup</strong></h4>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong></strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Distribución global del backup</strong></h5>
+                                    </div>
+                                    <div class="card" id="divChartBackup_DistGlobal">
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>Distribución por ambiente de backup</strong></h5>
+                                    </div>
+                                    <div class="card" id="divChartBackup_DistAmbiente">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="view-listado">
+            <div class="row gutter-xs">
+                <div class="text-center">
+                    <h4><strong>Top aplicaciones por capacidad respaldada (en TB)</strong></h4>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong></strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-12 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>En base a las relaciones configuradas</strong></h5>
+                                    </div>
+                                    <div class="card" id="divChartBackup_Top10">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="view-listado">
+            <div class="row gutter-xs">
+                <div class="text-center">
+                    <h4><strong>Top de servidores con mayor duración en la ejecución de las tareas de backup</strong></h4>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong></strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-12 div-report">
+                                    <div class="text-center">
+                                        <h5><strong>En base a la información recolectada por Open</strong></h5>
+                                    </div>
+                                    <div class="card" id="divChartBackup_Top10Equipos">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="view-listado">
+            <div class="row">
+                <div class="col-md-6 col-xs-6">
+                    <div class="row gutter-xs">
+                        <div class="text-center">
+                            <h4><strong>Tareas de backup que fallan por mes</strong></h4>
+                        </div>
+                    </div>
+                    <div class="row gutter-xs">
+                        <div class="col-xs-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <strong></strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row gutter-xs">
+                                        <div class="col-xs-12 div-report">
+                                            <div class="text-center">
+                                                <h5><strong>En base a la información recolectada por Open</strong></h5>
+                                            </div>
+                                            <div class="card" id="divChartBackup_TareasFallan">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+                <div class="col-md-6 col-xs-6">
+                    <div class="row gutter-xs">
+                        <div class="text-center">
+                            <h4><strong>Restores realizados por mes</strong></h4>
+                        </div>
+                    </div>
+                    <div class="row gutter-xs">
+                        <div class="col-xs-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <strong></strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row gutter-xs">
+                                        <div class="col-xs-12 div-report">
+                                            <div class="text-center">
+                                                <h5><strong>En base a la información recolectada por Open</strong></h5>
+                                            </div>
+                                            <div class="card" id="divChartBackup_TareasRestore">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>           
+            <div class="view-listado">
+                <div class="row gutter-xs">
+                    <div class="text-center">
+                        <h4><strong>Distribución del backup por sistemas operativos</strong></h4>
+                    </div>
+                </div>
+                <div class="row gutter-xs">
+                    <div class="col-xs-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong></strong>
+                            </div>
+                            <div class="card-body">
+                                <div class="row gutter-xs">
+                                    <div class="col-xs-6 div-report">
+                                        <div class="text-center">
+                                            <h5><strong>Distribución por tipo de Sistema Operativo</strong></h5>
+                                        </div>
+                                        <div class="card" id="divChartBackup_SO">
+
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6 div-report">
+                                        <div class="text-center">
+                                            <h5><strong>Distribución por Infraestructura</strong></h5>
+                                        </div>
+                                        <div class="card" id="divChartBackup_Infraestructura">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/app/storageIndicadores.js?v=2.1.0"></script>

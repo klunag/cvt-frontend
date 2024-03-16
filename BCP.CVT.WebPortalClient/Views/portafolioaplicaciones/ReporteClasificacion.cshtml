@@ -1,0 +1,111 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    //ViewBag.Title1 = "Listado";
+    //ViewBag.Title2 = "Listado";
+    //ViewBag.Title3 = "Listado";
+}
+<style>
+    .opcionesStyle {
+        width: 500px;
+    }
+    .fondoAzul {
+        background-color: #013A81 !important;
+        color: #ffffff !important;
+    }
+    .centerBold {
+        text-align:center;
+        font-weight:bold;
+    }
+    .fondoGris {
+        background-color: #CCCCCC !important;
+        color: #013A81 !important;
+    }
+    .fondoBlanco {
+        background-color: #F2F2F2 !important;
+        color: #013A81 !important;
+    }
+</style>
+
+<h2>Reporte por estado de aplicaciones</h2>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistroApps" class="table table-striped table-nowrap table-bordered" cellspacing="0" width="100%" data-mobile-responsive="true">
+                    <thead>
+                        <tr style="text-align:center; vertical-align:middle;">
+                            <th rowspan="3" class="fondoAzul" style="text-align:center; vertical-align:middle; font-weight:bold;">Categorías</th>
+                            <th colspan="9" class="fondoGris">Apps vigentes</th>
+                            <th class="fondoBlanco">Apps en desarrollo</th>
+                        </tr>
+                        <tr style="text-align:center; vertical-align:middle;">
+                            <td rowspan="2" style="width:8%;" class="fondoGris">Total de apps</td>
+                            <td rowspan="2" style="width:8%;">Apps en on-premise</td>
+                            <td rowspan="2" style="width:8%;">Apps en cloud</td>
+                            <td colspan="2">Apps con obsolescencia</td>
+                            <td colspan="2">Apps desarrolladas (in-house)</td>
+                            <td colspan="2">Apps en paquetes</td>
+                            <td class="fondoBlanco" rowspan="2" style="width:8%;">Total de apps</td>
+                        </tr>
+                        <tr style="text-align:center; vertical-align:middle;">
+                            <td style="width:8%;">On-premise</td>
+                            <td style="width:8%;">Cloud</td>
+                            <td style="width:8%;">On-premise</td>
+                            <td style="width:8%;">Cloud</td>
+                            <td style="width:8%;">On-premise</td>
+                            <td style="width:8%;">Cloud</td>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <p>
+            <strong>Consideraciones</strong><br />
+            - Solo se han considerado obsolescencia por Sistema Operativo y Base de datos (relacionales y no relacionales) <br />
+            - No se consideran las aplicaciones no vigentes <br />
+            - No se consideran los aplicaciones de Prima AFP, Credicorp Capital y BCP Bolivia
+            - No se consideran los campos vacíos para el conteo de aplicaciones obsoletas, desarrolladas y paquetes. 
+        </p>
+    </div>
+</div>
+
+<h2>Reporte por Áreas BIAN BCP</h2>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">            
+            <div class="card-body">
+                <table id="tblRegistro" class="table table-striped table-nowrap table-bordered" cellspacing="0" width="100%" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <td rowspan="2" class="fondoAzul" style="text-align:center; vertical-align:middle; font-weight:bold;">Categorías</td>
+                            <td colspan="5" style="text-align:center;">Áreas BIAN BCP</td>
+                        </tr>
+                        <tr style="text-align:center;">
+                            <td style="width:15%;">BANKING PRODUCTS</td>
+                            <td style="width:15%;">BICE</td>
+                            <td style="width:15%;">BUSINESS DIRECTION</td>
+                            <td style="width:15%;">BUSINESS INTEGRATION</td>
+                            <td style="width:15%;">BUSINESS SUPPORT</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p>
+            <strong>Consideraciones</strong><br/>
+            - Solo se han considerado las aplicaciones vigentes BCP <br/>
+            - No se consideran los valores NO APLICA y en blanco para los Áreas BIAN <br/>
+            - No se consideran los valores NO APLICA y en blanco para la Clasificación técnica
+        </p>
+    </div>
+</div>
+
+<script src="~/app/reporteClasificacion.js?v=1.1.0"></script>
+

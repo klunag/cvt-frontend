@@ -1,0 +1,253 @@
+﻿@using BCP.CVT.WebPortalClient.Models;
+@{
+    var proyecciones = MetodosUtiles.ObtenerProyecciones();
+}
+@{
+    ViewBag.Title1 = "Tecnologías relacionadas con equipos y aplicaciones";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Tecnología";
+    ViewBag.Title3 = "Tecnologías relacionadas con equipos y aplicaciones";
+
+    int IdTecnologia = (int)ViewBag.IdTecnologia;
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+
+<style>
+    #reportHorizontalBar {
+        width: 100%;
+        height: 800px;
+    }
+
+    #reportPie {
+        width: 100%;
+        height: 280px;
+    }
+
+    .div-report {
+        display: none;
+    }
+
+
+    .lblDetalle {
+        font-weight: bold;
+        font-size: 13px;
+    }
+
+    .lblTotal {
+        font-size: 65px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="row"></div>
+<div class="row">
+
+    <form id="formTecnologia">
+        <div class="col-md-12">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-3">
+                        <label>Tecnología: (*)</label>
+                    </div>
+                    <div class="equipoContainer">
+                        <div class="col-md-9">
+                            <input type="text" id="txtTecnologia" name="txtEquipo" class="form-control input-sm" />
+                        </div>
+                        <input type="hidden" id="hdTecnologiaId" name="hdTecnologiaId" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="col-md-5">
+                        <label>Fecha: (*)</label>
+                    </div>
+                    <div class="equipoContainer">
+                        <div class="col-md-7">
+                            <input type="text" id="txtFechaReporte" name="txtFechaReporte" class="form-control input-sm" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <a class="btn btn-primary" href="javascript: void(0)" onclick="CargarReporte()">
+                        <span class="icon icon-external-link"></span>
+                        <span class="count-text">Generar Gráficos</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+    <hr />
+
+</div>
+
+<div id="divReporte" style="display:none">
+
+    <div class="col-md-6">
+        <div class="col-md-12">
+            <div id="reportPie"></div>
+        </div>
+    </div>
+
+
+    <div class="row col-md-6">
+
+        <div class="row">
+            <div class="col-md-4">
+                <span class="lblDetalle">Dominio:</span>
+            </div>
+            <div class="col-md-8">
+                <span id="lblTecnologiaDominio"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <span class="lblDetalle">Subdominio:</span>
+            </div>
+            <div class="col-md-8">
+                <span id="lblTecnologiaSubdominio"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <span class="lblDetalle">Estado de Estandarización:</span>
+            </div>
+            <div class="col-md-8">
+                <span id="lblTecnologiaTipo"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <span class="lblDetalle">Estado de Tecnología:</span>
+            </div>
+            <div class="col-md-8">
+                <span id="lblEstadoIdTecnologiaStr"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <span class="lblDetalle">Fecha de fin configurada:</span>
+            </div>
+            <div class="col-md-8">
+                <span id="lblTecnologiaFechaFinConfigurada"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <span class="lblDetalle">Estado actual:</span>
+            </div>
+            <div class="col-md-8">
+                <span id="lblEstadoActual"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <span class="lblDetalle">Estado a @proyecciones.MesProyeccion1 meses:</span>
+            </div>
+            <div class="col-md-8">
+                <span id="lblEstadoIndicador1"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <span class="lblDetalle">Estado a @proyecciones.MesProyeccion2 meses:</span>
+            </div>
+            <div class="col-md-8">
+                <span id="lblEstadoIndicador2"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <span>Equipos con la tecnología</span><br />
+                <span class="lblTotal" id="lblTotal"></span>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row col-md-12">
+        <table id="tblEquipos" class="table" data-unique-id="Id">
+            <caption class="caption">
+                <span>Equipos donde se encuentra instalado la tecnología</span>
+                <div class="pull-right btnExportarEquipos" style="display: inline;">
+                    <a class="btn btn-primary" onclick="ExportarListadoEquipos()">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+
+            </caption>
+            <thead>
+                <tr>
+                    <th data-formatter="rowNumFormatterServerAlt" data-field="tblEquipos" data-valign="middle" data-align="center" data-width="5%">#</th>
+                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-width="18%">Equipo</th>
+                    <th data-field="TemporalToString" data-halign="center" data-valign="middle" data-align="left">Descubrimiento</th>
+                    <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-width="18%">Tipo de Equipo</th>
+                    <th data-field="Ambiente" data-halign="center" data-valign="middle" data-align="left" data-width="15%">Ambiente</th>
+                    <th data-field="Subsidiaria" data-halign="center" data-valign="middle" data-align="left" data-width="15%">Subsidiaria</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <div class="row col-md-12">
+        <table id="tblAplicaciones" class="table" data-unique-id="Id">
+            <caption class="caption">
+                <span>Aplicaciones relacionadas con la tecnología</span>
+                <div class="pull-right btnExportarEquipos" style="display: inline;">
+                    <a class="btn btn-primary" onclick="ExportarListadoAplicaciones()">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </caption>
+            <thead>
+                <tr>
+                    <th data-formatter="rowNumFormatterServerAlt" data-field="tblAplicaciones" data-valign="middle" data-align="center" data-width="5%">#</th>
+                    <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-width="10%">Código APT</th>
+                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left">Nombre</th>
+                    <th data-field="Equipo" data-halign="center" data-valign="middle" data-align="left">Equipo</th>
+                    <th data-field="EstadoRelacionToString" data-halign="center" data-valign="middle" data-align="left">Estado de <br />la relación</th>
+                    <th data-field="EstadoAplicacion" data-halign="center" data-valign="middle" data-align="left" data-width="18%">Estado</th>
+                    <th data-field="IndiceObsolescencia_FLooking" data-formatter="porcentajeFormatter" data-halign="center" data-valign="middle" data-align="center" data-width="10%">KPI Obsolescencia<br />Forward Looking (%)</th>
+                    <th data-field="KPIObsolescencia" data-formatter="porcentajeFormatter" data-halign="center" data-valign="middle" data-align="center" data-width="10%">KPI Obsolescencia</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <div class="row col-md-12">
+        <table id="tblTecnologiasVinculadas" class="table" data-unique-id="Id">
+            <caption class="caption">
+                <span>Tecnologías vinculadas</span>
+                <div class="pull-right btnExportarEquipos" style="display: inline;">
+                    <a class="btn btn-primary" onclick="ExportarListadoTV()">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </caption>
+            <thead>
+                <tr>
+                    <th data-formatter="rowNumFormatterServerAlt" data-field="tblTecnologiasVinculadas" data-valign="middle" data-align="center" data-width="5%">#</th>
+                    <th data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="left" data-width="22%">Tecnología</th>
+                    <th data-field="DominioNomb" data-halign="center" data-valign="middle" data-align="left">Dominio</th>
+                    <th data-field="SubdominioNomb" data-halign="center" data-valign="middle" data-align="left" data-width="18%">Subdominio</th>
+                    <th data-field="FechaCalculoBaseStr" data-halign="center" data-valign="middle" data-align="left" data-width="12%">Fecha fin</th>
+                    <th data-field="TipoTecNomb" data-halign="center" data-valign="middle" data-align="left" data-width="16%">Estado de estandarización</th>
+                    <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="left" data-width="16%">Estado de tecnología</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+
+</div>
+<script>
+    var IdTecnologia = parseInt('@IdTecnologia');
+</script>
+<script src="~/app/dashboardTecnologiaEquipo.js?v=2.2.18"></script>

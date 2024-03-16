@@ -1,0 +1,143 @@
+﻿@{
+    ViewBag.Title1 = "Auditoría API";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Auditoría API";
+}
+<script type="text/javascript" src="~/Scripts/json-viewer.js"></script>
+<link type="text/css" href="~/Content/json-viewer.css" />
+<style>
+    .idAsociado {
+        min-width: 180px;
+    }
+    .saltoPalabra {
+        word-wrap: break-word;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo de Método: </h5>
+                                    <select id="cbFilTipoMetodo" name="cbFilTipoMetodo" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Método: </h5>
+                                    <div class="input-with-icon">
+                                        <input id="txtFiltroMetodo" name="txtFiltroMetodo" class="form-control input-thick pill input-with-icon-search" type="text">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>API Usuario: </h5>
+                                    <div class="input-with-icon">
+                                        <input id="txtFiltroUsuario" name="txtFiltroMatricula" class="form-control input-thick pill input-with-icon-search" type="text">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-xs-3 col-md-3">
+                                <h5>Fecha Desde: </h5>
+                                <div class="input-group date" id="divFechaDesde">
+                                    <input type="text" id="txtFiltroFechaDesde" name="txtFiltroFechaDesde" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                    <span class="input-group-addon">
+                                        <span class="icon icon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <h5>Fecha Hasta: </h5>
+                                <div class="input-group date" id="divFechaHasta">
+                                    <input type="text" id="txtFiltroFechaHasta" name="txtFiltroFechaHasta" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                    <span class="input-group-addon">
+                                        <span class="icon icon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-md-12">
+                                <div class="text-right">
+                                    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="RefrescarListado()">
+                                        <span class="count-text">Buscar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom " href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Auditoria</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblData" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="AuditoriaAPIId" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="APINombre" data-halign="center" data-valign="middle" data-align="left" data-width="27%" data-sort-name="APINombre">API Nombre</th>
+                            <th data-field="APIMetodo" data-halign="center" data-valign="middle" data-align="left" data-width="5%" data-sort-name="APIMetodo">API Método</th>
+                            <th data-field="APIUsuario" data-halign="center" data-valign="middle" data-align="left" data-width="8%" data-sort-name="APIUsuario">API Usuario</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="left" data-width="11%" data-sort-name="FechaOrden">Fecha registro</th>
+                            <th data-formatter="formatterVerParams" data-field="APIParametros" data-halign="center" data-valign="middle" data-align="center" data-width="3%">Ver parámetros</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal -->
+<div id="mdParametros" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleMd">Parámetros</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formComentarios">
+                    <div class="form-group divComments" id="divComments">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal -->
+
+<script src="~/app/auditoriaApi.js?v=1.1.1"></script>

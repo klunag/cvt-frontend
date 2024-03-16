@@ -1,0 +1,275 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Reactivación de aplicaciones eliminadas";
+    ViewBag.Title2 = "Gestión de aplicaciones";
+    ViewBag.Title3 = "Reactivación de aplicaciones eliminadas";
+
+    string nombreApp = (string)ViewBag.Nombre_App;
+    int paginaActual = (int)ViewBag.PaginaActual;
+    int paginaTamanio = (int)ViewBag.PaginaTamanio;
+
+}
+
+<style>
+    .width-des {
+        min-width: 300px;
+    }
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    /* Chat containers */
+    .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    /* Darker chat container */
+    .darker {
+        border-color: #f7a033;
+        background-color: #ddd;
+    }
+
+    /* Clear floats */
+    .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    /* Style images */
+    .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+        /* Style the right image */
+        .container img.right {
+            float: right;
+            margin-left: 20px;
+            margin-right: 0;
+        }
+
+    /* Style time text */
+    .time-right {
+        float: right;
+        color: #aaa;
+    }
+
+    /* Style time text */
+    .time-left {
+        float: left;
+        color: #999;
+    }
+
+    .user-name {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+</style>
+
+@*<div class="col-md-12">
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img class="navbar-brand-logo" src="~/images/logo-bcp.svg" alt="BCP">
+                </a>
+                <h3 class="navbar-text navbar-brand-center">
+                    <strong>Aplicaciones User IT</strong>
+                </h3>
+                <p class="navbar-text navbar-right">
+                    <a id="btnShowHideFilter" href="#filters-box" data-toggle="collapse" title="Filtros">
+                        <span class="icon icon-2x icon-search"></span>
+                    </a>
+                </p>
+            </div>
+        </nav>
+    </div>*@
+<div class="card">
+    @*<div id="filters-box" class="card-body collapse">*@
+    <div class="card-body">
+
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-4 col-md-3">
+                                <div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+                                    <h5>Aplicación (código) </h5>
+                                    <input type="text" id="txtAplicacionFiltro" name="txtAplicacionFiltro" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    <input type="hidden" name="hdAplicacionFiltroId" id="hdAplicacionFiltroId" />
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-3">
+
+                            </div>
+                            <div class="col-xs-4 col-md-3 text-right">
+                                <h5>&nbsp;</h5>
+                                <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+                            </div>
+                            <div class="col-xs-4 col-md-3 text-right">
+                                <h5>&nbsp;</h5>
+                                <a id="btnExportar" class="btn btn-primary" href="javascript: void(0)" title="Exportar aplicaciones">
+                                    <span class="icon icon-file-excel-o"></span>
+                                    <span class="count-text">Exportar</span>
+                                </a>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    @*</div>*@
+</div>
+<hr />
+@*<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+        <a id="btnExportar" class="btn btn-primary" href="javascript: void(0)" title="Exportar aplicaciones">
+            <span class="icon icon-file-excel-o"></span>
+            <span class="count-text">Exportar</span>
+        </a>
+    </div>*@
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <ul class="nav nav-tabs nav-justified otros">
+                    <li class="active tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datGen" data-toggle="tab">Aplicaciones eliminadas</a></li>
+                    <li class="tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datTran" data-toggle="tab">Solicitudes de reactivación</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade active in" id="datGen">
+                        <br />
+                        <table id="tblRegistro" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+                            <caption class="hidden caption text-left">
+                                <span>Aplicaciones eliminadas</span>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th> 
+                                    <th data-field="applicationId" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationId">Código</th>
+                                    <th data-field="name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Nombre</th>
+                                    <th data-field="managedBy" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="managedBy">Gestionado por</th>
+                                    <th data-field="eliminacionFecha" data-formatter="dateFormat2" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="eliminacionFecha">Fecha de <br /> Eliminación</th>
+                                    <th data-field="eliminacionUsuario" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="eliminacionUsuario">Usuario <br />Eliminación</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+
+
+
+                    <div class="tab-pane" id="datTran">
+                        <br />
+                        <table id="tblRegistro2" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true" style="font-size: 11px !important;">
+                            <caption class="hidden caption text-left">
+                                <span>Solicitudes registradas</span>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-formatter="opcionesDescargar" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+
+                                    <th data-field="CodigoAplicacion" data-halign="center" data-valign="middle" data-align="left">Código <br /> aplicación</th>
+                                    <th data-field="NombreAplicacion" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                                    <th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="center">Tipo activo <br />información</th>
+                                    <th data-field="NombreUsuario" data-halign="center" data-valign="middle" data-align="center">Usuario que atendió <br />la solicitud</th>
+                                    <th data-field="EstadoSolicitudToString" data-halign="center" data-valign="middle" data-align="center">Estado de la <br />solicitud</th>
+                                    <th data-field="Observaciones" data-halign="center" data-valign="middle" data-align="left">Observaciones</th>
+                                    <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de <br />actualización</th>
+                                    <th data-field="ObservacionesRechazo" data-halign="center" data-valign="middle" data-align="left">Observaciones del portafolio</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modalRevertirEliminacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRevertirEliminacion" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formSolicitarReversionEliminacion">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md"></h5> 
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a este cambio de estado: </label>
+                                <textarea id="txtDescripcionReversion" name="txtDescripcionReversion" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Adjuntar sustento: </label>
+                                <div class="input-group" id="divTxtConformidadGST"  >
+                                    <input id="txtNomArchivoConformidad" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                    <span class="input-group-btn">
+                                        <label class="btn btn-primary file-upload-btn">
+                                            <input id="flConformidad" class="file-upload-input inputConformidad" type="file" name="flConformidad">
+                                            <span class="glyphicon glyphicon-folder-open"></span>
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnSolicitarReversionEliminacion" class="btn btn-primary" type="button" data-loading-text="Procesando...">Solicitar reversión</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<input type="hidden" name="hdFlowAppId" id="hdFlowAppId" value="0" />
+<input type="hidden" name="hdPreviousState" id="hdPreviousState" />
+
+<script>
+	const REGISTRO_PARCIAL = 1;
+	const REGISTRO_COMPLETO = 2;
+
+	const ESTADO_ENDESARROLLO = 1;
+	const ESTADO_VIGENTE = 2;
+	const ESTADO_NOVIGENTE = 3;
+	const ESTADO_ELIMINADA = 4;
+
+	var nombre_app = '@nombreApp';
+    var PAGINA_ACTUAL = @paginaActual;
+    var PAGINA_TAMANIO = @paginaTamanio;
+	var FLUJO_REGISTRO = 2;
+
+
+    const ACCION_REGISTRAR = 1;
+    const ACCION_RECHAZAR = 2;
+    const ACCION_TRANSFERIR = 3;
+</script>
+<script src="~/app/RegistroPortafolio/reversionEliminacionAplicaciones.js?v=2.1.2"></script>

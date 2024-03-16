@@ -1,0 +1,350 @@
+﻿
+@{
+	ViewBag.Title1 = "Configuración de Funciones por Producto";
+	ViewBag.Title2 = "Matriz de Roles";
+	ViewBag.Title3 = "Configuración de Funciones por Producto";
+
+}
+
+<div class="card">
+	<div class="card-body">
+		<div class="card-search">
+			<fieldset class="fieldset">
+				<legend class="legend">Filtro de búsqueda</legend>
+				<div class="card-search-box">
+					<form action="javascript:void(0);">
+						<div class="row gutter-xs">
+							<div class="col-xs-4 col-md-3">
+								<div class="text-left" data-toggle="match-height">
+									<h5>Producto: </h5>
+									<input id="txtProducto" name="txtProducto" class="form-control" type="text" placeholder="">
+								</div>
+							</div>
+							@*<div class="col-xs-4 col-md-4">
+			<div class="text-left" data-toggle="match-height">
+				<h5>Dominio: </h5>
+				<select id="ddlDominio" class="form-control"></select>
+			</div>
+		</div>
+		<div class="col-xs-4 col-md-4">
+			<div class="text-left" data-toggle="match-height">
+				<h5>Subdominio: </h5>
+				<select id="ddlSubDominio" class="form-control"></select>
+			</div>
+		</div>*@						 	@*<div class="col-xs-4 col-md-3">
+			<h5>Exportar: </h5>
+			<select id="ddlReporte" class="form-control">
+
+				<option value=1>Exportar por Función</option>
+				<option value=2>Exportar por Persona</option>
+			</select>
+		</div>*@
+
+						<div class="col-xs-4 col-md-3">
+							<div class="text-left" data-toggle="match-height">
+								<h5>&nbsp;</h5>
+								<button id="btnBuscar" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+							</div>
+						</div>
+
+						<div class="col-xs-4 col-md-3">
+							<h5>&nbsp;</h5>
+							<div class="btn-group">
+								<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<span class="icon icon-external-link"></span>
+									<span class="count-text">Exportar</span>&nbsp;
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu" style="min-width: initial">
+									<li><a href="javascript:ExportarInfo()" class="text-center">Por Función</a></li>
+									<li><a href="javascript:ExportarInfoPersona()" class="text-center">Por Persona</a></li>
+								</ul>
+							</div>
+						</div>
+
+						@*<div class="col-xs-4 col-md-3">
+		<div class="text-left" data-toggle="match-height">
+			<h5>&nbsp;</h5>
+			<button id="btnExportar" class="btn btn-primary btn-width-custom">Exportar</button>
+		</div>
+	</div>*@
+
+
+						@*<div class="col-xs-4 col-md-3">
+		<div class="text-left" data-toggle="match-height">
+			<h5>&nbsp;</h5>
+			<button id="btnExportar" class="btn btn-primary btn-width-custom">Exportar</button>
+		</div>
+	</div>*@
+
+						@*<div class="col-xs-4 col-md-3">
+		<div class="text-left" data-toggle="match-height">
+			<h5>&nbsp;</h5>
+			<button id="btnExportarPer" class="btn btn-primary btn-width-custom">Exportar por<br />Persona</button>
+		</div>
+	</div>*@
+						</div>
+					</form>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+@*<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+		<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+			<span class="icon icon-external-link"></span>
+			<span class="count-text">Exportar</span>
+		</a>
+	</div>*@
+
+<div class="row gutter-xs">
+	<div class="col-xs-12">
+		<div class="card">
+			<div class="card-body">
+				<table id="tblRegistros" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true" data-detail-view="true" data-detail-formatter="detailFormatter">
+					<caption class="caption text-left">
+						<span>Funciones por Producto</span>
+					</caption>
+					<thead>
+						<tr>
+							<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+							<th data-field="DominioStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="DominioStr" data-width="15%">Dominio</th>
+							<th data-field="SubDominioStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="SubDominioStr" data-width="20%">SubDominio</th>
+							<th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Nombre" data-width="38%">Producto</th>
+							<th data-field="CantidadRoles" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="CantidadRoles" data-width="20%">Roles asociados</th>
+							@*<th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Agregar</th>*@
+							@*<th data-field="NombreUsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreUsuarioCreacion" data-width="20%">Usuario Creación</th>*@
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div id="modalAgregarRol" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalAgregarRol" aria-hidden="true">
+	<div class="modal-dialog " role="document">
+		<form id="formEli">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="titulo">Agregar Función</h5>
+				</div>
+				<div class="modal-body">
+
+
+					@*<div class="row">
+			<div class="col-md-3">
+				<p>Producto</p>
+			</div>
+			<div class="col-md-7">
+				<input id="txtProducto2" name="txtProducto2" class="form-control" type="text" placeholder="" disabled>
+			</div>
+		</div>*@
+					<div class="row">
+						<div class="col-md-3">
+							<p>Rol</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtRol" name="txtRol" class="form-control" type="text" placeholder="" disabled>
+						</div>
+					</div>
+
+
+					<div class="row">
+						<div class="col-md-3">
+							<p>Grupo de Red</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtGrupoRed" name="txtGrupoRed" class="form-control" type="text" placeholder="" disabled>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-3">
+							<p>Tribu/COE</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtTribu" name="txtTribu" class="form-control" type="text">
+							<input type="hidden" name="hdTribu" id="hdTribu" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-3">
+							<p>Chapter</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtChapter" name="txtChapter" class="form-control" type="text">
+							<input type="hidden" name="hdChapter" id="hdChapter" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-3">
+							<p>Función</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtFuncion" name="txtFuncion" class="form-control" type="text">
+							<input type="hidden" name="hdFuncion" id="hdFuncion" />
+						</div>
+					</div>
+
+
+
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+					<button id="btnAgregar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Agregar</button>
+				</div>
+			</div>
+
+
+		</form>
+	</div>
+</div>
+
+<div id="modalEditarRol" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEditarRol" aria-hidden="true">
+	<div class="modal-dialog " role="document">
+		<form id="formEli2">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="titulo">Editar Función</h5>
+				</div>
+				<div class="modal-body">
+
+
+					@*<div class="row">
+			<div class="col-md-3">
+				<p>Producto</p>
+			</div>
+			<div class="col-md-7">
+				<input id="txtProducto2" name="txtProducto2" class="form-control" type="text" placeholder="" disabled>
+			</div>
+		</div>*@
+					<div class="row">
+						<div class="col-md-3">
+							<p>Rol</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtRol2" name="txtRo2l" class="form-control" type="text" placeholder="" disabled>
+						</div>
+					</div>
+
+
+					<div class="row">
+						<div class="col-md-3">
+							<p>Grupo de Red</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtGrupoRed2" name="txtGrupoRed2" class="form-control" type="text" placeholder="" disabled>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-3">
+							<p>Tribu/COE</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtTribu2" name="txtTribu2" class="form-control" type="text">
+							<input type="hidden" name="hdTribu2" id="hdTribu2" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-3">
+							<p>Chapter</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtChapter2" name="txtChapter2" class="form-control" type="text" placeholder="">
+							<input type="hidden" name="hdChapter2" id="hdChapter2" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-3">
+							<p>Función</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtFuncion2" name="txtFuncion2" class="form-control" type="text" placeholder="">
+							<input type="hidden" name="hdFuncion2" id="hdFuncion2" />
+						</div>
+					</div>
+
+
+
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+					<button id="btnAgregar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Editar</button>
+				</div>
+			</div>
+
+
+		</form>
+	</div>
+</div>
+
+<div id="modalPersonas" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalPersonas" aria-hidden="true">
+	<div class="modal-dialog " role="document">
+		<form id="formEli3">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="titulo">Personas relacionadas a la función</h5>
+				</div>
+				<div class="modal-body">
+
+
+
+
+					<table id="tblPersonas" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+						<caption class="caption text-left">
+							<span>Personas</span>
+						</caption>
+						<thead>
+							<tr>
+								<th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="2%">#</th>
+								<th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Chapter" data-width="25%">Nombre</th>
+								<th data-field="Matricula" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Funcion" data-width="25%">Matrícula</th>
+
+								<th data-field="Email" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Email" data-width="25%">Email</th>
+
+							</tr>
+						</thead>
+					</table>
+
+
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+
+				</div>
+			</div>
+
+
+		</form>
+	</div>
+</div>
+
+
+<input type="hidden" name="hdProductoId" id="hdProductoId" value="0" />
+<input type="hidden" name="hdRolProductoId" id="hdRolProductoId" value="0" />
+
+
+<input type="hidden" name="hdFuncionId" id="hdFuncionId" value="0" />
+
+
+
+<script src="~/app/ConfiguracionPortafolio/rolesProductoFuncionAdmin.js?v=2.1.0"></script>

@@ -1,0 +1,448 @@
+﻿var URL_API_VISTA = URL_API + "/Gestionetiquetado";
+var $table = $("#tblEtiqueta");
+var $tableTab2 = $("#tblEtiqueta2");
+var ETIQUETA = [];
+
+$(function () {
+    Listar();
+    ListarTab2();
+});
+
+function registrar() {
+    modalRegistro(true);
+}
+
+function modalRegistro(modal) {
+    if (modal) {
+        LimpiarModalTa1();
+        $("#mdRegistro").modal(opcionesModal);
+    }
+    else
+    {
+        LimpiarModalTa1();
+        $("#mdRegistro").modal("hide");
+    }
+}
+
+function modalEditar(modal) {
+    if (modal)
+        $("#mdEditar").modal(opcionesModal);
+    else
+        $("#mdEditar").modal("hide");
+}
+
+function RefrescarListado() {
+    Listar();
+}
+
+function Listar() {
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+
+    var etiqueta = $("#txtEtiqueta").val();
+    var clave = $("#txtClave").val();
+
+    $.ajax({
+        url: URL_API_VISTA + `/ListadoEtiquetado?etiqueta=${etiqueta}&clave=${clave}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token')); },
+        success: function (data) {
+            waitingDialog.hide();
+            $table.bootstrapTable('destroy');
+            $table.bootstrapTable({
+                data: data.Rows,
+                pagination: true,
+                detailView: false,
+                showFooter: false
+            });
+        }
+    });
+}
+
+function GuardarRegistro() {
+
+    var etiqueta = $("#txtEtiquetaModal").val();
+    var clave = $("#txtClaveModal").val();
+    var comentario = $("#txtComentario").val();
+
+    if (etiqueta.length > 20) {
+        alert("La etiqueta ingresada debe tener como maximo 20 caracteres");
+        return;
+    } else if (etiqueta.length == 0) {
+        alert("El campo etiqueta es obligatorio");
+        return;
+    }
+
+    if (clave.length > 20) {
+        alert("La palabra clave ingresada debe tener como maximo 20 caracteres");
+        return;
+    } else if (clave.length == 0) {
+        alert("El campo palabra clave es obligatorio");
+        return;
+    }
+
+    $.ajax({
+        url: URL_API_VISTA + `/RegistrarServidor?etiqueta=${etiqueta}&clave=${clave}&comentario=${comentario}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token')); },
+        success: function (data) {
+            if (data == 0) {
+                modalRegistro(false);
+                LimpiarModalTa1();
+                Listar();
+            } else if (data == 1) {
+                alert("La palabra Clave ingresada ya existe");
+            } else if (data == 2) {
+                alert("La etiqueta ingresada ya existe");
+            }
+        }
+    });
+}
+
+function opcionesFormatter(value, row, index) {
+    let btn1 = `<a href="javascript:dataDetalle('${row.id}')" title="Editar Etiqueta"><i class="glyphicon glyphicon-edit"></i></a>`;
+    let btn2 = `<a href="javascript:eleminarData('${row.id}');" title="Eliminar Etiqueta"><i class="glyphicon glyphicon-trash"></i></a>`;
+    return btn1.concat("&nbsp;&nbsp;", btn2);
+}
+
+function dataDetalle(value) {
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    modalEditar(true);
+    $.ajax({
+        url: URL_API_VISTA + `/BuscarRegistro?id=${value}`,
+        type: "GET",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            $("#txtEditarId").val(result.id);
+            $("#txtEtiquetaModalEditar").val(result.etiqueta);
+            $("#txtClaveModalEditar").val(result.clave);
+            $("#txtComentarioEditar").val(result.comentario);
+        }
+    });
+}
+
+function ActualizarRegistro() {
+    modalEditar(true);
+
+    var id = $("#txtEditarId").val();
+    var etiqueta = $("#txtEtiquetaModalEditar").val();
+    var clave = $("#txtClaveModalEditar").val();
+    var comentario = $("#txtComentarioEditar").val();
+
+    if (etiqueta.length > 20) {
+        alert("La etiqueta ingresada debe tener como maximo 20 caracteres");
+        return;
+    } else if (etiqueta.length == 0) {
+        alert("El campo etiqueta es obligatorio");
+        return;
+    }
+
+    if (clave.length > 20) {
+        alert("La palabra clave ingresada debe tener como maximo 20 caracteres");
+        return;
+    } else if (clave.length == 0) {
+        alert("El campo palabra clave es obligatorio");
+        return;
+    }
+
+    $.ajax({
+        url: URL_API_VISTA + `/EditarEtiqueta?id=${id}&etiqueta=${etiqueta}&clave=${clave}&comentario=${comentario}`,
+        type: "GET",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token')); },
+        success: function (data) {
+            waitingDialog.hide();
+            if (data == 0) {
+                modalEditar(false);
+                LimpiarModalTa1();
+                Listar();
+            } else if (data == 1) {
+                alert("La palabra Clave ingresada ya existe");
+            } else if (data == 2) {
+                alert("La etiqueta ingresada ya existe");
+            }
+        }
+    });
+}
+
+function eleminarData(value) {
+    $.ajax({
+        url: URL_API_VISTA + `/EliminarEtiqueta?id=${value}`,
+        type: "GET",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token')); },
+        success: function (result) {
+            Listar();
+        }
+    });
+}
+
+function ExportarTab1() {
+    var etiqueta = $("#txtEtiqueta").val();
+    var clave = $("#txtClave").val();
+    let url = `${URL_API_VISTA}/ExportarTab1?etiqueta=${etiqueta}&clave=${clave}`;
+    $.ajax({
+        url: url,
+        contentType: "application/vnd.ms-excel",
+        beforeSend: function (xhr) {
+            waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+        },
+        success: function (data, status, xhr) {
+            let bytes = Base64ToBytes(data.excel);
+            var blob = new Blob([bytes], { type: "application/octetstream" });
+            let url = URL.createObjectURL(blob);
+            let link = document.createElement("a");
+            link.href = url;
+            link.download = data.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }, complete: function (xhr, status) {
+            waitingDialog.hide();
+        }
+    });
+}
+
+function registrarTab2() {
+    modalRegistroTab2(true);
+}
+
+function modalRegistroTab2(modal) {
+    if (modal) {
+        LimpiarModalTab2();
+        $("#mdRegistroTab2").modal(opcionesModal);
+    } else {
+        LimpiarModalTab2();
+        $("#mdRegistroTab2").modal("hide");
+    }
+}
+
+function modalEditarTab2(modal) {
+    if (modal)
+        $("#mdEditarTab2").modal(opcionesModal);
+    else
+        $("#mdEditarTab2").modal("hide");
+}
+
+function RefrescarListadoTab2() {
+    ListarTab2();
+}
+
+function ListarTab2() {
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+
+    var etiqueta = $("#txtEtiquetaTab2").val();
+    var comodin = $("#txtComodinTab2").val();
+    var prioridad = $("#txtPrioridadTab2").val() == "" ? 0 : $("#txtPrioridadTab2").val();
+    var tipo = $("#cbTipoPrincipal").val();
+
+    $.ajax({
+        url: URL_API_VISTA + `/ListadoServidorRelacion?etiqueta=${etiqueta}&comodin=${comodin}&prioridad=${prioridad}&tipo=${tipo}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token')); },
+        success: function (data) {
+            waitingDialog.hide();
+            $tableTab2.bootstrapTable('destroy');
+            $tableTab2.bootstrapTable({
+                data: data.Rows,
+                pagination: true,
+                detailView: false,
+                showFooter: false
+            });
+        }
+    });
+}
+
+function GuardarRegistroTab2() {
+    var etiqueta = $("#txtEtiquetaModalTab2").val();
+    var comodin = $("#txtComodinModalTab2").val();
+    var prioridad = $("#txtPrioridadModalTab2").val();
+    var comentario = $("#txtComentarioModalTab2").val();
+    var tipo = $("#cbTipo").val();
+
+    if (etiqueta.length > 20) {
+        alert("La etiqueta ingresada debe tener como maximo 20 caracteres");
+        return;
+    } else if (etiqueta.length == 0) {
+        alert("El campo etiqueta es obligatorio");
+        return;
+    }
+
+    if (comodin.length > 100) {
+        alert("El comodin ingresado debe tener como maximo 20 caracteres");
+        return;
+    } else if (comodin.length == 0) {
+        alert("El campo comodin es obligatorio");
+        return;
+    }
+
+    if (prioridad.length == 0) {
+        alert("El campo prioridad es obligatorio");
+        return;
+    }
+
+    if (tipo == 0) {
+        alert("El Tipo es obligatorio");
+        return;
+    }
+
+    $.ajax({
+        url: URL_API_VISTA + `/RegistrarServidorRelacion?etiqueta=${etiqueta}&comodin=${comodin}&prioridad=${prioridad}&comentario=${comentario}&tipo=${tipo}`,
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token')); },
+        success: function (data) {
+            if (data == 0) {
+                modalRegistroTab2(false);
+                LimpiarModalTab2();
+                ListarTab2();
+            } else if (data == 1) {
+                alert("El comodin ingresado ya existe");
+            } else if (data == 2) {
+                alert("La etiqueta ingresada ya existe");
+            }
+        }
+    });
+}
+
+function opcionesFormatterTab2(value, row, index) {
+    let btn1 = `<a href="javascript:dataDetalleTab2('${row.id}')" title="Editar Etiqueta"><i class="glyphicon glyphicon-edit"></i></a>`;
+    let btn2 = `<a href="javascript:eleminarDataTab2('${row.id}');" title="Eliminar Etiqueta"><i class="glyphicon glyphicon-trash"></i></a>`;
+    return btn1.concat("&nbsp;&nbsp;", btn2);
+}
+
+function dataDetalleTab2(value) {
+    waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+    modalEditarTab2(true);
+    $.ajax({
+        url: URL_API_VISTA + `/BuscarServidorRelacion?id=${value}`,
+        type: "GET",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token')); },
+        success: function (result) {
+            waitingDialog.hide();
+            $("#txtEditarModalEditarTab2").val(result.id);
+            $("#txtEtiquetaModalEditarTab2").val(result.etiqueta);
+            $("#txtComodinModalEditarTab2").val(result.comodin);
+            $("#txtPrioridadModalEditarTab2").val(result.prioridad);
+            $("#txtComentarioModalEditarTab2").val(result.comentario);
+            $("#cbTipoEditar").val(result.tipoaplicacionrelacion);
+        }
+    });
+}
+
+function ActualizarRegistroTab2() {
+    var id = $("#txtEditarModalEditarTab2").val();
+    var etiqueta = $("#txtEtiquetaModalEditarTab2").val();
+    var comodin = $("#txtComodinModalEditarTab2").val();
+    var prioridad = $("#txtPrioridadModalEditarTab2").val();
+    var comentario = $("#txtComentarioModalEditarTab2").val();
+    var tipo = $("#cbTipoEditar").val();
+
+    if (etiqueta.length > 20) {
+        alert("La etiqueta ingresada debe tener como maximo 20 caracteres");
+        return;
+    } else if (etiqueta.length == 0) {
+        alert("El campo etiqueta es obligatorio");
+        return;
+    }
+
+    if (comodin.length > 100) {
+        alert("El comodin ingresado debe tener como maximo 20 caracteres");
+        return;
+    } else if (comodin.length == 0) {
+        alert("El campo comodin es obligatorio");
+        return;
+    }
+
+    if (prioridad.length == 0) {
+        alert("El campo prioridad es obligatorio");
+        return;
+    }
+
+    if (tipo == 0) {
+        alert("El campo tipo es obligatorio");
+        return;
+    }
+
+    $.ajax({
+        url: URL_API_VISTA + `/EditarServidorRelacion?id=${id}&etiqueta=${etiqueta}&comodin=${comodin}&prioridad=${prioridad}&comentario=${comentario}&tipo=${tipo}`,
+        type: "GET",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token')); },
+        success: function (data) {
+            if (data == 0) {
+                modalEditarTab2(false);
+                LimpiarModalTab2();
+                ListarTab2();
+            } else if (data == 1) {
+                alert("El comodin ingresada ya existe");
+            } else if (data == 2) {
+                alert("La etiqueta ingresada ya existe");
+            }
+        }
+    });
+}
+
+function eleminarDataTab2(value) {
+    $.ajax({
+        url: URL_API_VISTA + `/EliminarServidorRelacion?id=${value}`,
+        type: "GET",
+        dataType: "json",
+        beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token')); },
+        success: function (result) {
+            ListarTab2();
+        }
+    });
+}
+
+function LimpiarModalTa1() {
+    $("#txtEtiquetaModal").val("");
+    $("#txtClaveModal").val("");
+    $("#txtComentario").val("");
+}
+
+function LimpiarModalTab2() {
+    $("#txtEtiquetaModalTab2").val("");
+    $("#txtComodinModalTab2").val("");
+    $("#txtPrioridadModalTab2").val("");
+    $("#txtComentarioModalTab2").val("");
+}
+
+function ExportarTab2() {
+    var etiqueta = $("#txtEtiquetaTab2").val();
+    var comodin = $("#txtComodinTab2").val();
+    var prioridad = $("#txtPrioridadTab2").val() == "" ? 0 : $("#txtPrioridadTab2").val();
+    var tipo = $("#cbTipoPrincipal").val();
+    let url = `${URL_API_VISTA}/ExportarTab2?etiqueta=${etiqueta}&comodin=${comodin}&prioridad=${prioridad}&tipo=${tipo}`;
+    $.ajax({
+        url: url,
+        contentType: "application/vnd.ms-excel",
+        beforeSend: function (xhr) {
+            waitingDialog.show("Procesando...", { dialogSize: "sm", progressType: "warning" });
+            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+        },
+        success: function (data, status, xhr) {
+            let bytes = Base64ToBytes(data.excel);
+            var blob = new Blob([bytes], { type: "application/octetstream" });
+            let url = URL.createObjectURL(blob);
+            let link = document.createElement("a");
+            link.href = url;
+            link.download = data.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }, complete: function (xhr, status) {
+            waitingDialog.hide();
+        }
+    });
+}

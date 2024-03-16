@@ -1,0 +1,320 @@
+﻿@{
+    ViewBag.Title1 = "Tecnologías no registradas en el catálogo";
+    ViewBag.Title2 = "Gestión de las Tecnologías";
+    ViewBag.Title3 = ViewBag.Title1;
+}
+
+<style>
+    .tec {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div id="SearchContainer" class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row gutter-xs form-group ">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusTecNoReg" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre de la equivalencia o clasificación sugerida...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusTecNoReg" class="btn btn-primary btn-width-custom" onclick="buscarTecNoReg()">Buscar</button>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo de equipo: </h5>
+                                    <select id="cbFilTipEq" name="cbFilTipEq" class="form-control">
+                                        <option value="-1">-- Todos --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            @*<div class="col-xs-6 col-md-6">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Clasificación sugerida: </h5>
+                                    <select id="cbFilEq" name="cbFilEq" class="form-control">
+                                        <option value="-1">-- Todos --</option>
+                                    </select>
+                                </div>
+                            </div>*@
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div id="AsocContainer" class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    @*<a id="btnAsociar" class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="irAsociarTecNoReg()">
+            <span class="count-text">Asociar</span>
+        </a>*@
+    @*<a id="btnImportar" class="btn btn-primary" href="javascript: void(0)" onclick="IrImportarEquipos()">
+        <span class="icon icon-file-excel-o"></span>
+        <span class="count-text">Importar tecnologías</span>
+    </a>*@
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarRegistros()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar reporte completo</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            @*<div class="card-header">
+                    <strong>Equivalencias sin tecnologías</strong>
+                </div>*@
+            <div class="card-body">
+                <table id="tblTecNoReg" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Equivalencias sin tecnologías</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="5%">#</th>
+                            @*<th data-field="state" data-checkbox="true" data-events="operateEvent" data-width="5%"></th>*@
+                            <th data-field="Tecnologia" data-halign="center" data-valign="middle" data-align="left" data-width="15%" data-sortable="true" data-sort-name="Tecnologia">Tecnología</th>
+                            <th data-field="TipoEquipoToString" data-halign="center" data-valign="middle" data-align="center" data-width="10%" data-sortable="true" data-sort-name="TipoEquipo">Tipo de equipo</th>
+                            <th data-field="Total" data-halign="center" data-valign="middle" data-align="center" data-width="15%" data-sortable="true" data-sort-name="Total">Total de equipos impactados</th>
+                            <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="Dominio">Dominio</th>
+                            <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="Subdominio">Subdominio</th>
+                            <th data-field="TribuCoe" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="TribuCoe">Tribu/Coe</th>
+                            <th data-field="Squad" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="Squad">Squad</th>
+                            <th data-field="Owner" data-halign="center" data-valign="middle" data-align="center" data-width="20%" data-sortable="true" data-sort-name="Owner">Nombre del Owner</th>
+                            <th data-field="FechaFinSoporteStr" data-halign="center" data-valign="middle" data-align="center" data-width="10%" data-sortable="true" data-sort-name="FechaFinSoporte">Fecha de fin de soporte</th>
+                            <th data-field="FechaFinSoporteExtendidoStr" data-halign="center" data-valign="middle" data-align="center" data-width="10%" data-sortable="true" data-sort-name="FechaFinSoporteExtendido">Fecha de fin de soporte extendido</th>
+                            @*<th data-formatter="formatOpc" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Asociar Tecnologias No Registradas-->
+<div id="mdTec" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Asociar tecnología: <span id="lblTecnologia"></span></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formMdTec">
+                    <div class="form-group">
+                        <label class="control-label">Subdominios sugeridos: </label>
+                        <select id="cbSubSugerido" name="cbSubSugerido" class="form-control" multiple="multiple"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Tecnología: </label>
+                        <div class="form-group">
+                            <input id="txtNomTecReg" name="txtNomTecReg" class="form-control" type="text">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="buscarTecSugeridas()">Buscar</button>
+                    </div>
+                    <div class="form-group">
+                        <table id="tblMdTec" style="font-size:11px !important;" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="DominioNomb" data-halign="center" data-valign="middle" data-align="left">Dominio</th>
+                                    <th data-field="SubdominioNomb" data-halign="center" data-valign="middle" data-align="left">Subdominio</th>
+                                    <th data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="left">Tecnología</th>
+                                    <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="left">Estado</th>
+                                    <th data-formatter="formatOpcTecSug" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hIdTec" id="hIdTec" value="0" />
+</div>
+<!--Modal Asociar Tecnologias No Registradas-->
+<!--Modal Agregar tecnologia (TNR)-->
+<div id="MdAddTec" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormAddTec"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddTec">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Fabricante:
+                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el nombre del fabricante."></span>
+                                </label>
+                                <input id="txtFabricanteTec" class="form-control" type="text" name="txtFabricanteTec">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Nombre de la tecnología a estandarizar:
+                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el nombre con el cual será definido el estándar en el site de estándares de arquitectura TI."></span>
+                                </label>
+                                <input id="txtNomTec" class="form-control" type="text" name="txtNomTec" pos-tab="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Versiones:
+                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica las versiones"></span>
+                                </label>
+                                <textarea id="txtVerTec" class="form-control" rows="2" name="txtVerTec"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Clave de la tecnología:
+                                </label>
+                                <input id="txtClaveTecnologia" class="form-control" type="text" name="txtClaveTecnologia" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-6 col-md-6">
+                                    <div class="panel text-left" data-toggle="match-height">
+                                        <label class="control-label">Familia: </label>
+                                        <div class="input-with-icon famContainer">
+                                            <input id="txtFamTec" name="txtFamTec" class="form-control input-with-icon-search" type="text">
+                                            <span class="icon icon-search input-icon"></span>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="hFamTecId" id="hFamTecId" value="0" />
+                                </div>
+                                <div class="col-xs-6 col-md-6">
+                                    <div class="panel text-left" data-toggle="match-height">
+                                        <label class="control-label">Estado de Estandarización: </label>
+                                        <select id="cbTipTec" name="cbTipTec" class="form-control"></select>
+                                    </div>
+                                </div>
+                                @*<input type="hidden" name="hdFlagEstandarTec" id="hdFlagEstandarTec" />*@
+                            </div>
+                            <div class="row gutter-xs">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Dominio:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el dominio"></span>
+                                    </label>
+                                    <select id="cbDomTec" name="cbDomTec" class="form-control">
+                                        <option value="-1">-- Seleccione --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs">
+                                <div class="row"></div>
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Subdominio:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el subdominio"></span>
+                                    </label>
+                                    <select id="txtSubTec" name="txtSubTec" class="form-control">
+                                        <option value="-1"> -- Seleccione -- </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegTec" class="btn btn-primary" onclick="guardarAddTec()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Agregar tecnologia (TNR)-->
+<!--Modal Importar (Gestion equipo)-->
+<div id="mdImportar" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormImp"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formImportar">
+                    <div class="form-group onlyUpdate">
+                        <label class="control-label">Tipo de equipo: </label>
+                        <select id="cbTipoEquipoFil" name="cbTipoEquipoFil" class="form-control onlyUpdate"></select>
+                    </div>
+                    <div class="form-group onlyUpdate">
+                        <a id="" class="" href="javascript:descargarEquiposActualizar()" title="Descargar equipos">
+                            [Descargar equipos]
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            Archivo excel:
+                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="La aplicación carga los registros que se encuentren en la primera hoja del archivo MS Excel."></span>
+                        </label>
+                        <a id="btnDescargarPlantilla" class="" href="javascript:descargarPlantillaEquipos()" title="Descargar plantilla">
+                            [Descargar plantilla]
+                        </a>
+                        <div class="input-group">
+                            <input id="txtArchivo" name="txtArchivo" class="form-control onlyImport" type="text" value="Ningún archivo seleccionado" readonly>
+                            <span class="input-group-btn">
+                                <label class="btn btn-primary file-upload-btn">
+                                    <input id="flArchivo" class="file-upload-input inputfile onlyImport" type="file" name="flArchivo" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    <span class="glyphicon glyphicon-folder-open"></span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnReg" class="btn btn-primary" onclick="CargarEquipos()" type="button" data-loading-text="Procesando...">Importar</button>
+                <button id="btnActualizar" class="btn btn-primary onlyUpdate" onclick="ActualizarEquipos()" type="button" data-loading-text="Procesando...">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Importar (Gestion equipo)-->
+
+
+<script src="~/app/tecnologiaNoRegistrada.js?v=2.5.0"></script>

@@ -1,0 +1,303 @@
+﻿@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Gerencia/División/Área/Unidad";
+	ViewBag.Title2 = "Configuración de Portafolio";
+	ViewBag.Title3 = "Gerencia/División/Área/Unidad";
+}
+
+@using BCP.CVT.Cross
+
+<style>
+	.opcionesStyle {
+		width: 500px;
+	}
+
+	.fondoAzul {
+		background-color: #013A81 !important;
+		color: #ffffff !important;
+		font-weight: bold;
+	}
+
+	.fondoGris {
+		background-color: #CCCCCC !important;
+		color: #013A81 !important;
+	}
+
+	.fondoBlanco {
+		background-color: white !important;
+		color: #013A81 !important;
+	}
+</style>
+
+<div class="row gutter-xs fondoBlanco">
+	<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+		<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+			<span class="icon icon-external-link"></span>
+			<span class="count-text">Exportar</span>
+		</a>
+		<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="Buscar()">
+			<span class="icon icon-external-link"></span>
+			<span class="count-text">Buscar</span>
+		</a>
+	</div>
+	<div class="col-md-3" style="display:none; margin:0px; padding-right:0px;">
+		<div id="toolbar1">
+			<button id="button1" onclick="showHideActions(@Html.Raw((int)EConfiguracionPortafolio.Gerencia))" class="btn btn-secondary">Mostrar acciones</button>
+		</div>
+		<table id="tblGerencia" data-unique-id="Id" data-mobile-responsive="true" data-toggle="table" data-show-pagination-switch="true" data-toolbar="#toolbar1">
+			<thead>
+				<tr>
+					<th data-formatter="cogFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="3">
+						<i class="glyphicon glyphicon-cog"></i>
+					</th>
+					<th data-formatter="nombreFormatter"
+						data-field="Nombre"
+						data-halign="center"
+						data-width="20"
+						data-valign="middle"
+						data-cell-style="cellStyle"
+						data-align="left">
+						Gerencia  <a href="javascript:AddGerencia()" title="Nuevo registro"><i class="glyphicon glyphicon-plus-sign"></i></a>
+					</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<div class="col-md-3" style="display:none; margin:0px; padding-left:0px; padding-right:0px;">
+		<div id="toolbar2">
+			<button id="button2" onclick="showHideActions(@Html.Raw((int)EConfiguracionPortafolio.Division))" class="btn btn-secondary">Mostrar acciones</button>
+		</div>
+		<table id="tblDivision" data-unique-id="Id" data-mobile-responsive="true" data-toggle="table" data-show-pagination-switch="true" data-toolbar="#toolbar2">
+			<thead>
+				<tr>
+					<th data-formatter="cogFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="3">
+						<i class="glyphicon glyphicon-cog"></i>
+					</th>
+					<th data-formatter="nombreFormatter"
+						data-field="Nombre"
+						data-halign="center"
+						data-width="20"
+						data-valign="middle"
+						data-cell-style="cellStyle"
+						data-align="left">
+						División  <a href="javascript:AddDivision()" title="Nuevo registro"><i class="glyphicon glyphicon-plus-sign"></i></a>
+					</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<div class="col-md-3" style="display:none; margin:0px; padding-left:0px; padding-right:0px;">
+		<div id="toolbar3">
+			<button id="button3" onclick="showHideActions(@Html.Raw((int)EConfiguracionPortafolio.Area))" class="btn btn-secondary">Mostrar acciones</button>
+		</div>
+		<table id="tblArea" data-unique-id="Id" data-mobile-responsive="true" data-toggle="table" data-show-pagination-switch="true" data-toolbar="#toolbar3">
+			<thead>
+				<tr>
+					<th data-formatter="cogFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="3">
+						<i class="glyphicon glyphicon-cog"></i>
+					</th>
+					<th data-formatter="nombreFormatter"
+						data-field="Nombre"
+						data-halign="center"
+						data-width="20"
+						data-valign="middle"
+						data-cell-style="cellStyle"
+						data-align="left">
+						Área  <a href="javascript:AddArea()" title="Nuevo registro"><i class="glyphicon glyphicon-plus-sign"></i></a>
+					</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<div class="col-md-3" style="display:none; margin:0px; padding-left:0px;">
+		<div id="toolbar4">
+			<button id="button4" onclick="showHideActions(@Html.Raw((int)EConfiguracionPortafolio.Unidad))" class="btn btn-secondary">Mostrar acciones</button>
+		</div>
+		<table id="tblUnidad" data-unique-id="Id" data-mobile-responsive="true" data-toggle="table" data-show-pagination-switch="true" data-toolbar="#toolbar4">
+			<thead>
+				<tr>
+					<th data-formatter="cogFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="3">
+						<i class="glyphicon glyphicon-cog"></i>
+					</th>
+					<th data-formatter="nombreFormatter"
+						data-field="Nombre"
+						data-halign="center"
+						data-width="20"
+						data-valign="middle"
+						data-cell-style="cellStyle"
+						data-align="left">
+						Unidad  <a href="javascript:AddUnidad()" title="Nuevo registro"><i class="glyphicon glyphicon-plus-sign"></i></a>
+					</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div>
+
+<!--Modal Add or Edit-->
+<div id="mdAddOrEditRegistro" tabindex="-1" role="dialog" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title" id="title-form"></h4>
+			</div>
+			<div class="modal-body">
+				<form id="formAddOrEditRegistro">
+					<div class="form-group">
+						<label class="control-label">Nombre: </label>
+						<input id="txtNombre" name="txtNombre" maxlength="200" class="form-control" type="text">
+						<input type="hidden" name="hdRegistroId" id="hdRegistroId" value="0" />
+					</div>
+					<div class="form-group">
+						<label class="control-label">Descripción: </label>
+						<textarea id="txtDescripcion" name="txtDescripcion" maxlength="500" rows="4" class="form-control"></textarea>
+					</div>
+
+					<div class="form-group registroField">
+						<label class="control-label">Nombre Responsable: </label>
+						<input id="txtNombreResponsable" name="txtNombreResponsable" class="form-control registroField" type="text">
+						<input id="hdReponsableAuto" name="hdReponsableAuto" class="form-control registroField" type="hidden">
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<label class="control-label">Responsable: </label>
+							<input id="txtReponsable" name="txtReponsable" class="form-control registroField" type="text">
+						</div>
+						<div class="col-md-6">
+							<label class="control-label">Matricula: </label>
+							<input id="txtMatricula" name="txtMatricula" class="form-control registroField" type="text">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<label class="control-label">Correo: </label>
+							<input id="txtCorreo" name="txtCorreo" class="form-control registroField" type="text">
+						</div>
+						<div class="col-md-6">
+							<label class="control-label">Código SIGA de la unidad organizacional: </label>
+							<input id="txtCodigoSIGA" name="txtCodigoSIGA" class="form-control" type="text">
+						</div>
+					</div>
+
+
+
+
+				</form>
+				<input type="hidden" name="hdMantenimientoId" id="hdMantenimientoId" value="0" />
+				<input type="hidden" name="hdEntidadRelacionId" id="hdEntidadRelacionId" value="0" />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				<button id="btnRegistrar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Registrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Modal Add or Edit (Activos)-->
+<div id="MdBus" tabindex="-1" role="dialog" class="modal fade">
+	<div class="modal-dialog  modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title" id="titleFormAct">Buscar</h4>
+			</div>
+			<div class="modal-body">
+				<form id="formAddOrEditGrp">
+					<div class="form-group">
+						@*<label class="control-label">Código: </label>*@
+						@*<input id="txtCodPar" class="form-control" type="text" name="txtCodPar">*@
+						<input type="hidden" id="txtCodGrp" class="form-control" name="txtCodGrp">
+						<input type="hidden" name="hdGrupoId" id="hdGrupoId" value="0" />
+
+						<div class="row">
+
+							<div class="col-md-4">
+								Búsqueda por unidad
+
+							</div>
+							<div class="col-md-7">
+								<input id="txtUnidad" name="txtUnidad" type="text" class="form-control" maxlength="120" />
+								<input type="hidden" id="hdUnidadId" value="" />
+							</div>
+							<div class="col-md-1"></div>
+
+
+						</div>
+
+
+						<div class="row">
+
+							<div class="col-md-4">
+								Búsqueda por Owner/Lider usuario
+
+							</div>
+							<div class="col-md-7">
+								<input id="txtOwner" name="txtOwner" type="text" class="form-control" maxlength="120" />
+								<input type="hidden" id="hdOwnerId" value="" />
+							</div>
+							<div class="col-md-1"></div>
+
+
+						</div>
+
+						<table id="tblunidadP" class="table" data-unique-id="Id" data-mobile-responsive="true">
+							<caption class="caption text-left">
+								<span>Responsable</span>
+							</caption>
+							<thead>
+								<tr>
+
+
+									@*<th data-field="Id" data-halign="center" data-visible="false" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Id">Código</th>*@
+									<th data-field="Responsable" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Responsable</th>
+									<th data-field="ResponsableMatricula" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Matrícula</th>
+									<th data-field="ResponsableCorreo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="UsuarioModificacion" data-width="70">Email</th>
+									<th data-field="Situacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Situacion" data-width="70">Situación</th>
+									<th data-field="Unidad" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Unidad" data-width="70">Unidad</th>
+								</tr>
+							</thead>
+						</table>
+
+						<div class="row">
+							<div class="col-md-2">
+							</div>
+							<div class="col-md-9">
+								<div id="msjUsuarioRepetido" display="none">
+
+									<label id="label" class="my-error-class">
+
+									</label>
+								</div>
+							</div>
+							<div class="col-md-1"></div>
+						</div>
+
+
+					</div>
+
+
+
+
+
+
+
+
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+				@*<button id="btnBus" class="btn btn-primary" onclick="guardarAddOrEditGrupo()" type="button" data-loading-text="Procesando...">Registrar</button>*@
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script src="~/app/ConfiguracionPortafolio/gerenciaAreaDivision.js?v=2.0.0"></script>

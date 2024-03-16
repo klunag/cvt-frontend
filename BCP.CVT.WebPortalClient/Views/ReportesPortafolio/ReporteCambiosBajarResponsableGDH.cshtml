@@ -1,0 +1,185 @@
+﻿@{
+    ViewBag.Title1 = "Reporte de Cambios Bajas Responsables GDH";
+    ViewBag.Title2 = "Reportes portafolio";
+    ViewBag.Title3 = "Reporte de Cambios Bajas Responsables GDH";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+}
+@using BCP.CVT.Cross
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+<style>
+    .btn-width-custom {
+        width: 112px;
+    }
+
+    .multiselect-container {
+        position: absolute;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+    }
+
+    div.col-xs-4.col-md-4:nth-child(n) {
+        margin-right: 7%;
+    }
+
+    select {
+        text-align: center;
+        /*appearance: none;*/
+    }
+
+    #tableAplicaciones {
+        margin-top: 5%;
+        display: none;
+    }
+
+    .div-report {
+        display: none;
+    }
+
+    #report4, #report5, #report6, #report1_1 {
+        width: 100%;
+        height: 500px;
+    }
+
+    #report1, #report2, #report3, #report7 {
+        width: 100%;
+        height: 350px;
+    }
+
+    .table {
+        font-size: 11px !important;
+    }
+
+    .div-report h4 {
+        font-size: 14px;
+    }
+
+    .card-header-title {
+        display: inline-block;
+        width: 85%;
+    }
+
+    .card .card-body .alerta {
+        font-size: 13px;
+        color: red;
+        font-weight: 300;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-6">
+                                <div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+                                    <h5>Aplicación (código) </h5>
+                                    <input type="text" id="txtAplicacionFiltro" name="txtAplicacionFiltro" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    <input type="hidden" name="hdAplicacionFiltroId" id="hdAplicacionFiltroId" />
+                                </div>
+                            </div>
+                            @*<div class="col-xs-3 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Líder Usuario/Owner: </h5>
+                                    <select id="ddlLiderUsuario" class="form-control">
+                                    </select>
+                                </div>
+                            </div>*@
+                            <div class="col-xs-3 col-md-6">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo Cambio: </h5>
+                                    <select id="cbFiltroTimpoCambio" name="cbFiltroTimpoCambio" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Desde:</h5>
+                                    <div class="input-group date" id="divFechaFiltroDesde">
+                                        <input type="text" id="FechaFiltroDesde" name="FechaFiltroDesde" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        <span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Hasta:</h5>
+                                    <div class="input-group date" id="divFechaFiltroHasta">
+                                        <input type="text" id="FechaFiltroHasta" name="FechaFiltroHasta" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        <span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-12 col-md-12">
+                                <div class="text-right">
+                                    <h5>&nbsp;</h5>
+                                    <a id="btnBuscar" class="btn btn-primary btn-width-custom" href="javascript: void(0)">
+                                        <span class="icon icon-search"></span>
+                                        <span class="count-text">Ver reporte</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card" id="tableAplicaciones">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h4 style="color:#ee8809; font-weight:bold; font-size:16px ">Lista de Registros Cambiados</h4>
+                </div>
+
+                <div style="display:flex; float: right; font-size:16px">
+                    <h5>&nbsp;</h5>
+                    <a id="btnExportar" class="btn btn-primary btn-sm" href="javascript: void(0)">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistro" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                            <th data-field="Matricula" data-halign="center" data-valign="middle" data-align="left">Matricula</th>
+                            <th data-field="NombreResponsable" data-halign="center" data-valign="middle" data-align="left">Nombre Responsable</th>
+                            <th data-field="Unidad" data-halign="center" data-valign="middle" data-align="left">Unidad Actual</th>
+                            <th data-field="UnidadAnterior" data-halign="center" data-valign="middle" data-align="left">Unidad Anterior</th>
+                            <th data-field="Puesto" data-halign="center" data-valign="middle" data-align="left">Puesto Actual</th>
+                            <th data-field="PuestoAnterior" data-halign="center" data-valign="middle" data-align="left">Puesto Anterior</th>
+                            <th data-field="ApplicationId" data-halign="center" data-valign="middle" data-align="left">Código</th>
+                            <th data-field="NombreRol" data-halign="center" data-valign="middle" data-align="left">Nombre Rol</th>
+                            <th data-field="TipoCambio" data-halign="center" data-valign="middle" data-align="left">Tipo Cambio</th>
+                            <th data-field="FechaReporte" data-halign="center" data-valign="middle" data-align="left">Fecha Reporte</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/app/ReportePortafolio/reportePortafolioCambiosBajaGDH.js?v=1.0.1"></script>

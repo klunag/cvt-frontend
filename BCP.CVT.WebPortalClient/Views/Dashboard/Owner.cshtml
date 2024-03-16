@@ -1,0 +1,118 @@
+﻿@using BCP.CVT.WebPortalClient.Models;
+@{
+    /**/
+
+    var proyecciones = MetodosUtiles.ObtenerProyecciones();
+}
+@{
+    ViewBag.Title1 = "Reporte por dueño de tecnología";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Tecnología";
+    ViewBag.Title3 = "Reporte por dueño de tecnología";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="form-group">
+                                <div class="col-xs-4 col-md-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Dominio: (*)</h5>
+                                        <select id="cbFilDominio" name="cbFilDominio" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4 col-md-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Subdominio: (*)</h5>
+                                        <select id="cbFilSubdominio" name="cbFilSubdominio" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4 col-md-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Estado de Estandarización: </h5>
+                                        <select id="cbFilTipo" name="cbFilTipo" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Fecha de la consulta: (*)</h5>
+                                    <div class="input-group date" id="divFechaFiltro">
+                                        <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        @*<span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>*@
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="col-xs-4 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Owner de la tecnología: </h5>
+                                    <input type="text" id="txtFiltroOwner" name="txtFiltroOwner" class="form-control" maxlength="100" />
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tecnología: </h5>
+                                    <input type="text" id="txtFiltroTecnologia" name="txtFiltroTecnologia" class="form-control" maxlength="100" />
+                                </div>
+                            </div>*@
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="RefrescarListado()">
+        <span class="count-text">Buscar</span>
+    </a>
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarData()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar registros</span>
+    </a>
+</div>
+
+<div class="row gutter-xs" id="divResultado" style="display:none;">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Reporte detallado de tecnologías</strong>
+            </div>
+            <div class="card-body">
+                <div id="table-listing">
+                    <div class="table-scrollable">
+                        <table id="tblRegistro" data-count-fixed-columns="4" cellpadding="0" cellspacing="0" class="table" data-show-columns="true" data-detail-view="false" data-detail-formatter="detailFormatter" style="font-size:11px !important;">                            
+                            <thead>
+                                <tr>
+                                    <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="Dominio">Dominio</th>
+                                    <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="Subdominio">Subominio</th>                                    
+                                    <th data-field="Familia" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="Familia">Familia</th>
+                                    <th data-field="FechaMaxFamiliaStr" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="FechaMaxFamilia">Fin soporte familia</th>
+                                    <th data-field="Tecnologia" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="Tecnologia">Roadmap EOS</th>
+                                    <th data-formatter="ownerSemaforoFormatter" data-field="IndicadorProyOwnerHoy" data-halign="center" data-valign="middle" data-align="center" data-width="50">Estado de roadmap EOS (hoy)</th>
+                                    <th data-formatter="ownerSemaforoFormatter" data-field="IndicadorProyOwner1" data-halign="center" data-valign="middle" data-align="center" data-width="50">Estado de roadmap EOS (6 meses)</th>
+                                    <th data-formatter="ownerSemaforoFormatter" data-field="IndicadorProyOwner2" data-halign="center" data-valign="middle" data-align="center" data-width="50">Estado de roadmap EOS (18 meses)</th>
+                                    <th data-formatter="ownerSemaforoFormatter" data-field="IndicadorProyOwner3" data-halign="center" data-valign="middle" data-align="center" data-width="50">Estado de roadmap EOS (30 meses)</th>
+                                    <th data-field="TotalIndefinidas" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="TotalIndefinidas">Tecnologías con fechas fin indefinidas</th>
+                                    <th data-field="TotalAplicaciones" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="TotalAplicaciones">Total aplicaciones</th>
+                                    <th data-field="TotalEquipos" data-halign="center" data-valign="middle" data-align="left" data-width="50" data-sortable="true" data-sort-name="TotalEquipos">Total equipos</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+</div>
+
+<script src="~/app/owner.js?v=2.1.0"></script>

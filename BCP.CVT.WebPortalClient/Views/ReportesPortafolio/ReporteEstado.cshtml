@@ -1,0 +1,346 @@
+﻿@{
+    ViewBag.Title1 = "Reporte de estado de portafolio según unidades";
+    ViewBag.Title2 = "Reportes portafolio";
+    ViewBag.Title3 = "Reporte de estado de portafolio según unidades";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+}
+@using BCP.CVT.Cross
+ 
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+<style>
+    .btn-width-custom {
+        width: 112px;
+    }
+
+    .card .card-body .alerta {
+        font-size: 13px;
+        color: red;
+        font-weight: 300;
+    }
+
+    .card-search .btn-group {
+        width: 100% !important;
+    }
+
+    .multiselect-container {
+        position: absolute;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+    }
+
+    div.col-xs-4.col-md-4:nth-child(n) {
+        margin-right: 7%;
+    }
+
+    select {
+        text-align: center;
+        /*appearance: none;*/
+    }
+
+    .div-report, #tableAplicaciones, #tableAplicacionesRoles {
+        margin-top: 2.5%;
+        display: none;
+    }
+
+    #report1 {
+        width: 100%;
+        height: 380px;
+    }
+    #report2 {
+        width: 100%;
+        height: 390px;
+        
+    }
+    #report5, #report6 {
+        width: 100%;
+        height: 300px;
+    }
+
+    #report3, #report4 {
+        width: 100%;
+        height: 270px;
+    }
+
+    .table {
+        font-size: 11px !important;
+    }
+
+    .div-report h4 {
+        font-size: 14px;
+    }
+
+    .div-exportReport {
+        /*margin-top: -27px;
+        margin-bottom: 27px;*/
+    }
+
+    .card-header-title {
+        display: inline-block;
+        width: 85%;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo de activo de información: </h5>
+                                    <select id="ddlTipoActivo" name="ddlTipoActivo" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Gerencia: </h5>
+                                    <select id="cbFiltroGerencia" name="cbFiltroGerencia" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>División: </h5>
+                                    <select id="cbFiltroDivision" name="cbFiltroDivision" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Área: </h5>
+                                    <select id="cbFiltroArea" name="cbFiltroArea" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado de la aplicación: </h5>
+                                    <select id="cbFiltroEstado" name="cbFiltroEstado" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-9 col-md-9">
+                                <div class="text-right">
+                                    <h5>&nbsp;</h5>
+                                    <a id="btnBuscar" class="btn btn-primary btn-width-custom" href="javascript: void(0)">
+                                        <span class="icon icon-search"></span>
+                                        <span class="count-text">Ver reporte</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div id="divReporte1" class="col-xs-12 div-report  ">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h4 style="color:#ee8809; font-weight:bold; font-size:14px">Distribución de aplicaciones en el banco</h4>
+                </div>
+
+                <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                    <a id="btnExportarReporte1" class="btn btn-primary btn-sm" href="javascript: void(0)">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="report1"></div>
+                <div id="report1_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card" id="tableAplicaciones">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h4 style="color:#ee8809; font-weight:bold;">Relación de Aplicaciones</h4>
+                </div>
+
+                <div style="display:flex; float: right; font-size:16px">
+                    <h5>&nbsp;</h5>
+                    <a id="btnExportar" class="btn btn-primary btn-sm" href="javascript: void(0)">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistro" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                            <th data-field="ApplicationId" data-halign="center" data-valign="middle" data-align="left">Código</th>
+                            <th data-field="TipoActivo" data-halign="center" data-valign="middle" data-align="left">Tipo Activo</th>
+                            <th data-field="EstadoToStr" data-halign="center" data-valign="middle" data-align="left">Estado</th>
+                            <th data-field="Gerencia" data-halign="center" data-valign="middle" data-align="left">Gerencia</th>
+                            <th data-field="Division" data-halign="center" data-valign="middle" data-align="left">División</th>
+                            <th data-field="Area" data-halign="center" data-valign="middle" data-align="left">Área</th>
+                            <th data-field="Unidad" data-halign="center" data-valign="middle" data-align="left">Unidad</th>
+                            <th data-field="CriticidadBIAToStr" data-halign="center" data-valign="middle" data-align="left">Criticidad <br />BIA</th>
+                            <th data-field="Categoria" data-halign="center" data-valign="middle" data-align="left">Categoría</th>
+                            <th data-field="NivelCumplimiento" data-halign="center" data-valign="middle" data-align="left">Nivel de <br />Cumplim.</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card" id="tableAplicacionesRoles">
+            <div class="card-header">
+                <h4 style="color:#ee8809; font-weight:bold; font-size:16px ">Roles</h4>
+            </div>
+            <div class="card-body">
+                <table id="tblRoles" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                            <th data-field="Matricula" data-halign="center" data-valign="middle" data-align="left" data-width="210">Matrícula</th>
+                            <th data-field="ManagerName" data-halign="center" data-valign="middle" data-align="left">Nombres</th>
+                            <th data-field="Lider" data-formatter="formatterCirculoVerde" data-halign="center" data-valign="middle" data-align="center" data-width="60">Líder</th>
+                            <th data-field="Gestor" data-formatter="formatterCirculoVerde" data-halign="center" data-valign="middle" data-align="center" data-width="60">Gestor</th>
+                            <th data-field="Experto" data-formatter="formatterCirculoVerde" data-halign="center" data-valign="middle" data-align="center" data-width="60">Experto</th>
+                            <th data-field="TL" data-formatter="formatterCirculoVerde" data-halign="center" data-valign="middle" data-align="center" data-width="60">TL</th>
+                            <th data-field="TTL" data-formatter="formatterCirculoVerde" data-halign="center" data-valign="middle" data-align="center" data-width="60">TTL</th>
+                            <th data-field="JdE" data-formatter="formatterCirculoVerde" data-halign="center" data-valign="middle" data-align="center" data-width="60">JdE</th>
+                            <th data-field="Broker" data-formatter="formatterCirculoVerde" data-halign="center" data-valign="middle" data-align="center" data-width="60">Bróker</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div id="divReporte2" class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h4 style="color:#ee8809; font-weight:bold;">Distribución de aplicaciones en la unidad jerárquica seleccionada</h4>
+                </div>
+                <div style="display:flex; float: right; font-size:16px" class="div-exportReport">
+                    <a id="btnExportarReporte2" class="btn btn-primary  btn-sm" href="javascript: void(0)">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="report2"></div>
+                <div id="report2_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div id="divReporte3" class="col-xs-6 div-report">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h4 style="color:#ee8809; font-weight:bold;">Distribución de aplicaciones en la unidad jerárquica seleccionada: por estado</h4>
+                </div>
+                <div style="display:flex; float: right; font-size:16px" class="div-exportReport">
+                    <a id="btnExportarReporte3" class="btn btn-primary btn-sm" href="javascript: void(0)">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="report3"></div>
+                <div id="report3_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+    <div id="divReporte4" class="col-xs-6 div-report">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h4 style="color:#ee8809; font-weight:bold;">Distribución de aplicaciones en la unidad jerárquica seleccionada: por criticidad</h4>
+                </div>
+                <div style="display:flex; float: right; font-size:16px" class="div-exportReport">
+                    <a id="btnExportarReporte4" class="btn btn-primary btn-sm" href="javascript: void(0)">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="report4"></div>
+                <div id="report4_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div id="divReporte5" class="col-xs-6 div-report">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h4 style="color:#ee8809; font-weight:bold;">Distribución de aplicaciones en la unidad jerárquica seleccionada: por categoría tecnológica</h4>
+                </div>
+
+                <div style="display:flex; float: right; font-size:16px" class="div-exportReport">
+                    <a id="btnExportarReporte5" class="btn btn-primary btn-sm" href="javascript: void(0)">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="report5"></div>
+                <div id="report5_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+    <div id="divReporte6" class="col-xs-6 div-report">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h4 style="color:#ee8809; font-weight:bold;">Salud de aplicaciones en la unidad jerárquica seleccionada</h4>
+                </div>
+                <div style="display:flex; float: right; font-size:14px" class="div-exportReport">
+                    <a id="btnExportarReporte6" class="btn btn-primary btn-sm" href="javascript: void(0)">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="report6"></div>
+                <div id="report6_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+</div>
+<script>
+    const REPORTE_DISTRIBUCION_APLICACION_BANCO = @Html.Raw((int)ETipoExportarReportePortafolioEstado.DistribucionAplicacionesBanco);
+    const REPORTE_DISTRIBUCION_APLICACION = @Html.Raw((int)ETipoExportarReportePortafolioEstado.DistribucionAplicaciones);
+    const REPORTE_DISTRIBUCION_APLICACION_ESTADO = @Html.Raw((int)ETipoExportarReportePortafolioEstado.DistribucionAplicacionesByEstado);
+    const REPORTE_DISTRIBUCION_APLICACION_CRITICIDAD = @Html.Raw((int)ETipoExportarReportePortafolioEstado.DistribucionAplicacionesByCriticidad);
+    const REPORTE_DISTRIBUCION_APLICACION_CATEGORIA = @Html.Raw((int)ETipoExportarReportePortafolioEstado.DistribucionAplicacionesByCategoria);
+    const REPORTE_SALUD_APLICACION_ID = @Html.Raw((int)ETipoExportarReportePortafolioEstado.SaludAplicacion);
+</script>
+<script src="~/app/ReportePortafolio/reporteEstado.js?v=1.0.1"></script>

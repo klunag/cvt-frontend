@@ -1,0 +1,115 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace BCP.CVT.WebPortalClient.Controllers
+{
+    [RoutePrefix("Vista")]
+    public class VistaController : Base
+    {
+        // GET: Vista
+        public ActionResult Index()
+        {
+            
+            return View();
+        }
+
+        [Route("VTecnologia")]
+        public ActionResult VTecnologia()
+        {
+            return View();
+        }
+
+        [Route("Equipos")]
+        public ActionResult Equipos()
+        {
+            return View();
+        }
+
+        [Route("Aplicaciones")]
+        public ActionResult Aplicaciones()
+        {
+            return View();
+        }
+
+        [Route("BigFix")]
+        public ActionResult BigFix()
+        {
+            return View();
+        }
+
+        [Route("Ventana")]
+        public ActionResult Ventana()
+        {
+            return View();
+        }
+
+        [Route("Relaciones")]
+        public ActionResult Relaciones()
+        {
+            return View();
+        }
+
+        [Route("DetalleEquipo")]
+        public ActionResult DetalleEquipo(int? Id)
+        {
+            if (!Id.HasValue) Id = 0;
+            ViewBag.IdEquipo = Id;
+            return View();
+        }
+
+        [Route("DetalleAplicacion")]
+        public ActionResult DetalleAplicacion(string Id)
+        {
+            if (Id == null) Id = "";
+            ViewBag.CodigoAPT = Id;
+            return View();
+        }
+
+        [AllowAnonymous]
+        [Route("TecnologiaEstandar")]
+        public ActionResult TecnologiaEstandar()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [Route("EstandaresTecnologia")]
+        public ActionResult EstandaresTecnologia() => View();
+
+        [Route("AplicacionConsultor")]
+        public ActionResult AplicacionConsultor()
+        {
+            return View();
+        }
+
+        [Route("Ayuda")]
+        public ActionResult Ayuda()
+        {
+            return View();
+        }
+
+        [Route("ReporteAplicacion")]
+        public ActionResult ReporteAplicacion()
+        {
+            return View();
+        }
+
+        [Route("VistaOwnerTecnologia")]
+        public ActionResult VistaOwnerTecnologia() => View();
+
+        [Route("VistaOwnerProducto")]
+        public ActionResult VistaOwnerProducto() => View();
+
+        [Route("VistaObsolescenciaTecnologia")]
+        public ActionResult VistaObsolescenciaTecnologia() => View();
+
+        [Route("VistaObsolescenciaAplicacion")]
+        public ActionResult VistaObsolescenciaAplicacion() => View();
+
+        [Route("CatalogoTecnologia")]
+        public ActionResult CatalogoTecnologia() => View();
+    }
+}

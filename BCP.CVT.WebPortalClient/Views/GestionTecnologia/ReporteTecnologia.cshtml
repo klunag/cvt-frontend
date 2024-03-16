@@ -1,0 +1,1157 @@
+﻿@{
+    ViewBag.Title1 = "Reporte de tecnologías";
+    ViewBag.Title2 = "Gestión de las Tecnologías";
+    ViewBag.Title3 = "Reporte de tecnologías";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .nombreDom {
+        min-width: 180px;
+    }
+
+    .nombreTec {
+        min-width: 280px;
+    }
+
+    .accesoDirecto {
+        min-width: 200px;
+    }
+
+    .tecnologia-label {
+        padding: 0px;
+    }
+
+    /*.input-with-icon-search {
+         padding-left: 26px;
+     }*/
+
+    .tec {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .tooltip {
+        z-index: 2000 !important;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row gutter-xs form-group">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon searchContainer">
+                                    <input id="txtBusTec" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre o descripción de la tecnología...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusTec" class="btn btn-primary btn-width-custom" onclick="buscarTec()">Buscar</button>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Dominio: </h5>
+                                    <select id="cbFilDom" class="form-control">
+                                        <option value="-1">Todos</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Subdominio: </h5>
+                                    <select id="cbFilSub" class="form-control">
+                                        <option value="-1"> -- Todos --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado: </h5>
+                                    <select id="cbFilEst" class="form-control">
+                                        <option value="-1"> -- Todos -- </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Familia: </h5>
+                                    <div class="input-with-icon famfilContainer">
+                                        <input id="cbFilFam" name="cbFilFam" class="form-control input-with-icon-search" type="text">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>¿Tiene fecha fin de soporte?: </h5>
+                                    <select id="cbFilEsFecSop" class="form-control">
+                                        <option value="-1">-- Todos --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Aplica a: </h5>
+                                    <div class="input-with-icon">
+                                        <input id="txtFilAplica" name="txtFilAplica" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Código: </h5>
+                                    <div class="input-with-icon">
+                                        <input id="txtFilCodigo" name="txtFilCodigo" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Dueño: </h5>
+                                    <div class="input-with-icon">
+                                        <input id="txtFilDueno" name="txtFilDueno" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Equipo: </h5>
+                                    <div class="input-with-icon">
+                                        <input id="txtFilEquipo" name="txtFilEquipo" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado de Estandarización: </h5>
+                                    <select id="cbFilTipoTec" name="cbFilTipoTec" class="form-control">
+                                        <option value="-1">-- Todos --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado de Tecnología: </h5>
+                                    <select id="cbFilEstObs" name="cbFilEstObs" class="form-control">
+                                        <option value="-1">-- Todos --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    @*<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="addTecSTD()">
+            <span class="icon icon-plus"></span>
+            <span class="count-text">Nuevo</span>
+        </a>
+        <a class="btn btn-primary" href="javascript: void(0)" onclick="verEquivalencias()">
+            <span class="icon icon-list"></span>
+            <span class="count-text">Equivalencias</span>
+        </a>*@
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="exportarTecSTD()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Reporte de Tecnologías</strong>
+            </div>
+            <div class="card-body">
+                <table id="tbl-tecAprob" data-toggle="table" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <!--25 registros-->
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="20" data-width-unit="px">#</th>
+                            <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Dominio</th>
+                            <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" class="nombreDom">Subdominio</th>
+                            <th data-field="Fabricante" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Fabricante" data-width="200">Fabricante</th>
+                            <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="900">Nombre de la tecnología a estandarizar</th>
+                            <th data-field="Versiones" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="900">Versiones</th>
+                            <th data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="900" class="nombreTec">Clave</th>
+                            <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="900">Descripción</th>
+                            <th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="200">Fecha<br />registro</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="900">Usuario registro</th>
+                            <th data-field="Familia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="900">Familia</th>
+                            <th data-field="TipoTecnologiaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" data-sort-name="Tipo">Estado de <br />Estandarización</th>
+                            <th data-field="FuenteStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Riesgo" data-width="200">Fuente</th>
+                            <th data-field="FechaLanzamientoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" data-sort-name="FechaLanzamiento">Fecha<br /> lanzamiento</th>
+                            <th data-field="FechaFinSoporteStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" data-sort-name="FechaFinSoporte">Fecha fin<br /> soporte</th>
+                            <th data-field="FechaExtendidaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" data-sort-name="FechaExtendida">Fecha fin<br /> extendida</th>
+                            <th data-field="FechaAcordadaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" data-sort-name="FechaAcordada">Fecha fin<br /> interna</th>
+                            <th data-field="ComentariosFechaFin" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200">Comentarios asociados a la<br />fecha fin de soporte</th>
+                            <th data-field="FechaCalculoTecStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCalculoTecStr" data-width="200">Fecha para cálculos</th>
+                            <th data-field="Existencia" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Existencia" data-width="200">Existencia de profesionales</th>
+                            <th data-field="Facilidad" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Facilidad" data-width="200">Facilidad de actualización</th>
+                            <th data-field="Riesgo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Riesgo" data-width="200">Riesgo de mantenerse obsoleto</th>
+                            <th data-field="Vulnerabilidad" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Vulnerabilidad" data-width="200">Vulnerabilidad de seguridad</th>
+                            <th data-field="CasoUso" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="CasoUso" data-width="200">Casos de uso</th>
+                            <th data-field="Requisitos" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Requisitos" data-width="200">Requisitos de HW/SW, <br />procedimientos previos</th>
+                            <th data-field="Compatibilidad" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Compatibilidad" data-width="200">Compatibilidad</th>
+
+                            <!--18 registros-->
+                            <th data-field="Aplica" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Aplica" data-width="200">Aplica a</th>
+                            <th data-field="RoadmapOpcional" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="RoadmapOpcional" data-width="200">Roadmap de la tecnología</th>
+                            <th data-field="Referencias" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Referencias" data-width="200">Referencias</th>
+                            <th data-field="PlanTransConocimiento" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="PlanTransConocimiento" data-width="200">Plan de transferencia <br /> de conocimiento</th>
+                            <th data-field="EsqMonitoreo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EsqMonitoreo" data-width="200">Esquema monitoreo</th>
+                            <th data-field="LineaBaseSeg" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="LineaBaseSeg" data-width="200">Linea base de seguridad</th>
+                            <th data-field="EsqPatchManagement" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EsqPatchManagement" data-width="200">Definición del esquema <br /> de patch management</th>
+                            <th data-field="Dueno" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Dueno" data-width="200">Dueño (Owner) de  <br />la tecnología</th>
+                            <th data-field="EqAdmContacto" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EqAdmContacto" data-width="200">Equipo de administración <br />y punto de contacto</th>
+                            <th data-field="GrupoSoporteRemedy" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="GrupoSoporteRemedy" data-width="200">Grupo de soporte <br /> en REMEDY</th>
+                            <th data-field="ConfArqSeg" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="ConfArqSeg" data-width="200">Conformidad de arquitecto <br /> de seguridad</th>
+                            <th data-field="ConfArqTec" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="ConfArqTec" data-width="200">Conformidad de arquitecto <br /> de tecnología</th>
+                            <th data-field="EncargRenContractual" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EncargRenContractual" data-width="200">Encargado de renovación <br /> contractual</th>
+                            <th data-field="EsqLicenciamiento" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EsqLicenciamiento" data-width="200">Esquema de <br />licenciamiento/subscripción</th>
+                            <th data-field="SoporteEmpresarial" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="SoporteEmpresarial" data-width="200">Coordinar contrato para <br />contar con soporte empresarial</th>
+                            <th data-field="FlagVigenteFamiliaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagVigenteFamiliaStr" data-width="200">¿La Tecnología será<br /> vigente en la familia?</th>
+                            <th data-field="CodigoTecnologiaAsignado" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="CodigoTecnologiaAsignado" data-width="200">Código de tecnología <br /> asignado</th>
+                            <th data-field="FlagSiteEstandarStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagSiteEstandarStr" data-width="200">Mostrar en site de estándares</th>
+
+
+                            @*
+                                                        <th data-field="Observacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Observacion" data-width="200">Observación</th>
+                                                    <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="CodigoAPT" data-width="200">CodigoAPT</th>
+                                <th data-field="FlagConfirmarFamiliaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagConfirmarFamiliaStr" data-width="200">ConfirmarFamilia</th>
+                                <th data-field="EstadoTecnologiaStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Estado" data-width="200">Aprobación</th>
+                                <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" data-sort-name="EstadoId">Estado</th>
+                                <th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="200">Fecha de<br />Registro</th>
+                                <th data-field="FechaAprobacionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" data-sort-name="FechaAprobacion">Fecha de<br /> aprobación</th>
+                                <th data-field="FechaFinSoporteStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200" data-sort-name="FechaFinSoporte">Fecha fin<br /> soporte</th>
+                                <th data-field="UsuarioAprobacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="200">Aprobado por</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Tecnologia)-->
+<div id="mdAddOrEditTec" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" @*data-dismiss="modal"*@ onclick="defaultAccesoDirecto()">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormTec"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditTec">
+                    <div class="text-right" data-toggle="match-height">
+                        @if (ViewBag.Context == "1")
+                        {
+                            <button id="btnRegTec" class="btn btn-primary" onclick="guardarAddOrEditTec()" type="button" data-loading-text="Procesando...">Registrar</button>
+                            <button id="btnConTec" class="btn btn-primary" onclick="confirmarTec()" type="button" data-loading-text="Procesando...">Confirmar</button>
+                        }
+                        else
+                        {
+                            <button id="btnRegTecSTD" class="btn btn-primary btnRegTecSTD" onclick="guardarAddOrEditTecSTD()" type="button" data-loading-text="Procesando...">Registrar</button>
+                            <button id="btnConTec" class="btn btn-primary btnConTec" onclick="confirmarTecSTD()" type="button" data-loading-text="Procesando...">Confirmar</button>
+                            <button id="btnAprTec" class="btn btn-primary btnAprTec" onclick="aprobarTecSTD()" type="button" data-loading-text="Procesando...">Aprobar</button>
+                            <button id="btnObsTec" class="btn btn-primary btnObsTec" onclick="observarTecSTD()" type="button" data-loading-text="Procesando...">Observar</button>
+                            <button id="btnGuardarTec" class="btn btn-primary btnGuardarTec" onclick="guardarCambios()" type="button" data-loading-text="Procesando...">Guardar</button>
+                        }
+                        <button class="btn btn-primary" type="button" @*data-dismiss="modal"*@ onclick="defaultAccesoDirecto()">Cancelar</button>
+                    </div>
+                    <div class="form-group adBasico">
+                        <label class="control-label">
+                            Fabricante:
+                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el nombre del fabricante."></span>
+                        </label>
+                        <input id="txtFabricanteTec" class="form-control adBasico" type="text" name="txtFabricanteTec">
+                    </div>
+                    <div class="form-group adBasico">
+                        <label class="control-label">
+                            Nombre de la tecnología a estandarizar:
+                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el nombre con el cual será definido el estándar en el site de estándares de arquitectura TI."></span>
+                        </label>
+                        <input id="txtNomTec" class="form-control adBasico" type="text" name="txtNomTec" pos-tab="0">
+                        <input type="hidden" name="hIdTec" id="hIdTec" value="0" />
+                        <input type="hidden" name="hActTec" id="hActTec" value=false />
+                        <input type="hidden" name="hEstTec" id="hEstTec" value="0" />
+                    </div>
+                    <div class="form-group adBasico">
+                        <label class="control-label">
+                            Versiones:
+                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica las versiones"></span>
+                        </label>
+                        <textarea id="txtVerTec" class="form-control adBasico" rows="2" name="txtVerTec"></textarea>
+                    </div>
+                    <div class="form-group otros">
+                        <a class="btn btn-primary" href="javascript: void(0)" onclick="irListarTecnologiasEquivalentes()">
+                            <span class="count-text">Tecnologías equivalentes</span>
+                        </a>
+                    </div>
+                    <div class="form-group adBasico">
+                        <label class="control-label">
+                            Clave de la tecnología:
+                        </label>
+                        <input id="txtClaveTecnologia" class="form-control adBasico" type="text" name="txtClaveTecnologia" readonly>
+                    </div>
+                    <div class="form-group adBasico">
+                        <label class="control-label">
+                            Descripción de la tecnología:
+                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la descripción"></span>
+                        </label>
+                        <textarea id="txtDesTec" class="form-control adBasico" rows="3" name="txtDesTec" maxlength="300"></textarea>
+                    </div>
+                    <ul class="nav nav-tabs nav-justified otros">
+                        <li class="active tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datGen" data-toggle="tab">General</a></li>
+                        <li class="tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datTran" data-toggle="tab">Clasificación</a></li>
+                        <li class="tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#resp" data-toggle="tab">Responsabilidades</a></li>
+                        @if (ViewBag.Context == "2")
+                        {
+                            <li id="" class="tab-panel-tecnologia tabRegSTD"><a class="tab-panel-tecnologia" href="#aprob" data-toggle="tab">Aprobación</a></li>
+                            <li id="" class="tab-panel-tecnologia tabRegSTD"><a class="tab-panel-tecnologia" href="#vinculacion" data-toggle="tab">Componentes</a></li>
+                        }
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade active in" id="datGen">
+                            <div class="row"></div>
+                            <div class="row gutter-xs adFamilia">
+                                <div class="col-xs-4 col-md-3">
+                                    <label class="control-label">
+                                        Confirmar familia:
+                                    </label>
+                                    <div class="input-group" id="divConfirmarFamilia">
+                                    </div>
+                                </div>
+                                <div class="col-xs-4 col-md-5">
+                                    <div class="panel text-left" data-toggle="match-height">
+                                        <label class="control-label">Familia: </label>
+                                        <div class="input-with-icon famContainer">
+                                            <input id="txtFamTec" name="txtFamTec" class="form-control input-with-icon-search adFamilia" type="text" placeholder="">
+                                            <span class="icon icon-search input-icon"></span>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="hFamTecId" id="hFamTecId" value="0" />
+                                </div>
+                                <div class="col-xs-4 col-md-4">
+                                    <div class="panel text-left" data-toggle="match-height">
+                                        <label class="control-label">Estado de Estandarización: </label>
+                                        <select id="cbTipTec" name="cbTipTec" class="form-control adFamilia"></select>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="hdFlagEstandarTec" id="hdFlagEstandarTec" />
+                            </div>
+                            <div class="row gutter-xs adFamilia inputOpcional">
+                                <div class="col-xs-6 col-md-6">
+                                    <div class="panel text-left" data-toggle="match-height">
+                                        <label class="control-label">Estado: </label>
+                                        <select id="cbEstadoObs" name="cbEstadoObs" class="form-control inputOpcional">
+                                            <option value="-1"> -- Seleccione -- </option>
+                                            <option value="1">Vigente</option>
+                                            <option value="2">Deprecado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs adCicloVida">
+                                <div class="col-md-12">
+                                    <div class="col-md-2">
+                                        <div id="divFlagFecSop"></div>
+                                    </div>
+                                    <div class="col-md-10 tecnologia-label">
+                                        <label class="control-label">¿Tiene fecha fin de soporte?</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="FecSopContainer">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group adCicloVida">
+                                            <div class="col-md-4">
+                                                <select id="cbFuenteTec" name="cbFuenteTec" class="form-control adCicloVida"></select>
+                                            </div>
+                                            <div class="col-md-8 tecnologia-label">
+                                                Fuente
+                                                <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la fuente de donde se obtendrá las fechas de fin de soporte de la tecnología"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="FecSopManualContainer">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group adCicloVida">
+                                                <h5>
+                                                    1. Fecha de lanzamiento de tecnología
+                                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la fecha de lanzamiento de la tecnología"></span>
+                                                </h5>
+                                                <div class="input-group date" id="dpFecLanTec-btn">
+                                                    <input type="text" id="dpFecLanTec" name="dpFecLanTec" class="form-control adCicloVida" />
+                                                    <span class="input-group-addon">
+                                                        <span class="icon icon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group adCicloVida">
+                                                <h5>
+                                                    2. Fecha fin soporte de tecnología
+                                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la fecha fin de soporte de la tecnología"></span>
+                                                </h5>
+                                                <div class="input-group date" id="dpFecSopTec-btn">
+                                                    <input type="text" id="dpFecSopTec" name="dpFecSopTec" class="form-control adCicloVida fechaClass fechaSop" />
+                                                    <span class="input-group-addon">
+                                                        <span class="icon icon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group adCicloVida">
+                                                <h5>
+                                                    3. Fecha fin extendida de la tecnología
+                                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la fecha extendida de la tecnología"></span>
+                                                </h5>
+                                                <div class="input-group date" id="dpFecExtTec-btn">
+                                                    <input type="text" id="dpFecExtTec" name="dpFecExtTec" class="form-control adCicloVida fechaClass fechaExt" />
+                                                    <span class="input-group-addon">
+                                                        <span class="icon icon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group adCicloVida">
+                                                <h5>
+                                                    4. Fecha fin interna de la tecnología
+                                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la fecha interna de soporte de la tecnología"></span>
+                                                </h5>
+                                                <div class="input-group date" id="dpFecIntTec-btn">
+                                                    <input type="text" id="dpFecIntTec" name="dpFecIntTec" class="form-control adCicloVida fechaClass fechaInt" />
+                                                    <span class="input-group-addon">
+                                                        <span class="icon icon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <textarea placeholder="Comentarios asociados a la fecha fin de soporte de tecnología" id="txtComTec" class="form-control adCicloVida" rows="3" name="txtComTec" maxlength="400"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group adCicloVida">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="col-md-7">
+                                                    <select id="cbFecCalTec" name="cbFecCalTec" class="form-control adCicloVida"></select>
+                                                </div>
+                                                <div class="col-md-5 tecnologia-label">
+                                                    Fecha para cálculos
+                                                    <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la fecha que se usará para el cálculo de obsolescencia"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row adRiesgo">
+                                <div class="col-md-12" style="margin-bottom:10px;">
+                                    <label class="control-label">
+                                        Criterios para el riesgo del cálculo de la tecnología
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="col-md-4">
+                                                <select id="cbExisTec" name="cbExisTec" class="form-control adRiesgo"></select>
+                                            </div>
+                                            <div class="col-md-8 tecnologia-label">
+                                                Existencia de profesionales/vendors con conocimiento de Tecnología
+                                                <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la existencia de profesionales/vendors con conocimiento de tecnología: (1) - Niveles de habilidad reducidos y convirtiéndose en parte de un conjunto de habilidades generales. (2) - Habilidades disponibles; costos cayendo. (3) - Oferta y demanda de habilidades equilibradas; costos estables. (4) - Habilidades escasean. (5) - Habilidades en escasez."></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="col-md-4">
+                                                <select id="cbFacAcTec" name="cbFacAcTec" class="form-control adRiesgo"></select>
+                                            </div>
+                                            <div class="col-md-8 tecnologia-label">
+                                                Facilidad de actualización
+                                                <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la facilidad de actualización para su versión más reciente: (1) - La actualización de la tecnología a su versión más reciente tiene una complejidad baja. (3) - La actualización de la tecnología a su versión más reciente tiene una complejidad mediana. (5) - La actualización de la tecnología a su versión más reciente tiene una complejidad alta."></span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="col-md-4">
+                                                <select id="cbRiesgTec" name="cbRiesgTec" class="form-control adRiesgo"></select>
+                                            </div>
+                                            <div class="col-md-8 tecnologia-label">
+                                                Riesgo de mantenerse obsoleto
+                                                <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el riesgo de mantenerse obsoleto: (0) - No hay ningún lineamiento del banco o de la industria bancaria que el banco debe seguir para continuar su operación que indica que la tecnología no debe ser utilizada. (5) - Hay algún lineamiento del banco o de la industria bancaria que el banco debe seguir para continuar su operación que indica que la tecnología no debe ser utilizada."></span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="col-md-4">
+                                                <input id="txtVulTec" name="txtVulTec" type="text" class="form-control adRiesgo" />
+                                            </div>
+                                            <div class="col-md-8 tecnologia-label">
+                                                Vulnerabilidad de seguridad
+                                                <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la vulnerabilidad de seguridad, el indicador debe de ser provisto por el área de Seguridad del banco."></span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Casos de uso:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica los casos de uso"></span>
+                                    </label>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input id="hdArchivoId" name="hdArchivoId" class="form-control" type="text" value="0" style="display:none">
+                                            <input id="txtNomDiagCasoUso" name="txtNomDiagCasoUso" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                            <span class="input-group-btn">
+                                                <label class="btn btn-primary file-upload-btn">
+                                                    <input id="flDiagCasoUso" class="file-upload-input inputfile" type="file" name="flDiagCasoUso">
+                                                    <span class="glyphicon glyphicon-folder-open"></span>
+                                                </label>
+                                            </span>
+                                            <a id="btnDescargarFile" class="btn btn-success" href="javascript:DescargarArchivo()" title="Descargar archivo">
+                                                <span class="glyphicon glyphicon-download-alt"></span>
+                                            </a>
+                                            <a id="btnEliminarFile" class="btn btn-danger" href="javascript:EliminarArchivo()" title="Eliminar archivo">
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <textarea id="txtCusTec" name="txtCusTec" class="form-control" rows="8" maxlength="500"></textarea>
+                                </div>
+                            </div>
+                            <div class="row otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">Requisitos de HW/SW, procedimientos previos: </label>
+                                    <textarea id="txtReqHSTec" class="form-control" rows="2" name="txtReqHSTec" maxlength="500"></textarea>
+                                </div>
+                            </div>
+                            <div class="row otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">Compatibilidad: </label>
+                                    <textarea id="txtCompaTec" class="form-control" rows="2" name="txtCompaTec" maxlength="300"></textarea>
+                                </div>
+                            </div>
+                            <div class="row otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">Aplica a: </label>
+                                    <textarea id="txtApliTec" class="form-control" rows="2" name="txtApliTec" maxlength="150"></textarea>
+                                </div>
+                            </div>
+                            <div class="row otros">
+                                <div class="col-md-12">
+                                    <div class="col-md-2">
+                                        <div id="divFlagApp"></div>
+                                    </div>
+                                    <div class="col-md-10 tecnologia-label">
+                                        <label class="control-label">¿La Tecnología a su vez es una aplicación?</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="AppContainer" class="row otros">
+                                <div class="col-md-12 appContainer">
+                                    <label class="control-label">Aplicación: </label>
+                                    @*<textarea id="txtApliTec" class="form-control" rows="2" name="txtApliTec"></textarea>*@
+                                    <input type="text" class="form-control" id="txtApp" name="txtApp" />
+                                    <input type="hidden" name="hdIdApp" id="hdIdApp" value="0" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="datTran">
+                            <div class="row"></div>
+                            <div class="row gutter-xs adClasificacion">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Dominio:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el dominio"></span>
+                                    </label>
+                                    <select id="cbDomTec" name="cbDomTec" class="form-control adClasificacion">
+                                        <option value="-1" disabled> Seleccione </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs adClasificacion">
+                                <div class="row"></div>
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Subdominio:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el subdominio"></span>
+                                    </label>
+                                    <select id="txtSubTec" name="txtSubTec" class="form-control adClasificacion">
+                                        <option value="-1"> -- Seleccione -- </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Roadmap de la tecnología:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la eliminación de tecnología obsoleta a reemplazar"></span>
+                                    </label>
+                                    <div class="input-with-icon elimContainer">
+                                        <input id="txtElimTec" name="txtElimTec" class="form-control input-with-icon-search" type="text" placeholder="">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="hIdTecObs" id="hIdTecObs" value="" />
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">Referencias: </label>
+                                    <textarea id="txtRefTec" class="form-control" rows="2"></textarea>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Plan de transferencia de conocimiento:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el plan de transferencia de conocimiento"></span>
+                                    </label>
+                                    <textarea id="txtPlanTransTec" name="txtPlanTransTec" class="form-control" rows="2" maxlength="500"></textarea>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Esquema monitoreo:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el esquema monitoreo"></span>
+                                    </label>
+                                    <textarea id="txtEsqMonTec" name="txtEsqMonTec" class="form-control" rows="2" maxlength="300"></textarea>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Linea base de seguridad:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la linea base de seguridad"></span>
+                                    </label>
+                                    <textarea id="txtLinSegTec" name="txtLinSegTec" class="form-control" rows="2" maxlength="300"></textarea>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Definición del esquema de patch management:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la definición del esquema de patch management"></span>
+                                    </label>
+                                    <textarea id="txtPatManTec" name="txtPatManTec" class="form-control" rows="2" maxlength="300"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="resp">
+                            <div class="row"></div>
+                            <div class="row gutter-xs adResponsabilidad">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Dueño (Owner) de la tecnología:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el dueño"></span>
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="input-group">
+                                                <input id="txtDueTec" name="txtDueTec" type="text" class="form-control inputMatriculaDueno adResponsabilidad">
+                                                <span class="input-group-btn">
+                                                    <button id="txtDueTec-btn" class="btn btn-primary" type="button" onclick="ValidarMatriculaDueno()">
+                                                        Validar usuario
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label id="lblDueno" name="lblDueno" class="control-label"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs adResponsabilidad">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Equipo de administración y punto de contacto:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el equipo de administración y punto de contacto"></span>
+                                    </label>
+                                    <input id="txtEqAdmTec" name="txtEqAdmTec" type="text" class="form-control adResponsabilidad" />
+                                </div>
+                            </div>
+                            <div class="row gutter-xs adResponsabilidad">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Grupo de soporte en REMEDY:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el grupo de soporte en remedy"></span>
+                                    </label>
+                                    <input id="txtGrupRemTec" name="txtGrupRemTec" type="text" class="form-control adResponsabilidad" />
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Conformidad de arquitecto de seguridad:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la conformidad de arquitecto de seguridad"></span>
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="input-group">
+                                                <input id="txtConfArqSegTec" name="txtConfArqSegTec" type="text" class="form-control inputMatriculaArquitectoSeg">
+                                                <span class="input-group-btn">
+                                                    <button id="txtConfArqSegTec-btn" class="btn btn-primary" type="button" onclick="ValidarMatriculaArquitectoSeguridad()">
+                                                        Validar usuario
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label id="lblArquitectoSeg" name="lblArquitectoSeg" class="control-label"></label>
+                                            @*<input type="text" class="form-control" id="lblUsuario" name="lblUsuario" readonly/>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Conformidad de arquitecto de tecnología:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la conformidad de arquitecto de tecnología"></span>
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="input-group">
+                                                <input id="txtConfArqTec" name="txtConfArqTec" type="text" class="form-control inputMatriculaArquitectoTec">
+                                                <span class="input-group-btn">
+                                                    <button id="txtConfArqTec-btn" class="btn btn-primary" type="button" onclick="ValidarMatriculaArquitectoTecnologia()">
+                                                        Validar usuario
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label id="lblArquitectoTec" name="lblArquitectoTec" class="control-label"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12">
+                                    <label class="control-label">
+                                        Encargado de renovación contractual:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el encargado de renovación contractual"></span>
+                                    </label>
+                                    <input id="txtRenConTec" name="txtRenConTec" type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12" style="margin-top:15px;">
+                                    <label class="control-label">
+                                        Esquema de licenciamiento/subscripción:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el esquema de licenciamiento/subscripción"></span>
+                                    </label>
+                                    <input id="txtEsqLinTec" name="txtEsqLinTec" type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12" style="margin-top:15px;">
+                                    <label class="control-label">
+                                        Coordinar contrato para contar con soporte empresarial:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el soporte empresarial"></span>
+                                    </label>
+                                    <input id="txtSopEmpTec" name="txtSopEmpTec" type="text" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row gutter-xs otros">
+                                <div class="col-md-12" style="margin-top:15px;">
+                                    <label class="control-label">
+                                        Autorizadores:
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica los autorizadores"></span>
+                                    </label>
+                                    <div class="text-right" data-toggle="match-height">
+                                        <div class="input-group">
+                                            <input id="txtMatAutTec" name="txtMatAutTec" type="text" class="form-control matricula-auto" placeholder="Ingresar código de matrícula..." maxlength="20" />
+                                            <span class="input-group-btn">
+                                                <button id="" class="btn btn-primary" type="button" onclick="addItemAutorizador()">
+                                                    Agregar
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="panel" style="margin-top:10px;">
+                                        <table id="tblAutTec" class="table table-striped" data-unique-id="MatriculaBanco" data-mobile-responsive="true">
+                                            <thead>
+                                                <tr>
+                                                    <th data-field="MatriculaBanco" data-halign="left" data-valign="middle" data-align="center">Matrícula</th>
+                                                    <th data-formatter="formatOpcTec" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <input type="text" id="msjValidTbl" name="msjValidTbl" class="form-control" style="display:none;" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @if (ViewBag.Context == "2")
+                        {
+                            <div class="tab-pane fade" id="aprob">
+                                <div class="row"></div>
+                                <div class="row gutter-xs">
+                                    <div class="col-md-12">
+                                        <div class="col-md-2">
+                                            <div id="divEstado"></div>
+                                        </div>
+                                        <div class="panel text-left" data-toggle="match-height">
+                                            <label class="control-label">¿La Tecnología será vigente en la familia?</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row gutter-xs">
+                                    <div class="col-md-12" style="margin-top:15px;">
+                                        <label class="control-label">Código de tecnología asignado: </label>
+                                        <input id="txtCodAsigTec" name="txtCodAsigTec" type="text" class="form-control cbAprob" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-md-2">
+                                            <div id="divSiteEstandar"></div>
+                                        </div>
+                                        <div class="col-md-10 tecnologia-label">
+                                            <label class="control-label">Mostrar en site de estándares</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<div class="row gutter-xs">
+                                        <div class="col-md-12 arqContainer" style="margin-top:15px;">
+                                            <label class="control-label">Arquetipos: </label>
+                                            <div class="input-with-icon">
+                                                <input id="txtArqTec" name="txtArqTec" class="form-control input-with-icon-search cbAprob" type="text" placeholder="">
+                                                <span class="icon icon-search input-icon"></span>
+                                            </div>
+                                            <input type="hidden" name="hdIdArq" id="hdIdArq" value="0" />
+                                        </div>
+                                    </div>*@
+                                <div class="row gutter-xs">
+                                    <div class="col-md-12" style="margin-top:15px;">
+                                        <label class="control-label">
+                                            Arquetipos:
+                                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica los arquetipos"></span>
+                                        </label>
+                                        <div class="input-with-icon">
+                                            <input id="txtArqTec" name="txtArqTec" class="form-control input-with-icon-search cbAprob" type="text" placeholder="">
+                                            <span class="icon icon-search input-icon"></span>
+                                        </div>
+                                        <input type="hidden" name="hdIdArq" id="hdIdArq" value="0" />
+                                        @*<div class="text-right" data-toggle="match-height">
+                                                <div class="input-group">
+                                                    <input id="txtMatAutTec" name="txtMatAutTec" type="text" class="form-control matricula-auto" placeholder="Ingresar código de matrícula..." maxlength="20" />
+                                                    <span class="input-group-btn">
+                                                        <button id="" class="btn btn-primary" type="button" onclick="addItemAutorizador()">
+                                                            Agregar
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>*@
+                                        <div class="panel" style="margin-top:10px;">
+                                            <table id="tblArqAprob" class="table table-striped" data-unique-id="Id" data-mobile-responsive="true">
+                                                <thead>
+                                                    <tr>
+                                                        <th data-field="Nombre" data-halign="left" data-valign="middle" data-align="center">Arquetipo</th>
+                                                        <th data-formatter="formatOpcArqAprob" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                            @*<input type="text" id="msjValidTbl" name="msjValidTbl" class="form-control" style="display:none;" />*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row gutter-xs">
+                                    <div class="col-md-12">
+                                        <label class="control-label">Observaciones: </label>
+                                        <textarea id="txtObsTec" rows="4" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="vinculacion">
+                                <div class="row"></div>
+                                <div class="form-group">
+                                    <label class="control-label">Tecnología: </label>
+                                    <div class="form-group ui-widget tecVinculadaContainer">
+                                        <input id="txtTecnologiaVinculadad" class="form-control ui-autocomplete-input" type="text">
+                                        <input type="hidden" name="hIdTecnologiaVinculada" id="hIdTecnologiaVinculada" value="" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <table id="tblTecnologiaVinculacion" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                        <thead>
+                                            <tr>
+                                                <th data-field="DominioNomb" data-halign="center" data-valign="middle" data-align="left">Dominio</th>
+                                                <th data-field="SubdominioNomb" data-halign="center" data-valign="middle" data-align="center">Subdominio</th>
+                                                <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tecnología</th>
+                                                <th data-formatter="formatOpcTecVinculacion" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer footerModalTecnologia">
+                @if (ViewBag.Context == "1")
+                {
+                    <button id="btnRegTec" class="btn btn-primary" onclick="guardarAddOrEditTec()" type="button" data-loading-text="Procesando...">Registrar</button>
+                    <button id="btnConTec" class="btn btn-primary" onclick="confirmarTec()" type="button" data-loading-text="Procesando...">Confirmar</button>
+                }
+                else
+                {
+                    <button id="btnRegTecSTD" class="btn btn-primary btnRegTecSTD" onclick="guardarAddOrEditTecSTD()" type="button" data-loading-text="Procesando...">Registrar</button>
+                    <button id="btnConTec" class="btn btn-primary btnConTec" onclick="confirmarTecSTD()" type="button" data-loading-text="Procesando...">Confirmar</button>
+                    <button id="btnAprTec" class="btn btn-primary btnAprTec" onclick="aprobarTecSTD()" type="button" data-loading-text="Procesando...">Aprobar</button>
+                    <button id="btnObsTec" class="btn btn-primary btnObsTec" onclick="observarTecSTD()" type="button" data-loading-text="Procesando...">Observar</button>
+                    <button id="btnGuardarTec" class="btn btn-primary btnGuardarTec" onclick="guardarCambios()" type="button" data-loading-text="Procesando...">Guardar</button>
+                }
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit (Tecnologia)-->
+<!--Modal Cambiar Estado Tec (Tecnologia)-->
+<div class="modal fade" id="mdCambEstTec" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Cambiar Estado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formCambiarEstadoTec">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Estado Actual:
+                        </label>
+                        <input id="txtEstActTec" class="form-control" type="text" name="txtEstActTec" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            Nuevo Estado:
+                        </label>
+                        <select id="cbNueEstTec" name="cbNueEstTec" class="form-control">
+                            <option value="-1">Seleccione</option>
+                            <option value="3">Aprobado</option>
+                            <option value="4">Observado</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnGuardarEstTec" type="button" class="btn btn-primary" onclick="guardarNuevoEstadoTec()" data-loading-text="Procesando...">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Cambiar Estado Tec (Tecnologia)-->
+<!--Modal Tecnologias Equivalencias (Tecnologia)-->
+<div id="mdTecEq" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Equivalencias de la tecnología</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTecByArq">
+                    <div class="form-group">
+                        <label class="control-label">Equivalencia: </label>
+                        <div class="form-group ui-widget eqContainer">
+                            <input id="txtNomTecEq" name="txtNomTecEq" class="form-control ui-autocomplete-input" type="text" autocomplete="off" maxlength="300">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button id="btnRegTecEq" type="button" class="btn btn-primary" onclick="guardarTecnologiaEquivalente()" data-loading-text="Procesando...">Registrar equivalencia</button>
+                    </div>
+                    <p>
+                        Relación de equivalencias registradas para
+                        <span id="spNomTec"></span>
+                    </p>
+                    <div class="form-group ">
+                        <table id="tblTecEq" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="EqId" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Equivalencia</th>
+                                    <th data-formatter="formatOpcTecEq" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <input type="text" id="msjValidTblEq" name="msjValidTblEq" class="form-control" style="display:none;" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hIdArqByTec" id="hIdArqByTec" value="0" />
+</div>
+<!--Modal Tecnologias Equivalencias (Tecnologia)-->
+<!--Modal Tecnologias Equivalencias 2 (Tecnologia)-->
+<div id="mdTecEqList" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Tecnologías asociadas</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTecEqList">
+                    <div class="form-group">
+                        <table id="tblTecEqList" data-locale="es-SP" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center">Equivalencia</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Tecnologias Equivalencias 2 (Tecnologia)-->
+<!--Modal Tecnologias Equivalencias General (Tecnologia)-->
+<div id="mdTecEqGeneral" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Equivalencias de tecnologías</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTecEqGeneral">
+                    <div class="form-group">
+                        <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="exportarEquivalenciasGeneral()">
+                            <span class="icon icon-external-link"></span>
+                            <span class="count-text">Exportar</span>
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        <table id="tblTecEqGeneral" data-locale="es-SP" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-field="DominioTecnologia" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DominioTecnologia">Dominio</th>
+                                    <th data-field="SubdominioTecnologia" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="SubdominioTecnologia">Subdominio</th>
+                                    <th data-field="NombreTecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="NombreTecnologia" data-width="20%">Tecnología</th>
+                                    <th data-field="TipoTecnologia" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TipoTecnologia">Estado de Estandarización</th>
+                                    <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EstadoId">Estado</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Equivalencia</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Tecnologias Equivalencias General (Tecnologia)-->
+<!--Modal Migrar Equivalencias (Tecnologia)-->
+<div id="mdMigrarEquivalencia" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Migrar equivalencias</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formMigrarEquivalencia">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Tecnología padre:
+                        </label>
+                        <div class="input-with-icon tecReceptoraContainer">
+                            <input id="txtTecReceptora" name="txtTecReceptora" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="">
+                            <span class="icon icon-search input-icon"></span>
+                        </div>
+                        <input type="hidden" id="hdTecReceptora" name="hdTecReceptora" value="0" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnMigrarEquivalencia" type="button" class="btn btn-primary" onclick="migrarEquivalencias()" data-loading-text="Procesando...">Migrar equivalencias</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Migrar Equivalencias (Tecnologia)-->
+@*<script src="~/app/tecnologiaSTD.js"></script>*@
+
+<script src="~/app/reporteTecnologia.js?v=1.1.1"></script>

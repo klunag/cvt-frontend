@@ -1,0 +1,98 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Parámetros de configuración";
+    ViewBag.Title2 = "Configuración de Portafolio";
+    ViewBag.Title3 = "Parámetros de configuración";
+}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <div class="card-search-box">
+                        <form action="javascript:void(0);">
+                            <div class="form-group row">
+                                <div class="col-md-10 col-xs-8 col-sm-9">
+                                    <div class="input-with-icon">
+                                        <input id="txtFiltro" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Ingrese código...">
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-xs-4 col-sm-3">
+                                    <a id="btnBuscar" class="btn btn-primary" href="javascript: void(0)">
+                                        <span class="icon icon-search"></span>                             |||  
+                                        <span class="count-text">Buscar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+<div class="row gutter-xs" style="margin-top:20px;">
+    <div class="col-xs-12">
+        <div class="card">
+            
+            <div class="card-body">
+                <table id="tblRegistros" data-locale="es-SP" class="table table-striped table-nowrap dataTable" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Parámetros de la aplicación</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="Codigo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="8%">Código</th>
+                            <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Descripción</th>
+                            <th data-field="Valor" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Valor</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Creado por</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                            <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hdRegistroId" id="hdRegistroId" value="0" />
+</div>
+
+
+<!--Modal-->
+<div id="mdRegistro" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title_modal">Editar parámetro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formRegistro">
+                    <div class="form-group">
+                        <label class="control-label">Código:</label>
+                       <input type="text" id="txtCodigo" name="txtCodigo" class="form-control" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Valor:</label>
+                        <textarea id="txtValor" name="txtValor" rows="5" class="form-control"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegistrar" type="button" class="btn btn-primary" onclick="guardarRegistro()" data-loading-text="Procesando..." title="Guardar registro">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal-->
+
+
+<script src="~/app/ConfiguracionPortafolio/parametroAplicacion.js?v=2.0.0"></script>

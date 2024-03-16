@@ -1,0 +1,287 @@
+﻿@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Gestionado Por";
+    ViewBag.Title2 = "Configuración de Portafolio";
+    ViewBag.Title3 = "Gestionado Por";
+}
+@using BCP.CVT.Cross
+
+<style>
+    .opcionesStyle {
+        width: 600px;
+        text-align: justify;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtFiltro" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre de item...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <a id="btnBuscar" class="btn btn-primary" href="javascript: void(0)">
+                                    <span class="icon icon-search"></span>
+                                    <span class="count-text">Buscar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a id="btnRegInactivos" class="btn btn-primary" href="javascript: void(0)">
+        <span class="icon icon-ban"></span>
+        <span class="count-text">Reg. Inactivos</span>
+    </a>
+    <a id="btnNuevo" class="btn btn-primary" href="javascript: void(0)">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistro" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Registros configurados</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="left">Acciones</th>
+                            <th data-formatter="linkFormatter" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Nombre</th>
+                            <th data-field="FlagEquipoAgilDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagEquipoAgil">Estructura Ágil</th>
+                            <th data-field="FlagUserITDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagUserIT">User IT</th>
+                            <th data-field="FlagSubsidiariasDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagSubsidiarias">Subsidiaria</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaCreacion">Fecha de registro</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion">Creado por</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit-->
+<div id="mdRegistro" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="title-md"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditRegistro">
+                    <div class="form-group">
+                        <label class="control-label">Nombre: </label>
+                        @*<input id="txtNombre" class="form-control" type="text" name="txtNombre" maxlength="100">*@
+                        <textarea id="txtNombre" name="txtNombre" rows="2" class="form-control"></textarea>
+                        <input type="hidden" name="hdRegistroId" id="hdRegistroId" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Descripción: </label>
+                        @*<input id="txtDescripcion" class="form-control" type="text" name="txtDescripcion" maxlength="300">*@
+                        <textarea id="txtDescripcion" name="txtDescripcion" rows="3" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Codigo SIGA: </label>
+                        <input id="txtCodigoSIGA" class="form-control" type="text" name="txtCodigoSIGA">
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="control-label">Representa una estructura ágil</label>
+                            <div class="input-group" id="divFlagEquipoAgil"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="control-label">Asociado a las aplicaciones User IT</label>
+                            <div class="input-group" id="divFlagAppsUserIT"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="control-label">Asociado a Subsidiarias</label>
+                            <div class="input-group" id="divFlagSubsidiarias"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="control-label">Requiere de un Jefe de Equipo</label>
+                            <div class="input-group" id="divFlagJefeEquipos"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegistrar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="mdPreview" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="title-md">Gestionado por (Vista previa)</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <select id="ddlPreview" name="ddlPreview" class="form-control">
+                            @*<option value="-1">-- Seleccione --</option>*@
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Registros Inactivos-->
+<div id="mdRegInactivos" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Registros inactivos</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTecEqGeneral">
+                    <div class="form-group">
+                        <a id="btnExportarInactivos" class="btn btn-primary" href="javascript: void(0)" onclick="exportarEquivalenciasGeneral()">
+                            <span class="icon icon-external-link"></span>
+                            <span class="count-text">Exportar</span>
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        <table id="tblRegInactivos" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                    @*<th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Acciones</th>*@
+                                    <th data-formatter="linkFormatter" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Nombre</th>
+                                    <th data-field="FlagEquipoAgilDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagEquipoAgil">Estructura Ágil</th>
+                                    <th data-field="FlagUserITDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagUserIT">User IT</th>
+                                    <th data-field="FlagSubsidiariasDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagSubsidiarias">Subsidiaria</th>
+                                    <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaCreacion">Fecha de registro</th>
+                                    <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion">Creado por</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Registros Inactivos-->
+<!--Modal TeamSquad-->
+<div id="mdTeamSquadLinked" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" id="btnIconCloseTS">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Equipos asociados</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTeamSquadLinked">
+                    <div class="form-group">
+                        <table id="tblTeamSquadLinked" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true" style="font-size: 11px !important;">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                    <th data-formatter="opcionesTS" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Acciones</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">TeamSquad</th>
+                                    <th data-formatter="InputRespFormatter" data-field="Responsable" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Responsable</th>
+                                    <th data-formatter="InputMatriculaFormatter" data-field="ResponsableMatricula" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Matricula</th>
+                                    <th data-formatter="InputCorreoFormatter" data-field="ResponsableCorreo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Correo</th>
+                                    <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaCreacion">Fecha de registro</th>
+                                    @*<th data-field="CodigoSIGA" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Código SIGA</th>*@
+                                    @*<th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion">Creado por</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnCloseTS">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal TeamSquad-->
+<!--Modal TribeLeader-->
+<div id="mdTribeLeaderLinked" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" id="btnIconCloseTL">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Tribe Leader asociados</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTeamSquadLinked">
+                    <div class="form-group">
+                        <table id="tblTribeLeaderLinked" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true" style="font-size: 11px !important;">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                    <th data-formatter="BtnFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Acciones</th>
+                                    @*<th data-field="NombreEquipo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">TeamSquad</th>*@
+                                    <th data-formatter="InputRespFormatter" data-field="Responsable" data-halign="center" data-valign="middle" data-align="center">TL Responsable</th>
+                                    <th data-formatter="InputMatriculaFormatter" data-field="ResponsableMatricula" data-halign="center" data-valign="middle" data-align="center">TL Matricula</th>
+                                    <th data-formatter="InputCorreoFormatter" data-field="ResponsableCorreo" data-halign="center" data-valign="middle" data-align="center">TL Correo</th>
+                                    @*<th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaCreacion">Fecha de registro</th>*@
+                                    @*<th data-field="CodigoSIGA" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Código SIGA</th>*@
+                                    @*<th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion">Creado por</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnCloseTL">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal TribeLeader-->
+
+<script>
+    const ENTIDAD_MANTENIMIENTO = @Html.Raw((int)EConfiguracionPortafolio.GestionadoPor);
+</script>
+<!--Modal Add or Edit-->
+<script src="~/app/ConfiguracionPortafolio/gestionadoPor.js?v=2.0.3"></script>

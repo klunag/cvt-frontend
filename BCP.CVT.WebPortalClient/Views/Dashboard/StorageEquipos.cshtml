@@ -1,0 +1,132 @@
+﻿@{
+
+    ViewBag.Title1 = "Vista por storage y equipos";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Storage";
+    ViewBag.Title3 = "Vista por storage y equipos";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+</style>
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <form id="formFiltros">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-3 col-md-3 equipoContainer">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Equipo: </h5>
+                                        <input type="text" name="txtEquipo" id="txtEquipo" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3 storageContainer">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Storage: </h5>
+                                        <input type="text" name="txtStorage" id="txtStorage" class="form-control" value="" maxlength="100" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3 containerFiltroSO">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Tiene réplica: </h5>
+                                        <select class="form-control" id="dlReplica" name="dlReplica">
+                                            <option value="-1" selected="selected">Todos</option>
+                                            <option value="1">Si</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Fecha de la consulta: (*)</h5>
+                                        <div class="input-group date" id="divFechaFiltro">
+                                            <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                            @*<span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row gutter-xs form-group">
+                                <div class="col-xs-4 col-md-4">
+                                </div>
+                                <div class="col-xs-4 col-md-4">
+                                </div>
+                                <div class="col-xs-2 col-md-2">
+                                    <button id="btnExportar" type="button" class="btn btn-primary btn-width-custom" onclick="ExportarInfo()">Exportar</button>
+                                </div>
+                                <div class="col-xs-2 col-md-2">
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Buscar()">Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Relación de equipos registrados en la plataforma</strong>
+                </div>
+                <div class="card-body">
+                    <table id="tblRegistro" class="table" data-mobile-responsive="true" data-unique-id="Id" style="font-size:11px !important"  >
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="10">#</th>
+                                <th data-field="Equipo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Equipo">Equipo</th>
+                                <th data-field="DetalleAmbiente" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="StorageVolumen">Ambiente</th>
+                                <th data-field="FlagTemporalToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagTemporal">Descubrimiento</th>
+                                <th data-field="Disco" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Disco">Disco del equipo</th>
+                                <th data-field="CapacidadGB" data-halign="center" data-valign="middle" data-align="right" data-sortable="true" data-sort-name="CapacidadMB">Capacidad (GB)</th>
+                                <th data-field="UsadoGB" data-halign="center" data-valign="middle" data-align="right" data-sortable="true" data-sort-name="UsadoMB">Espacio usado (GB)</th>
+                                <th data-field="LibreGB" data-halign="center" data-valign="middle" data-align="right" data-sortable="true" data-sort-name="LibreMB">Espacio libre (GB)</th>
+                                <th data-field="PorcentajeLibre" data-halign="center" data-valign="middle" data-align="right" data-sortable="true" data-sort-name="PorcentajeLibre">% libre</th>
+                                <th data-field="SoftwareBase" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="SoftwareBase">Storage software</th>
+                                <th data-field="Storage" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Storage">Storage</th>
+                                <th data-field="Volumen" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="StorageVolumen">Volumen</th>
+                                <th data-field="UbicacionToString" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="UbicacionId">Ubicación</th>
+                                <th data-field="NombreTier" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Tier">Tier</th>
+                                <th data-field="TieneReplicaToString" data-halign="center" data-valign="middle" data-align="right" data-sortable="true" data-sort-name="TieneReplica">Replicado</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/storageEquipos.js?v=2.1.0"></script>

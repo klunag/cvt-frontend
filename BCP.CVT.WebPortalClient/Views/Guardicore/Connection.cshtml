@@ -1,0 +1,237 @@
+﻿
+@{
+    ViewBag.Title1 = "Interacciones entre servidores";
+    ViewBag.Title2 = "Guardicore";
+    ViewBag.Title3 = "Listado de interacciones entre servidores";
+}
+
+<style>
+    .bg-amarillo {
+        background-color: #ffe494 !important;
+    }
+
+    .bg-rojo {
+        background-color: #ff9ea7 !important;
+    }
+
+    .bg-verde {
+        background-color: #a3ffb9 !important;
+    }
+
+    #exTab3 .nav-pills > li > a {
+        border-radius: 4px 4px 0 0;
+    }
+
+    #exTab3 .tab-content {
+        background-color: #FFFFFF;
+        padding: 5px 15px;
+    }
+
+    .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+        color: #fff;
+        background-color: #ee8809;
+    }
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <div class="panel-group" id="accordion-filtro" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default" style="overflow: inherit;">
+                    <a class="panel-heading" role="tab" id="heading-filtro" data-toggle="collapse" data-parent="#accordion-filtro" href="#collapse-filtro" aria-expanded="true" aria-controls="collapse-filtro" style="display: flex">
+                        <h4 class="panel-title">
+                            Filtro de búsqueda
+                        </h4>
+                    </a>
+                    <div id="collapse-filtro" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro">
+                        <div class="panel-body">
+                            <div class="card-search-box">
+                                <form action="javascript:void(0);" id="formFiltros">
+                                    <div class="row" style="margin-bottom: 0;">
+                                        <div class="col-sm-3">
+                                            <label>Aplicación Origen: </label>
+                                            <div class="text-left" data-toggle="match-height">
+                                                @*<input type="text" name="txtEtiquetaOrigen" id="txtEtiquetaOrigen" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                                    <span class="icon icon-search input-icon"></span>*@
+                                                <select id="ddlEtiquetaOrigen" class="form-control"></select>
+                                            </div>
+                                            @*<input id="hdEtiquetaOrigen" type="hidden">*@
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label>Aplicación Destino: </label>
+                                            <div class="text-left" data-toggle="match-height">
+                                                <select id="ddlEtiquetaDestino" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label>Ambiente Origen: </label>
+                                            <div class="text-left" data-toggle="match-height">
+                                                <select id="cbAmbOri" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label>Ambiente Destino: </label>
+                                            <div class="text-left" data-toggle="match-height">
+                                                <select id="cbAmbDes" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-bottom: 0;">
+                                        <div class="col-sm-3">
+                                            <label>Tipos: </label>
+                                            <div class="text-left" data-toggle="match-height">
+                                                <select id="cbType" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label>Acciones: </label>
+                                            <div class="text-left" data-toggle="match-height">
+                                                <select id="cbAction" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <label>Desde (Max 60 dias antes): </label>
+                                                <div class="input-group date" id="divFechaFiltroDesde">
+                                                    <input type="text" id="FechaFiltroDesde" name="FechaFiltroDesde" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy HH:mm")" />
+                                                    <span class="input-group-addon">
+                                                        <span class="icon icon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <label id="titleTpBusqueda">Hasta (Fecha actual):</label>
+                                                <div class="input-group date" id="divFechaFiltroHasta">
+                                                    <input type="text" id="FechaFiltroHasta" name="FechaFiltroHasta" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy HH:mm")" />
+                                                    <span class="input-group-addon">
+                                                        <span class="icon icon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-bottom: 0;">
+                                        <div class="col-sm-3">
+                                            <label>Puertos: </label>
+                                            <div class="input-with-icon filterContainer">
+                                                <input id="txtPorts" name="txtPorts" placeholder="Buscar por Puertos" class="form-control input-thick pill input-with-icon-search" type="text">
+                                                <span class="icon icon-search input-icon"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <div class="text-right" data-toggle="match-height">
+                                                <label></label>
+                                                <div class="input-group date">
+                                                    <button id="btnBuscar" class="btn btn-primary btn-width-custom" onclick="buscarConnection()">
+                                                        <span class="icon icon-search"></span>
+                                                        Buscar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <div class="text-right" data-toggle="match-height">
+                                                <label></label>
+                                                <div class="input-group date">
+                                                    <button id="btnLimpiar" class="btn btn-primary btn-width-custom" onclick="LimpiarCampos()">
+                                                        <span class="icon icon-eraser"></span>
+                                                        Limpiar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <div class="text-right" data-toggle="match-height">
+                                                <label></label>
+                                                <div class="input-group date">
+                                                    <button id="btnExportar" class="btn btn-primary btn-width-custom" onclick="Exportar()">
+                                                        <span class="icon icon-external-link"></span>
+                                                        Exportar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+<div class="card" style="display:flex;flex-direction: column; margin-bottom: 16px;font-size: 14px;">
+    <label style="font-weight:600">Leyenda: </label>
+    <label style="margin-bottom: 0px">
+        <i class='glyphicon glyphicon-stop text-success' style="margin-right: 3px; font-size:14px;" aria-hidden="true"></i>Se encuentra en el catalogo de CVT
+    </label>
+    <label style="margin-bottom: 0px">
+        <i class='glyphicon glyphicon-stop text-warning' style="margin-right: 3px; font-size:14px;" aria-hidden="true"></i>El equipo se encuentra inactivo en el catalogo de CVT
+    </label>
+    <label style="margin-bottom: 0px">
+        <i class='glyphicon glyphicon-stop text-danger' style="margin-right: 3px; font-size:14px;" aria-hidden="true"></i>El equipo no se encuentra en el catalogo de CVT
+    </label>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tbRegistros" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                            <th data-field="source_ip" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="source_ip">IP origen</th>
+                            <th data-field="validateSource" data-cell-style="cellStyleSources" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="validateSource">Servidor origen</th>
+                            @*<th data-field="source_node_type" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="source_node_type">Tipo de nodo origen</th>*@
+                            <th data-field="source_process" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="source_process">Proceso origen</th>
+                            <th data-field="labelsOrigen" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="source_process">Aplicación origen</th>
+                            <th data-field="destination_ip" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="destination_ip">IP destino</th>
+                            <th data-field="validateDestination" data-cell-style="cellStyleDestination" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="validateDestination">Servidor destino</th>
+                            @*<th data-field="destination_node_type" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="destination_node_type">Tipo de nodo destino</th>*@
+                            <th data-field="destination_process" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="destination_process">Proceso destino</th>
+                            <th data-field="labelDestino" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="source_process">Aplicación destino</th>
+                            <th data-field="destination_port" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="destination_port">Puerto destino</th>
+                            <th data-field="ip_protocol" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="ip_protocol">Protocolo usado</th>
+                            <th data-field="slot_start_time" data-formatter="slotFormater" data-halign="center" data-valign="middle" data-align="left" data-sortable="false">Fecha Evento</th>
+                            <th data-field="connection_type" data-formatter="typeFormatter" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-sort-name="connection_type">Tipo de conexión</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mdEditarTab2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="exampleModalLabel">Exportar</h5>
+            </div>
+            <div class="modal-body">
+                <form id="formRegistroModal">
+                    <label id="textoModal"></label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnGuardarRegistro" type="button" class="btn btn-primary" onclick="GenerarReporteGuardicore()" data-loading-text="Procesando...">Generar</button>
+                <iframe id="iframe" style="display:none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/Guardicore/Connection.js"></script>

@@ -1,0 +1,473 @@
+﻿@using System.Configuration;
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="~/content/fontawesome.css" rel="stylesheet" />
+    <link href="~/content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/content/site.css" rel="stylesheet" />
+    @*<link href="~/content/stylesheet.css" rel="stylesheet" />*@
+    @*<link href="~/content/select2.min.css" rel="stylesheet" />
+        <link href="~/content/metismenu.min.css" rel="stylesheet" />*@
+    <link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
+    <title>Site de Gestión de la Tecnología y Obsolescencia</title>
+
+    <!-- Bootstrap table -->
+    @Styles.Render("~/Content/bootstrap-table.min.css")
+    <!-- Bootstrap toggle -->
+    @Styles.Render("~/Content/bootstrap-toggle.min.css")
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    @Scripts.Render("~/Scripts/bootstrap-table.min.js")
+    @Scripts.Render("~/Scripts/bootstrap-toggle.min.js")
+    @Scripts.Render("~/Scripts/util.js")
+    <script src="~/app/common.js?v=3.0.0"></script>
+    <script>
+            var URL_LOGIN_SERVER = '@Url.Content("~/Login")';
+            var URL_API = "@BCP.CVT.Cross.Utilitarios.URL_API";
+            var REGISTRO_PAGINACION = "10";
+        var OPCIONES_PAGINACION = "[10,20,30]";
+
+        var OPCIONES_PAGINACION_ALT = "[30,60,90]";
+            USUARIO = getCache(NAME_CACHE_USUARIO);
+    </script>
+
+    <style>
+        .navbar {
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 0;
+        }
+
+        .navbar-default {
+            background-color: #012d74;
+        }
+
+            .navbar-default .navbar-text {
+                color: #eee;
+            }
+
+        .fondoAzul {
+            background-color: #013A81 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+
+        .faq {
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            background-color: #f7a033;
+            margin-top: 0px;
+            padding: 5px;
+        }
+
+            .faq a {
+                color: #eee;
+                font-weight: bold;
+                font-size: 15px;
+            }
+
+        /*.header-fixed {
+            position: fixed;
+            top: 0px;
+        }
+
+        .tableFixHead {
+            overflow-y: auto;
+        }
+
+            .tableFixHead thead th {
+                position: sticky;
+                top: 0;
+            }*/
+        a.obsoletoClass:hover, a.vigenteClass:hover, a.vigentePorVencer:hover {
+            background-color: #002A8D;
+            color: white;
+        }
+
+        .btn-et {
+            width: 120px;
+        }
+
+        .legend {
+            margin: 0px !important;
+        }
+
+        .leyendaTecnologia {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /*#tblTecnologiaEstandar td.vigenteClass, a.vigenteClass:link, a.vigenteClass:visited, a.vigenteClass:hover {
+            color: #7ddc67;
+        }*/
+
+        /*#tblTecnologiaEstandar thead tr th {
+            background-color: #013A81 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+        }*/
+
+        #tblTecnologiaEstandar td.vigenteClass, a.vigenteClass, .leyendaTecnologia.vigenteClass {
+            color: #7ddc67;
+        }
+
+        #tblTecnologiaEstandar td.deprecadoClass, a.deprecadoClass:link, a.deprecadoClass:visited, a.deprecadoClass:hover, .leyendaTecnologia.deprecadoClass {
+            color: #ccbf15;
+        }
+
+        #tblTecnologiaEstandar td.obsoletoClass, a.obsoletoClass, .leyendaTecnologia.obsoletoClass {
+            color: #dc6967;
+        }
+
+        #tblTecnologiaEstandar td.restringidoClass, a.restringidoClass, .leyendaTecnologia.restringidoClass {
+            color: #800080;
+        }
+
+            #tblTecnologiaEstandar td.vigentePorVencer, a.vigentePorVencer, #tblTecnologiaEstandar td.deprecadoPorVencerClass, a.deprecadoPorVencerClass, #tblTecnologiaEstandar td.restringidoPorVencerClass, a.restringidoPorVencerClass, .leyendaTecnologia.vigentePorVencer {
+                color: #EEA434;
+            }
+
+        .data-extra {
+            display: none;
+        }
+
+        .custom-hr {
+            border: 0.1px solid #eee;
+            margin: 0px;
+        }
+
+        .text-info{
+            word-break: break-all;
+        }
+    </style>
+    <link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+    <script src="~/Scripts/bootstrap-multiselect.js"></script>
+</head>
+<body>
+    <div class="form-group">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="col-md-12">
+                <div class="row">
+                    @*<h3><strong>Estándares de tecnologías</strong></h3>*@
+                    <div class="col-md-12">
+                        <nav class="navbar navbar-default">
+                            <div class="container">
+                                <a class="navbar-brand" href="#">
+                                    <img class="navbar-brand-logo" src="~/images/logo-bcp.svg" alt="BCP">
+                                </a>
+                                <h3 class="navbar-text navbar-brand-center">
+                                    <strong>Estándares de tecnologías</strong>
+                                </h3>
+                                <p class="navbar-text navbar-right">
+                                    <a id="btnShowHideFilter" href="#filters-box" data-toggle="collapse" title="Filtros">
+                                        <span class="icon icon-2x icon-search"></span>
+                                    </a>
+                                </p>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="card">
+                        <div id="filters-box" class="card-body collapse">
+                            <div class="card-search">
+                                <fieldset class="fieldset">
+                                    <legend class="legend">Filtro de búsqueda</legend>
+                                    <div class="card-search-box">
+                                        <form action="javascript:void(0);">
+                                            <div class="row gutter-xs form-group">
+                                                <div class="col-xs-3 col-md-4">
+                                                    <div class="text-left" data-toggle="match-height">
+                                                        <h5>Estado de Estandarización: </h5>
+                                                        <select id="ddlTipoTecFiltro" name="ddlTipoTecFiltro" class="form-control" multiple="multiple"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-3 col-md-4">
+                                                    <div class="text-left" data-toggle="match-height">
+                                                        <h5>Tecnología: </h5>
+                                                        <div class="input-with-icon filTecContainer">
+                                                            <input id="txtFilTecnologia" name="txtFilTecnologia" class="form-control input-thick pill input-with-icon-search" type="text">
+                                                            <span class="icon icon-search input-icon"></span>
+                                                        </div>
+                                                        <input type="hidden" id="hdFilTecnologiaId" name="hdFilTecnologiaId" value="0" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-3 col-md-4">
+                                                    <div class="text-left" data-toggle="match-height">
+                                                        <h5>&nbsp;</h5>
+                                                        <div class="btn-class">
+                                                            <button id="btnBuscar" type="button" class="btn btn-primary btn-et" title="Buscar">
+                                                                <span class="icon icon-search"></span>
+                                                                Buscar
+                                                            </button>
+                                                            <button id="btnExportar" type="button" class="btn btn-primary btn-et" title="Exportar">
+                                                                <span class="icon icon-download"></span>
+                                                                Exportar
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row gutter-xs form-group">
+                                                <div class="col-xs-3 col-md-4">
+                                                    <div class="text-left" data-toggle="match-height">
+                                                        <h5>Dominio: </h5>
+                                                        <select id="cbFilDom" name="cbFilDom" class="form-control" multiple="multiple"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-3 col-md-4">
+                                                    <div class="text-left" data-toggle="match-height">
+                                                        <h5>Subdominio: </h5>
+                                                        <select id="cbFilSub" name="cbFilSub" class="form-control" multiple="multiple"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-3 col-md-4">
+                                                    <div class="text-left" data-toggle="match-height">
+                                                        <h5>Estado: </h5>
+                                                        <select id="ddlEstadoFiltro" name="ddlEstadoFiltro" class="form-control" multiple="multiple"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row gutter-xs form-group">
+                                                <div class="col-xs-3 col-md-4">
+                                                    <div class="text-left" data-toggle="match-height">
+                                                        <h5>Plataforma a la que aplica: </h5>
+                                                        <select id="ddlPlataformaAplicaFiltro" name="ddlPlataformaAplicaFiltro" class="form-control" multiple="multiple"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-3 col-md-4">
+                                                    <div class="text-left" data-toggle="match-height">
+                                                        <h5>Compatibilidad de SO: </h5>
+                                                        <select id="ddlCompatibilidadSOFiltro" name="ddlCompatibilidadSOFiltro" class="form-control" multiple="multiple"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-3 col-md-4">
+                                                    <div class="text-left" data-toggle="match-height">
+                                                        <h5>Compatibilidad Cloud: </h5>
+                                                        <select id="ddlCompatibilidadCloudFiltro" name="ddlCompatibilidadCloudFiltro" class="form-control" multiple="multiple"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row gutter-xs form-group">
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="col-md-2">
+                                                                <div id="divFlagCatalog"></div>
+                                                            </div>
+                                                            <div class="col-md-10">
+                                                                @*<label class="control-label">Ver todo el catálogo de tecnologías incluidas las "No Estándar"</label>*@
+                                                                <h5>Ver todo el catálogo de tecnologías incluidas las "No Estándar"</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <table class="table">
+                        <tr>
+                            <td colspan="1" style="font-weight: bold;text-align: center;vertical-align: top;font-size: 14px;">LEYENDA:</td>
+                            <td colspan="4">
+                                <p class="leyendaTecnologia vigenteClass">Vigente: Se debe usar en migraciones y nuevas implementaciones, son las versiones que el banco promueve.</p>
+                                <p class="leyendaTecnologia restringidoClass">Restringido: Solo es para uso de forma restringida para necesidades puntuales o casos especiales, su uso requiere ser validado en el Comité de Estándares Tecnológicos.</p>
+                                <p class="leyendaTecnologia deprecadoClass">Deprecado: Su uso ya no se fomenta dentro de la estretagia del BCP, debe utilizarse otra tecnología estándar vigente.</p>
+                                <p class="leyendaTecnologia obsoletoClass">Obsoleto: No se debe usar ésta tecnología bajo ninguna circunstancia.</p>
+                                <p class="leyendaTecnologia vigentePorVencer">Tecnologías por vencer: Se debe hacer planes de migración a versiones que se promueven por el banco.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <table 
+                                       id="tblTecnologiaEstandar" 
+                                       data-toggle="table"
+                                       data-height="550"
+                                       @*data-header-style="headerStyle"*@
+                                       >
+                                    <thead>
+                                        <tr>
+                                            <th data-field="DominioNomb" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="DominioNomb">Dominio</th>
+                                            <th data-field="SubdominioNomb" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="SubdominioNomb">Subdominio</th>
+                                            <th data-field="TecnologiaVigenteStr" data-halign="center" data-valign="top" data-align="left" data-width="360" class="vigenteClass">Vigente/Por vencer</th>
+                                            <th data-field="TecnologiaRestringidoStr" data-halign="center" data-valign="top" data-align="left" data-width="360" class="restringidoClass">Restringido/Por vencer</th>
+                                            <th data-field="TecnologiaDeprecadoStr" data-halign="center" data-valign="top" data-align="left" data-width="360" class="deprecadoClass">Deprecado/Por vencer</th>
+                                            <th data-field="TecnologiaObsoletoStr" data-halign="center" data-valign="top" data-align="left" data-width="360" class="obsoletoClass">Obsoleto</th>
+                                        </tr>
+                                    </thead>
+                                    @*<tbody></tbody>*@
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 faq">
+                        <a id="btnFAQ" href="#" target="_blank" title="Ir a la página de preguntas frecuentes">
+                            Preguntas frecuentes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+
+    <!--Modal Add or Edit-->
+    <div id="mdAddOrEditRegistro" tabindex="-1" role="dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="title-form">Detalle de Tecnología</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="formAddOrEditRegistro">
+                        <div class="form-group">
+                            <label class="control-label">Código del Producto: </label>
+                            <a id="txtCodigoTecnologia" href="" target="_blank" title=""></a>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Nombre tecnología: </label>
+                            @*<input id="txtNombreTecnologia" name="txtNombreTecnologia" class="form-control" type="text" disabled>*@
+                            <a id="txtNombreTecnologia" href="" target="_blank"></a>
+                        </div>
+                        <div>
+                            <ul class="nav nav-tabs nav-justified">
+                                <li class="active">
+                                    <a href="#DatosGenerales" data-toggle="tab">Datos Generales</a>
+                                </li>
+                                <li>
+                                    <a href="#Responsabilidades" data-toggle="tab">Responsabilidades</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content table-bordered">
+                                <div class="tab-pane fade active in" id="DatosGenerales">
+                                    <div class="row"></div>
+                                    <div class="col-sm-12">
+                                        @*<div class="form-group">
+                                            <label class="control-label">Documentación de la tecnología: </label>
+                                            <a id="txtUrlConfluence" href="" target="_blank"></a>
+                                            <input type="hidden" name="hdRegistroId" id="hdRegistroId" value="0" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Publicación LBS: </label>
+                                            <a id="txtPublicacionLBS" href="" target="_blank"></a>
+                                        </div>*@
+                                        <div class="form-group">
+                                            <label class="control-label">Descripción y Lineamientos Tecnológicos: </label>
+                                            <a href="#" target="_blank" class="text-info" id="txtLineamientoTecnologia"></a>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Línea base de seguridad: </label>
+                                            <a href="#" target="_blank" class="text-info" id="txtLineamientoBaseSeguridad"></a>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Plataforma a la que aplica: </label>
+                                            <span class="text-info" id="txtAplica"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Compatibilidad de SO: </label>
+                                            <span class="text-info" id="txtCompatibilidadSOIds"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Compatibilidad Cloud: </label>
+                                            <span class="text-info" id="txtCompatibilidadCloudIds"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Fecha para cálculo de obsolescencia: </label>
+                                            <span class="text-info" id="txtFechaCalculoId"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Fuente fecha fin de soporte: </label>
+                                            <span class="text-info" id="txtFuenteId"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Fecha Fin Soporte: </label>
+                                            <span class="text-info" id="txtFFS"></span>
+                                        </div>
+                                        <div class="form-group" id="tecReempDep" style="display: none">
+                                            <label class="control-label">Tecnología de Reemplazo: </label>
+                                            <span class="text-info" id="txtTecnologiaReemplazo"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade in" id="Responsabilidades">
+                                    <div class="row"></div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label">Tribu/COE/Unidad Organizacional: </label>
+                                            <span class="text-info" id="txtTribuCoe"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">SQUAD/Equipo: </label>
+                                            <span class="text-info" id="txtSquad"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Responsable Squad: </label>
+                                            <span class="text-info" id="txtResponsabilidadUnidad"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Equipo de administración y punto de contacto: </label>
+                                            @*<input id="txtEquipoAdm" name="txtEquipoAdm" class="form-control" type="text" disabled>*@
+                                            <span class="text-info" id="txtEquipoAdm"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Equipo Aprovisionamiento: </label>
+                                            <span class="text-info" id="txtEquipoAprovisionamiento"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label">Grupo de soporte en REMEDY: </label>
+                                            @*<input id="txtGrupoRemedy" name="txtGrupoRemedy" class="form-control" type="text" disabled>*@
+                                            <span class="text-info" id="txtGrupoRemedy"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal Add or Edit-->
+    <script src="~/Scripts/jqueryUI/jquery-ui.min.js"></script>
+    @*<script src="~/scripts/peity.min.js"></script>*@
+    <script src="~/scripts/jquery.matchheight-min.js"></script>
+    <script src="~/scripts/metismenu.min.js"></script>
+    <script src="~/scripts/jquery.slimscroll.min.js"></script>
+    <script src="~/scripts/select2.min.js"></script>
+    <script src="~/scripts/js/application.js"></script>
+    @Scripts.Render("~/Scripts/bootbox.min.js")
+    @Scripts.Render("~/Scripts/bootbox.locales.min.js")
+    @Scripts.Render("~/Scripts/bootbox.all.js")
+    @Scripts.Render("~/Scripts/locale/bootstrap-table-es-SP.min.js")
+    <script src="~/Scripts/bootstrap.js"></script>
+    @*<script src="~/app/tecnologiaEstandarVista.js?v=1.2.2"></script>*@
+    
+    <script src="~/app/estandarTecnologia.js?v=2.0.8"></script>
+
+</body>
+</html>

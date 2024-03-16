@@ -1,0 +1,266 @@
+﻿@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Solicitudes de creación de aplicaciones";
+    ViewBag.Title2 = "Portafolio de aplicaciones";
+    ViewBag.Title3 = "Solicitudes de creación";
+}
+@using BCP.CVT.Cross
+
+<style>
+    .width-des {
+        min-width: 300px;
+    }
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    /* Chat containers */
+    .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    /* Darker chat container */
+    .darker {
+        border-color: #f7a033;
+        background-color: #ddd;
+    }
+
+    /* Clear floats */
+    .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    /* Style images */
+    .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+        /* Style the right image */
+        .container img.right {
+            float: right;
+            margin-left: 20px;
+            margin-right: 0;
+        }
+
+    /* Style time text */
+    .time-right {
+        float: right;
+        color: #aaa;
+    }
+
+    /* Style time text */
+    .time-left {
+        float: left;
+        color: #999;
+    }
+
+    .user-name {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .table {
+        font-size: 11px !important;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-8 col-md-8">
+                                <div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+                                    <h5>Aplicación (código) </h5>
+                                    <input type="text" id="txtAplicacionFiltro" name="txtAplicacionFiltro" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    <input type="hidden" name="hdAplicacionFiltroId" id="hdAplicacionFiltroId" value="0" />
+                                </div>
+                            </div>
+                            <div class="col-xs-2 col-md-2">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Estado</h5>
+                                    <select id="cbFilEstado" name="cbFilEstado" class="form-control">
+                                        <option value="-1" selected="selected">Todos</option>
+                                        <option value="1">Registrado</option>
+                                        <option value="2">En proceso de revisión</option>
+                                        <option value="3">Aprobado</option>
+                                        <option value="4">Observado</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+
+    @*<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddSolicitud()">
+            <span class="icon icon-plus"></span>
+            <span class="count-text">Nuevo</span>
+        </a>*@
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            @*<div class="card-header">
+                    <strong>Mis solicitudes de creación</strong>
+                </div>*@
+            <div class="card-body">
+                <table id="tbl-solicitudes" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Mis solicitudes de creación</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            <th data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="10%">Solicitud</th>
+                            <th data-field="CodigoAplicacion" data-halign="center" data-valign="middle" data-align="left">Código aplicación</th>
+                            <th data-field="NombreAplicacion" data-formatter="nameAppFormatter" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                            <th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="center">Tipo activo información</th>
+                            <th data-field="EstadoSolicitudToString" data-halign="center" data-valign="middle" data-align="center">Estado de la solicitud</th>
+                            <th data-formatter="bdjArquitecturaTiFormatter" data-halign="center" data-valign="middle" data-align="center">Aprobador <br /> Arquitectura TI</th>
+                            <th data-formatter="bdjClasificacionTecnicaFormatter" data-halign="center" data-valign="middle" data-align="center">Aprobador <br /> Clasificación Técnica</th>
+                            <th data-formatter="bdjDevSecOpsFormatter" data-halign="center" data-valign="middle" data-align="center">Aprobador <br /> DevSecOps</th>
+                            <th data-formatter="bdjPOFormatter" data-halign="center" data-valign="middle" data-align="center">Aprobador <br /> Usuario autorizador/PO</th>
+                            <th data-formatter="bdjTTLFormatter" data-halign="center" data-valign="middle" data-align="center">Aprobador <br /> TTL</th>
+                            <th data-formatter="bdjGestorUserITFormatter" data-halign="center" data-valign="middle" data-align="center">Aprobador <br /> Gestor USER IT</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de registro</th>
+                            <th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de modificación</th>
+                            @*<th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center">Usuario</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <input type="hidden" name="hIdSolicitud" id="hIdSolicitud" value="0" />
+    </div>
+</div>
+
+<!--Modal Cambiar Estado Tec (Tecnologia)-->
+<div id="mdCambioEstado" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Cambiar Estado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formCambioEstado">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Estado actual:
+                        </label>
+                        <input id="txtEstadoActual" name="txtEstadoActual" class="form-control" type="text" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            Nuevo Estado:
+                        </label>
+                        <select id="ddlEstadoSolicitud" name="ddlEstadoSolicitud" class="form-control">
+                            <option value="-1">-- Seleccione --</option>
+                            <option value="2">Confirmar</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnCambioEstado" type="button" class="btn btn-primary" onclick="guardarCambioEstado()" data-loading-text="Procesando..." title="Guardar estado">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Cambiar Estado Tec (Tecnologia)-->
+<!--Modal comentarios (MODIFICACION)-->
+<div id="mdComentarios" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleMd">Comentarios y Observaciones</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formComentarios">
+                    <div class="form-group divComments">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal comentarios (MODIFICACION)-->
+<!--Modal Observar Solicitud-->
+<div id="mdOS" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Respuesta de Observaciones</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formOS">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Tus comentarios:
+                        </label>
+                        <textarea id="txtObservacionesElim" name="txtObservacionesElim" rows="8" class="form-control"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnOS" type="button" class="btn btn-primary" onclick="observarSolicitud()" data-loading-text="Procesando..." title="Guardar observación">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Observar Solicitud-->
+
+<script>
+    const BANDEJA_APROBACION = {
+        Administrador: @Html.Raw((int)EBandejaAprobadorAplicacion.Administrador),
+        ArquitecturaTI: @Html.Raw((int)EBandejaAprobadorAplicacion.ArquitecturaTI),
+        ClasificacionTecnica: @Html.Raw((int)EBandejaAprobadorAplicacion.ClasificacionTecnica),
+        DevSecOps: @Html.Raw((int)EBandejaAprobadorAplicacion.DevSecOps),
+        PO: @Html.Raw((int)EBandejaAprobadorAplicacion.PO),
+        TTL: @Html.Raw((int)EBandejaAprobadorAplicacion.TTL),
+        GestorUserIT: @Html.Raw((int)EBandejaAprobadorAplicacion.GestorUserIT)
+    };
+</script>
+
+<script src="~/app/solicitudcreacionaplicacion.js?v=1.0.6"></script>

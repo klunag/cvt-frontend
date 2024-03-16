@@ -1,0 +1,285 @@
+﻿@using BCP.CVT.WebPortalClient.Models
+@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Modificación de aplicación";
+	ViewBag.Title2 = "Gestión de aplicaciones";
+	ViewBag.Title3 = "Modificación aplicación";
+	int AplicacionId = (int)ViewBag.AplicacionId;
+}
+
+@{
+    Usuario_Storage eUsuario = (Usuario_Storage)Session["Usuario"];
+    string eusername = eUsuario == null ? "" : eUsuario.UsuarioBCP_Dto.Name;
+}
+
+
+<style>
+	a.tip {
+		border-bottom: 1px dashed;
+		text-decoration: none
+	}
+
+		a.tip:hover {
+			cursor: help;
+			position: relative
+		}
+
+		a.tip span {
+			display: none
+		}
+
+		a.tip:hover span {
+			border: #c0c0c0 1px dotted;
+			padding: 5px 20px 5px 5px;
+			display: block;
+			z-index: 100;
+			font-family: Roboto,sans-serif;
+			/*background: url(../images/status-info.png) #f0f0f0 no-repeat 100% 5%;*/
+			background: #F2F4F8;
+			left: 0px;
+			margin: 10px;
+			width: 250px;
+			position: absolute;
+			top: 10px;
+			text-decoration: none;
+			color: #002A8D;
+			text-align: left;
+		}
+
+	.stepwizard-step p {
+		margin-top: 0px;
+		color: #666;
+	}
+
+	.stepwizard-row {
+		display: table-row;
+	}
+
+	.stepwizard {
+		display: table;
+		width: 100%;
+		position: relative;
+	}
+
+	.stepwizard-step button[disabled] {
+		/*opacity: 1 !important;
+	filter: alpha(opacity=100) !important;*/
+	}
+
+	.stepwizard .btn.disabled, .stepwizard .btn[disabled], .stepwizard fieldset[disabled] .btn {
+		opacity: 1 !important;
+		color: #bbb;
+	}
+
+	.stepwizard-row:before {
+		top: 14px;
+		bottom: 0;
+		position: absolute;
+		content: " ";
+		width: 100%;
+		height: 1px;
+		background-color: #ccc;
+		z-index: 0;
+	}
+
+	.stepwizard-step {
+		display: table-cell;
+		text-align: center;
+		position: relative;
+		font-family: Roboto,sans-serif;
+		font-size: 18px;
+	}
+
+	.btn-circle {
+		width: 30px;
+		height: 30px;
+		text-align: center;
+		padding: 6px 0;
+		font-size: 12px;
+		line-height: 1.428571429;
+		border-radius: 15px;
+	}
+</style>
+<div class="row">
+	<div class="col-md-10">
+		<span style="font-size:14px;">Al completar los datos, se te asignará un código de aplicación para las gestiones internas que requieras hacer. </span>
+	</div>
+	<div class="col-md-2 text-right">
+		<a id="btnAgregar" class="btn btn-primary btn-width-custom" href="/RegistroPortafolioAplicaciones/Bandeja">
+			<span class="icon icon-arrow-left"></span>
+			<span class="count-text">Volver</span>
+		</a>
+	</div>
+</div>
+<hr>
+
+<hr>
+<div class="row gutter-xs" style="margin-top:5px;">
+
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-body">
+				<div class="card-search">
+					<fieldset class="fieldset">
+						<legend class="legend">Datos generales</legend>
+						<div class="card-search-box">
+							<form id="formAddOrEditApp">
+								<div class="row">
+									<div id="divApp" class="form-group">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="col-md-5">
+													Código de la aplicación
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodigo"></span></a>
+												</div>
+												<div class="col-md-7">
+													<input type="text" class="form-control" maxlength="4" id="txtCodigoAPT" name="txtCodigoAPT" disabled="disabled" />
+													<input type="hidden" value="0" id="hdAplicacionId" name="hdAplicacionId" />
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="col-md-4">
+													Gestionado por
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanGestionado"></span></a>
+												</div>
+												<div class="col-md-7">
+													<select id="ddlGestionadoPor" name="ddlGestionadoPor" class="form-control">
+													</select>
+												</div>
+												<div class="col-md-1"></div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-6">
+												<div class="col-md-5">
+													Nombre de la aplicación
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanNombre"></span></a>
+												</div>
+												<div class="col-md-7">
+													<input type="text" class="form-control" id="txtNombre" name="txtNombre" maxlength="180" />
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="col-md-4">
+													Tipo de implementación
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanTipoImplementacion"></span></a>
+												</div>
+												<div class="col-md-7">
+													<select id="ddlTipoImplementacion" name="ddlTipoImplementacion" class="form-control">
+													</select>
+												</div>
+												<div class="col-md-1"></div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-6">
+												<div class="col-md-5">
+													Descripción
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanDescripcion"></span></a>
+												</div>
+												<div class="col-md-7">
+													<textarea class="form-control" rows="10" id="txtDescripcion" name="txtDescripcion"></textarea>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="col-md-4">
+													Modelo de entrega
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanModeloEntrega"></span></a>
+												</div>
+												<div class="col-md-7">
+													<select id="ddlModeloEntrega" name="ddlModeloEntrega" class="form-control">
+														<option value="-1">-- Seleccione --</option>
+													</select>
+												</div>
+												<div class="col-md-1"></div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-6">
+												<div class="col-md-5">
+													Código de aplicación padre
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodigoPadre"></span></a>
+												</div>
+												<div class="col-md-7 containerAplicacion">
+													<input id="txtCodigoAppPadre" name="txtCodigoAppPadre" type="text" class="form-control" maxlength="200" />
+													<input type="hidden" id="hCodigoPadre" name="hCodigoPadre" value="" />
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="col-md-4">
+													Estado de la aplicación
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanEstado"></span></a>
+												</div>
+												<div class="col-md-7">
+													<select id="ddlEstadoAplicacion" name="ddlEstadoAplicacion" class="form-control">
+														<option value="-1">-- Seleccione --</option>
+														<option value="1">En desarrollo</option>
+														<option value="2">Vigente</option>
+													</select>
+												</div>
+												<div class="col-md-1"></div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-6">
+												<div class="col-md-5">
+													Arquitecto evaluador de la aplicación (solución, tecnología)
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanArquitectoNegocio"></span></a>
+												</div>
+												<div class="col-md-7">
+													<select id="ddlArquitectoNegocio" name="ddlArquitectoNegocio" class="form-control">
+													</select>
+												</div>
+											</div>
+											<div class="col-md-6 divInterfaz">
+												<div class="col-md-4">
+													Requiere de un código de interfaz
+													<a class="icon icon-question-circle-o tip" data-toggle="tooltip" data-placement="right"><span id="spanCodigoInterfaz"></span></a>
+												</div>
+												<div class="input-group col-md-2" id="divFlagInterface"></div>
+
+												<div class="col-md-5">
+													<input id="txtCodigoInterfaz" class="form-control" type="text" name="txtCodigoInterfaz" disabled="disabled" />
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-6">
+												<div class="col-md-5">
+													Fecha de registro
+												</div>
+												<div class="col-md-7">
+													<input id="txtFecha" name="txtFecha" type="text" class="form-control" disabled="disabled" value="@DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")" />
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="col-md-4">
+													Registrado por
+												</div>
+												<div class="col-md-7">
+													<input id="txtRegistradoPor" name="txtRegistradoPor" type="text" class="form-control" disabled="disabled" value="@eusername" />
+												</div>
+												<div class="col-md-1"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12 text-right">
+										<button id="btnRegistrarApp" name="btnRegistrarApp" class="btn btn-primary" type="button" data-loading-text="Procesando...">Modificar mi aplicación</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<script type="text/javascript">
+    const APLICACION_ID = @AplicacionId;
+
+</script>
+<script src="~/app/RegistroPortafolio/reversionAplicacion.js?v=2.5.0"></script>

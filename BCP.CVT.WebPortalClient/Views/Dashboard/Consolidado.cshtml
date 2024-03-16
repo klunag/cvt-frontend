@@ -1,0 +1,32 @@
+﻿@{
+    ViewBag.Title1 = "Consolidados";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Estándares y Consolidado";
+    ViewBag.Title3 = "Consolidado";
+}
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                @*<strong>Consolidados</strong>*@
+            </div>
+            <div class="card-body">
+                <table id="tblConsolidados" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="TipoConsolidadoId" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="TipoConsolidado" data-halign="center" data-valign="center" data-align="left" data-sortable="true" data-width="20%">Tipo consolidado</th>
+                            @*<th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Descripción</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                            <th data-field="FlagEstandarToString" data-halign="center" data-valign="middle" data-align="center" data-width="10%" data-sortable="true" data-sort-name="FlagEstandar">Registro principal</th>
+                            <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>*@
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/dashboardConsolidado.js?v=2.1.0"></script>

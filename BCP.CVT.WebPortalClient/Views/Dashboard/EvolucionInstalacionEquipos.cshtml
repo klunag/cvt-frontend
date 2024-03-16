@@ -1,0 +1,182 @@
+﻿
+@{
+    ViewBag.Title1 = "Evolución de Instalación Equipos";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Equipos";
+    ViewBag.Title3 = "Evolución de Instalación Equipos";
+
+}
+<style>
+    .opcionesStyle {
+        width: 500px;
+    }
+
+    .fondoRojo {
+        background-color: #E33D01 !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoNaranja {
+        background-color: #FF7F0D !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoAmarillo {
+        background-color: #FFDD5B !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoVerdeLeve {
+        background-color: #91C337 !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoVerdeFuerte {
+        background-color: #22A71C !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoCeleste {
+        background-color: #bfd9eb !important;
+        color: #000000 !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoBlanco {
+        text-align: center;
+        width: 10%;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    #chartdiv {
+        width: 100%;
+        height: 400px;
+        font-size: 11px;
+    }
+</style>
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+
+<div class="card">
+    <div class="card-body">
+        <form id="formFiltros">
+            <div class="card-search">
+                <fieldset class="fieldset" style="padding-block-start: 0 !important; padding-block-end: 0 !important;">
+                    <legend class="legend" style="margin-bottom: 0 !important;">Filtro de búsqueda</legend>
+                    <div class="card-search-box">
+                        <div class="row gutter-xs form-group">
+                            <div class="col-xs-3 col-md-3">
+                                <h5>Subsidiaria: </h5>
+                                <div class="text-left" data-toggle="match-height">
+                                    <select id="cbSubsidiaria" name="cbSubsidiaria" class="form-control" multiple="multiple"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <h5>Tipo de equipo: </h5>
+                                <div class="text-left" data-toggle="match-height">
+                                    <select id="cbTipoEquipo" name="cbTipoEquipo" class="form-control" multiple="multiple"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <h5>Fecha: </h5>
+                                <div class="input-group date" id="dpFecBase-btn">
+                                    <input type="text" id="dpFecBase" name="dpFecBase" class="form-control" />
+                                    @*<span class="input-group-addon">
+                                        <span class="icon icon-calendar"></span>
+                                    </span>*@
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <h5>Periodo de tiempo: </h5>
+                                <div class="text-left" data-toggle="match-height">
+                                    <select id="cbPeriodoTiempo" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs form-group">
+                            <div class="col-xs-3 col-md-3">
+                                <h5>¿Búsqueda por familia?: </h5>
+                                <div class="text-left" data-toggle="match-height">
+                                    <div class="input-group" id="divToggleAgruparFamilia">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 divFiltrosFamilia">
+                                <h5>Fabricante</h5>
+                                <div class="input-with-icon  containerFiltroFabricante">
+                                    <input type="text" id="txtFabricante" name="txtFabricante" value="" maxlength="100" autocomplete="off" class="form-control input-with-icon-search" />
+                                    <input type="hidden" id="hdFabricante" name="hdFabricante" value="" />
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 divFiltrosFamilia">
+                                <h5>Nombre</h5>
+                                <div class="input-with-icon  containerAplicacion">
+                                    <input type="text" id="txtNombreTecnologia" name="txtNombreTecnologia" value="" maxlength="100" autocomplete="off" class="form-control input-with-icon-search" />
+                                    <input type="hidden" id="hdNombreTecnologia" name="hdNombreTecnologia" value="" />
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-6 divFiltrosClave" style="display:none">
+                                <h5>Tecnología</h5>
+                                <div class="input-with-icon famfilContainer">
+                                    <input type="text" id="txtClaveTecnologia" name="txtClaveTecnologia" value="" maxlength="100" autocomplete="off" class="form-control input-with-icon-search" />
+                                    <input type="hidden" id="hdFilTecnologiaId" name="hdFilTecnologiaId" value="0" />
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-2 col-md-2">
+                                <h5>&nbsp;</h5>
+                                <div class="text-right">
+                                    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="GenerarGrafico()">
+                                        <span class="count-text">Buscar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<div class="row gutter-xs" style="margin-top:20px;">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <div id="chartdiv"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/evolucionInstalacionEquipos.js?v=2.1.0"></script>

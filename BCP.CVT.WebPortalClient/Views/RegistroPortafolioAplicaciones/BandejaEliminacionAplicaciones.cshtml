@@ -1,0 +1,546 @@
+﻿@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Bandeja de Solicitudes de Eliminación";
+	ViewBag.Title2 = "Gestión de aplicaciones";
+	ViewBag.Title3 = "Bandeja de Solicitudes de Eliminación";
+
+	int PaginaActual = (int)ViewBag.PaginaActual;
+	int PaginaTamanio = (int)ViewBag.PaginaTamanio;
+}
+@using BCP.CVT.Cross
+
+<style>
+	.bloq-element {
+		pointer-events: none;
+		opacity: 0.7;
+	}
+
+	/* Chat containers */
+	.container {
+		border: 2px solid #dedede;
+		background-color: #f1f1f1;
+		border-radius: 5px;
+		padding: 10px;
+		margin: 10px 0;
+	}
+
+	/* Darker chat container */
+	.darker {
+		border-color: #f7a033;
+		background-color: #ddd;
+	}
+
+	/* Clear floats */
+	.container::after {
+		content: "";
+		clear: both;
+		display: table;
+	}
+
+	/* Style images */
+	.container img {
+		float: left;
+		max-width: 60px;
+		width: 100%;
+		margin-right: 20px;
+		border-radius: 50%;
+	}
+
+		/* Style the right image */
+		.container img.right {
+			float: right;
+			margin-left: 20px;
+			margin-right: 0;
+		}
+
+	/* Style time text */
+	.time-right {
+		float: right;
+		color: #aaa;
+	}
+
+	/* Style time text */
+	.time-left {
+		float: left;
+		color: #999;
+	}
+
+	.user-name {
+		font-weight: bold;
+		text-transform: uppercase;
+	}
+</style>
+
+<div class="card">
+	<div class="card-body">
+		<div class="card-search">
+			<fieldset class="fieldset">
+				<legend class="legend">Filtro de búsqueda</legend>
+				<div class="card-search-box">
+					<form action="javascript:void(0);">
+						<div class="form-group row gutter-xs">
+							<div class="col-xs-3 col-md-3">
+								<div class="text-left" data-toggle="match-height">
+									<h5>Código de la aplicación: </h5>
+									<input type="text" class="form-control" value="" id="txtCodigoFiltro" name="txtCodigoFiltro" />
+								</div>
+							</div>
+							<div class="col-xs-3 col-md-3">
+								<div class="text-left" data-toggle="match-height">
+									<h5>Estado: </h5>
+                                    <select id="ddlEstadoFiltro" name="ddlEstadoFiltro" class="form-control">
+                                        <option value="-1" selected="selected">Todos</option>
+                                        <option value="1">Aprobada</option>
+                                        <option value="2">Pendiente por el portafolio</option>
+                                        <option value="3">Rechazada</option>
+                                        <option value="4">Pendiente Owner / Líder usuario</option>
+                                        <option value="5">Desestimada</option>
+                                        <option value="6">Observada</option>
+                                        <option value="7">Observada por Owner / Líder usuario</option>
+                                    </select>
+								</div>
+							</div>
+							<div class="col-xs-3 col-md-3">
+
+							</div>
+							<div class="col-xs-3 col-md-3">
+
+							</div>
+						</div>
+						<div class="form-group row gutter-xs">
+							<div class="col-md-12">
+								<div class="text-right">
+									<a id="btnBuscar" class="btn btn-primary" href="javascript: void(0)" title="Buscar">
+										<span class="icon icon-search"></span>
+										<span class="count-text">Buscar</span>
+									</a>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;">
+	<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+		<span class="icon icon-external-link"></span>
+		<span class="count-text">Exportar</span>
+	</a>
+</div>
+
+<div class="row gutter-xs" style="margin-top:20px;">
+	<div class="col-xs-12">
+		<div class="card">
+			<div class="card-body">
+				<table id="tbl-solicitudes" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true" style="font-size: 11px !important;">
+					<caption class="caption text-left">
+						<span>Registro de solicitudes de aplicaciones</span>
+					</caption>
+					<thead>
+						<tr>
+							<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+							<th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+							<th data-formatter="situacionFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Situación de registro</th>
+							<th data-field="CodigoAplicacion" data-halign="center" data-valign="middle" data-align="left">Código aplicación</th>
+							<th data-field="NombreAplicacion" data-formatter="nameAppFormatter" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+							<th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="center">Tipo activo información</th>
+							<th data-field="NombreSolicitante" data-halign="center" data-valign="middle" data-align="center">Solicitante</th>
+							<th data-field="EstadoSolicitudEliminacion" data-halign="center" data-valign="middle" data-align="center">Estado de la solicitud</th>
+							<th data-field="Observaciones" data-halign="center" data-valign="middle" data-align="left">Comentarios del solicitante</th>
+							<th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha registro de eliminación</th>
+							<th data-field="NombreUsuarioModificacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreUsuarioModificacion">Owner/Líder usuario <br />que atendió la solicitud</th>
+							<th data-formatter="dateFormat" data-field="FechaModificacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaModificacion">Fecha de atención <br />Owner/Líder usuario</th>
+							<th data-field="NombreUsuarioAprobacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreUsuarioAprobacion">Usuario (Portafolio) <br />que atendió la solicitud</th>
+							<th data-formatter="dateFormat" data-field="FechaAprobacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaAprobacion">Fecha de atención <br />Portafolio Aplicaciones</th>
+							<th data-field="NombreRechazo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreRechazo">Rol que rechazó la solicitud</th>
+							<th data-formatter="dateFormat" data-field="FechaRechazo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaRechazo">Fecha de rechazo</th>
+							<th data-field="ObservacionesRechazo" data-halign="left" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="ObservacionesRechazo">Comentarios asociados a la solicitud</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal eliminado-->
+
+<input type="hidden" name="hdSolicitudId" id="hdSolicitudId" value="0" />
+<input type="hidden" name="hdFlowId" id="hdFlowId" value="0" />
+<div id="modalEliminar" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEliminar" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<form id="formEliminar">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="titulo">Solicitud de eliminación de esta aplicación</h5>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-md-12">
+							<label class="control-label" id="subtitulo"></label>
+						</div>
+					</div>
+					@*<div class="row">
+							<div class="col-md-12">
+								<textarea class="form-control" id="descripcion" disabled></textarea>
+							</div>
+						</div>*@
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<div class="row">
+									<div class="col-md-3">
+										<label class="control-label">Estado de relaciones en CVT: </label>
+									</div>
+									<div class="col-md_9">
+										<div class="input-group">
+											<a class="btn btn-success btn-circle"></a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="form-group">
+								<div class="row">
+									<div class="col-md-5">
+										<div class="col-md-1">
+											<div class="input-group">
+												<a class="btn btn-danger btn-circle"></a>
+											</div>
+										</div>
+										<div class="col-md-11">
+											<em>Tiene relaciones activas (aprobadas, pendientes de aprobación, suspendidas) en CVT, antes de proseguir con la eliminación es importante que todas estas relaciones se encuentren en estado eliminadas. Ingresa a la opción Relaciones y formatos => Bandeja de aprobación y realiza esta tarea.</em>
+										</div>
+									</div>
+									<div class="col-md_7"></div>
+								</div>
+								<div class="row">
+									<div class="col-md-5">
+										<div class="col-md-1">
+											<div class="input-group">
+												<a class="btn btn-success btn-circle"></a>
+											</div>
+										</div>
+										<div class="col-md-11">
+											<em>No tiene información relacionada en CVT</em>
+										</div>
+									</div>
+									<div class="col-md_7"></div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-3">
+									<label class="control-label">Tipo de Eliminación: </label>
+								</div>
+								<div class="col-md-6">
+									<select id="ddlTipoEliminacion" name="ddlTipoEliminacion" class="form-control" disabled>
+										<option value="-1" selected>-- Seleccione --</option>
+										<option value="1">Eliminación administrativa</option>
+										<option value="2">Pasó por proceso de eliminación de la aplicación</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<br />
+						<div class="col-md-12 divProcesoEliminacion">
+							<div class="form-group">
+								<div class="row">
+									<div class="col-md-3">
+										<label class="control-label">Requiere Conformidad GST: </label>
+
+									</div>
+									<div class="col-md-1">
+										<div class="input-group" id="divFlagConformidadGST" disabled></div>
+									</div>
+									<div class="col-md-5">
+										<div class="input-group" id="divTxtConformidadGST" disabled="disabled">
+											<input id="txtNomArchivoConformidad" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+											<span class="input-group-btn">
+												<label class="btn btn-primary file-upload-btn">
+													<input id="flConformidad" class="file-upload-input inputConformidad" type="file" name="flConformidad" disabled>
+													<span class="glyphicon glyphicon-folder-open"></span>
+												</label>
+											</span>
+										</div>
+									</div>
+									<div class="col-md-3">
+										<a id="btnDescargar" class="btn btn-primary btn-width-custom">
+											<span class="icon icon-arrow-down"></span>
+											<span class="count-text">Descargar</span>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12 divProcesoEliminacion">
+							<div class="form-group">
+								<label class="control-label">Ticket de eliminación: </label>
+								<div class="row">
+									<div class="col-md-4">
+										<input id="txtTicket" class="form-control" type="text" disabled>
+									</div>
+									<div class="col-md-5">
+										<div class="input-group">
+											<input id="txtNomTicket" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+											<span class="input-group-btn">
+												<label class="btn btn-primary file-upload-btn">
+													<input id="flTicket" class="file-upload-input inputTicket" type="file" name="flTicket" disabled>
+													<span class="glyphicon glyphicon-folder-open"></span>
+												</label>
+											</span>
+										</div>
+									</div>
+									<div class="col-md-3">
+										<a id="btnDescargar2" class="btn btn-primary btn-width-custom">
+											<span class="icon icon-arrow-down"></span>
+											<span class="count-text">Descargar</span>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12 divProcesoEliminacion">
+							<div class="form-group">
+								<label class="control-label">Ratificación: </label>
+								<div class="row">
+									<div class="col-md-4 divExpertoContainer">
+										<div class="row">
+											<div class="col-md-3">
+												Ratificante
+
+											</div>
+											<div class="col-md-9">
+												<input id="txtExperto" name="txtExperto" type="text" class="form-control" maxlength="120" disabled />
+												<input type="hidden" id="hExpertoId" value="" />
+												<input type="hidden" id="hExpertoMatricula" value="" />
+												<input type="hidden" id="hExpertoCorreo" value="" />
+											</div>
+										</div>
+									</div>
+									<div class="col-md-5">
+										<div class="input-group">
+											<input id="txtNomRatificacion" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+											<span class="input-group-btn">
+												<label class="btn btn-primary file-upload-btn">
+													<input id="flRatificacion" class="file-upload-input inputRatificacion" type="file" name="flRatificacion" disabled>
+													<span class="glyphicon glyphicon-folder-open"></span>
+												</label>
+											</span>
+										</div>
+									</div>
+									<div class="col-md-3">
+										<a id="btnDescargar3" class="btn btn-primary btn-width-custom">
+											<span class="icon icon-arrow-down"></span>
+											<span class="count-text">Descargar</span>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-12 divEliminacionAdministrativa">
+							<div class="form-group">
+
+								<div class="row">
+									<div class="col-md-3 divConformidadContainer">
+
+										<label class="control-label">Conformidad: </label>
+
+
+									</div>
+									<div class="col-md-6">
+
+										<input id="txtConformidad" name="txtConformidad" type="text" class="form-control" maxlength="120" disabled />
+										<input type="hidden" id="hConformidadId" value="" />
+										<input type="hidden" id="hConformidadMatricula" value="" />
+										<input type="hidden" id="hConformidadCorreo" value="" />
+
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-12 divEliminacionAdministrativa">
+							<div class="form-group">
+
+								<div class="row">
+									<div class="col-md-3">
+										<label class="control-label">Archivo Adjunto: </label>
+									</div>
+									<div class="col-md-6">
+										<div class="input-group">
+											<input id="txtArchivo" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+											<span class="input-group-btn">
+												<label class="btn btn-primary file-upload-btn">
+													<input id="flArchivo" class="file-upload-input inputArchivo" type="file" name="flArchivo" disabled>
+													<span class="glyphicon glyphicon-folder-open"></span>
+												</label>
+											</span>
+										</div>
+									</div>
+									<div class="col-md-3">
+										<a id="btnDescargar4" class="btn btn-primary btn-width-custom">
+											<span class="icon icon-arrow-down"></span>
+											<span class="count-text">Descargar</span>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-12">
+							<div class="form-group">
+								<label class="control-label">Comentarios del solicitante asociados a esta solicitud: </label>
+								<textarea id="txtDescripcionEliminar" name="txtDescripcionEliminar" rows="5" class="form-control" disabled></textarea>
+							</div>
+						</div>
+
+						<div class="col-md-12">
+							<div class="form-group">
+								<div class="row">
+									<div class="col-md-4">
+										<label class="control-label">Owner/Líder Usuario encargado de la aplicación: </label>
+									</div>
+									<div class="col-md-8">
+										<input id="txtAprobadoPor" name="txtAprobadoPor" type="text" class="form-control" disabled />
+									</div>
+									@*<div class="col-md-2">
+											<label class="control-label">Fecha aprobación Owner/Líder Usuario aprobador: </label>
+										</div>
+										<div class="col-md-4 ">
+											<input id="txtFechaAprobacion" name="txtFechaAprobacion" type="text" class="form-control" maxlength="120" disabled />
+										</div>*@
+								</div>
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="form-group">
+											<label class="control-label">Observaciones: </label>
+											<textarea id="txtObservaciones" name="txtObservaciones" rows="5" class="form-control" disabled></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+					<button id="btnEliminar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Enviar solicitud</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+
+
+<div id="modalRechazarSolicitante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRechazarSolicitante" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<form id="formRechazarSolicitante">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="title-md">Ingrese el comentario indicando la desestimación de la solicitud</h5>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label class="control-label">Comentarios asociados a esta desestimación: </label>
+								<textarea id="txtDescripcionRechazoSolicitante" name="txtDescripcionRechazoSolicitante" rows="5" class="form-control" maxlength="1000"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+					<button id="btnProcesarRechazoSolicitante" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div id="modalVerFlujosAprobacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalVerFlujosAprobacion" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="title-md">Información detallada de los responsables de aprobación de la aplicación: <span id="spanApp"></span></h5>
+				</div>
+				<div class="modal-body">
+					<div class="row gutter-xs">
+						<div class="col-xs-12">
+							<div class="card">
+								<div class="card-body">
+									<table id="tblFlujosAprobacion" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+										<caption class="caption text-left">
+											<span>Solicitudes registradas para la aplicación</span>
+										</caption>
+										<thead>
+											<tr>
+												<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+												<th data-formatter="estadoFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Estado de atención</th>
+												<th data-field="nameDetail" data-halign="center" data-valign="middle" data-align="center">Responsable</th>
+												<th data-field="typeRegisterDetail2" data-halign="center" data-valign="middle" data-align="center">Rol asignado</th>
+												<th data-field="isApprovedDetail" data-halign="center" data-valign="middle" data-align="center">Situación de <br /> la solicitud</th>
+												<th data-field="dateApprovedStr" data-halign="center" data-valign="middle" data-align="center">Fecha de Aprobación</th>
+												<th data-field="dateRejectedStr" data-halign="center" data-valign="middle" data-align="center">Fecha de Rechazo</th>
+												<th data-field="comments" data-halign="center" data-valign="middle" data-align="center">Comentarios</th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<input type="hidden" name="hdSolicitudId" id="hdSolicitudId" value="0" />
+
+<script>
+    var ULTIMO_REGISTRO_PAGINACION = @PaginaTamanio;
+	var ULTIMO_PAGE_NUMBER = @PaginaActual;
+	const REGISTRO_APROBADO = 1;
+	const REGISTRO_PENDIENTE = 2;
+	const REGISTRO_RECHAZADO = 3;
+
+    const BANDEJA_APROBACION = {
+        Administrador: @Html.Raw((int)EBandejaAprobadorAplicacion.Administrador),
+        ArquitecturaTI: @Html.Raw((int)EBandejaAprobadorAplicacion.ArquitecturaTI),
+        ClasificacionTecnica: @Html.Raw((int)EBandejaAprobadorAplicacion.ClasificacionTecnica),
+        DevSecOps: @Html.Raw((int)EBandejaAprobadorAplicacion.DevSecOps),
+        PO: @Html.Raw((int)EBandejaAprobadorAplicacion.PO),
+        TTL: @Html.Raw((int)EBandejaAprobadorAplicacion.TTL),
+        GestorUserIT: @Html.Raw((int)EBandejaAprobadorAplicacion.GestorUserIT)
+    };
+</script>
+
+<script src="~/app/RegistroPortafolio/bandejaEliminacionSolicitud.js?v=2.1.5"></script>

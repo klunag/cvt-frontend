@@ -1,0 +1,250 @@
+﻿@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Modificación de aplicaciones";
+	ViewBag.Title2 = "Gestión de Portafolio";
+	ViewBag.Title3 = "Modificación de aplicaciones";
+
+	int PaginaActual = (int)ViewBag.PaginaActual;
+	int PaginaTamanio = (int)ViewBag.PaginaTamanio;
+	string nombreApp = (string)ViewBag.Nombre_App;
+	int estado = (int)ViewBag.Estado;
+}
+@using BCP.CVT.Cross
+
+<style>
+	.bloq-element {
+		pointer-events: none;
+		opacity: 0.7;
+	}
+
+	/* Chat containers */
+	.container {
+		border: 2px solid #dedede;
+		background-color: #f1f1f1;
+		border-radius: 5px;
+		padding: 10px;
+		margin: 10px 0;
+	}
+
+	/* Darker chat container */
+	.darker {
+		border-color: #f7a033;
+		background-color: #ddd;
+	}
+
+	/* Clear floats */
+	.container::after {
+		content: "";
+		clear: both;
+		display: table;
+	}
+
+	/* Style images */
+	.container img {
+		float: left;
+		max-width: 60px;
+		width: 100%;
+		margin-right: 20px;
+		border-radius: 50%;
+	}
+
+		/* Style the right image */
+		.container img.right {
+			float: right;
+			margin-left: 20px;
+			margin-right: 0;
+		}
+
+	/* Style time text */
+	.time-right {
+		float: right;
+		color: #aaa;
+	}
+
+	/* Style time text */
+	.time-left {
+		float: left;
+		color: #999;
+	}
+
+	.user-name {
+		font-weight: bold;
+		text-transform: uppercase;
+	}
+</style>
+
+<div class="card">
+	<div class="card-body">
+		<div class="card-search">
+			<fieldset class="fieldset">
+				<legend class="legend">Filtro de búsqueda</legend>
+				<div class="card-search-box">
+					<form action="javascript:void(0);">
+						<div class="form-group row gutter-xs">
+							<div class="col-xs-3 col-md-3">
+								<div class="text-left" data-toggle="match-height">
+									<h5>Código de la aplicación: </h5>
+									<input type="text" class="form-control" value="" id="txtCodigoFiltro" name="txtCodigoFiltro" />
+								</div>
+							</div>
+							<div class="col-xs-3 col-md-3">
+								<div class="text-left" data-toggle="match-height">
+									<h5>Estado: </h5>
+									<select id="ddlEstadoFiltro" name="ddlEstadoFiltro" class="form-control"></select>
+								</div>
+							</div>
+							<div class="col-xs-3 col-md-3">
+
+							</div>
+							<div class="col-xs-3 col-md-3">
+
+							</div>
+						</div>
+						<div class="form-group row gutter-xs">
+							<div class="col-md-12">
+								<div class="text-right">
+									<a id="btnBuscar" class="btn btn-primary" href="javascript: void(0)" title="Buscar">
+										<span class="icon icon-search"></span>
+										<span class="count-text">Buscar</span>
+									</a>
+
+									@*<a id="btnExportar" class="btn btn-primary" href="javascript: void(0)" title="Exportar">
+											<span class="icon icon-file-excel-o"></span>
+											<span class="count-text">Exportar</span>
+										</a>*@
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+<div class="row gutter-xs" style="margin-top:20px;">
+	<div class="col-xs-12">
+		<div class="card">
+			<div class="card-body">
+				<table id="tbl-solicitudes" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true" data-detail-view="true" data-detail-formatter="detailFormatter">
+					<caption class="caption text-left">
+						<span>Registro de solicitudes de aplicaciones</span>
+					</caption>
+					<thead>
+						<tr>
+							<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+							<th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+							<th data-formatter="situacionFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Situación de registro</th>
+							<th data-field="CodigoAplicacion" data-halign="center" data-valign="middle" data-align="left">Código aplicación</th>
+							<th data-field="NombreAplicacion" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+							<th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="center">Tipo activo información</th>
+							<th data-field="EstadoSolicitudToString" data-halign="center" data-valign="middle" data-align="center">Estado de la solicitud</th>
+							<th data-field="Observaciones" data-halign="center" data-valign="middle" data-align="center">Observaciones</th>
+							<th data-field="NombreUsuarioModificacion" data-halign="center" data-valign="middle" data-align="center">Solicitante</th>
+							<th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de creación</th>
+							<th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de última actualización</th>
+							<th data-field="FechaAprobacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de aprobación</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<input type="hidden" name="hdSolicitudId" id="hdSolicitudId" value="0" />
+
+<div id="modalRechazarSolicitante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRechazarSolicitante" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<form id="formRechazarSolicitante">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="title-md">Ingrese el comentario indicando el rechazo de la solicitud</h5>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label class="control-label">Comentarios asociados a este cambio de estado: </label>
+								<textarea id="txtDescripcionRechazoSolicitante" name="txtDescripcionRechazoSolicitante" rows="5" class="form-control"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+					<button id="btnProcesarRechazoSolicitante" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div id="modalVerFlujosAprobacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalVerFlujosAprobacion" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="title-md">Información detallada de los responsables de aprobación de la aplicación: <span id="spanApp"></span></h5>
+				</div>
+				<div class="modal-body">
+					<div class="row gutter-xs">
+						<div class="col-xs-12">
+							<div class="card">
+								<div class="card-body">
+									<table id="tblFlujosAprobacion" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+										<caption class="caption text-left">
+											<span>Solicitudes registradas para la aplicación</span>
+										</caption>
+										<thead>
+											<tr>
+												<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+												<th data-formatter="estadoFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Estado de atención</th>
+												<th data-field="nameDetail" data-halign="center" data-valign="middle" data-align="center">Responsable</th>
+												<th data-field="typeRegisterDetail2" data-halign="center" data-valign="middle" data-align="center">Rol asignado</th>
+												<th data-field="isApprovedDetail" data-halign="center" data-valign="middle" data-align="center">Situación de <br /> la solicitud</th>
+												<th data-field="dateApprovedStr" data-halign="center" data-valign="middle" data-align="center">Fecha de Aprobación</th>
+												<th data-field="ApprovedByName" data-halign="center" data-valign="middle" data-align="center">Aprobado Por</th>
+												<th data-field="dateRejectedStr" data-halign="center" data-valign="middle" data-align="center">Fecha de Rechazo</th>
+												<th data-field="comments" data-halign="center" data-valign="middle" data-align="center">Comentarios</th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+    var ULTIMO_REGISTRO_PAGINACION = @PaginaTamanio;
+    var ULTIMO_PAGE_NUMBER = @PaginaActual;
+    var nombre_app = '@nombreApp';
+	var ESTADO = '@estado';
+	const REGISTRO_APROBADO = 1;
+	const REGISTRO_PENDIENTE = 2;
+	const REGISTRO_RECHAZADO = 3;
+
+    const BANDEJA_APROBACION = {
+        Administrador: @Html.Raw((int)EBandejaAprobadorAplicacion.Administrador),
+        ArquitecturaTI: @Html.Raw((int)EBandejaAprobadorAplicacion.ArquitecturaTI),
+        ClasificacionTecnica: @Html.Raw((int)EBandejaAprobadorAplicacion.ClasificacionTecnica),
+        DevSecOps: @Html.Raw((int)EBandejaAprobadorAplicacion.DevSecOps),
+        PO: @Html.Raw((int)EBandejaAprobadorAplicacion.PO),
+        TTL: @Html.Raw((int)EBandejaAprobadorAplicacion.TTL),
+        GestorUserIT: @Html.Raw((int)EBandejaAprobadorAplicacion.GestorUserIT)
+    };
+</script>
+
+<script src="~/app/GestionPortafolio/bandejaAprobacionSolicitud.js?v=2.1.1"></script>

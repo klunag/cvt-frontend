@@ -1,0 +1,251 @@
+﻿
+@{
+	ViewBag.Title1 = "Configuracion Roles por Producto";
+	ViewBag.Title2 = "Matriz de Roles";
+	ViewBag.Title3 = "Configuración de Roles por Producto";
+
+}
+
+<div class="card">
+	<div class="card-body">
+		<div class="card-search">
+			@*<fieldset class="fieldset">
+		<legend class="legend">Filtro de búsqueda</legend>*@
+			<div class="panel-group" id="accordion-filtro" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default" style="overflow: inherit;">
+	
+					<a class="panel-heading" role="tab" id="heading-filtro" data-toggle="collapse" data-parent="#accordion-filtro" href="#collapse-filtro" aria-expanded="true" aria-controls="collapse-filtro" style="display: flex">
+						<h4 class="panel-title">Filtro de búsqueda</h4>
+					</a>
+					<div id="collapse-filtro" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro">
+						<div class="panel-body">
+							<div class="card-search-box">
+								<form action="javascript:void(0);">
+									<div class="row gutter-xs">
+
+										<div class="col-xs-4 col-md-3">
+											<div class="text-left divFiltro" data-toggle="match-height">
+												<h5>Tribu/COE: </h5>
+												<select id="ddlTribus" class="form-control"></select>
+											</div>
+										</div>
+										<div class="col-xs-4 col-md-3">
+											<div class="text-left divFiltro" data-toggle="match-height">
+												<h5>Squad: </h5>
+												<select id="ddlSquads" class="form-control"></select>
+											</div>
+										</div>
+										<div class="col-xs-4 col-md-3">
+
+										</div>
+
+									</div>
+									<div class="row gutter-xs">
+										<div class="col-xs-4 col-md-3">
+											<div class="text-left" data-toggle="match-height">
+												<h5>Producto: </h5>
+												<input id="txtProducto" name="txtProducto" class="form-control" type="text" placeholder="">
+												<input type="hidden" name="hdChapter" id="hdProd" />
+											</div>
+										</div>
+										<div class="col-xs-4 col-md-3">
+											<div class="text-left" data-toggle="match-height">
+												<h5>Dominio: </h5>
+												<select id="ddlDominio" class="form-control"></select>
+											</div>
+										</div>
+										<div class="col-xs-4 col-md-3">
+											<div class="text-left" data-toggle="match-height">
+												<h5>Subdominio: </h5>
+												<select id="ddlSubDominio" class="form-control"></select>
+											</div>
+										</div>
+										<div class="col-xs-4 col-md-1">
+											<div class="text-left" data-toggle="match-height">
+												<h5>&nbsp;</h5>
+
+												<button id="btnExportar" class="btn btn-primary btn-width-custom" onclick="Exportar()">Exportar</button>
+											</div>
+										</div>
+										<div class="col-xs-4 col-md-1">
+											<div class="text-left" data-toggle="match-height">
+												<h5>&nbsp;</h5>
+												<button id="btnBuscar" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				@*</fieldset>*@
+			</div>
+		</div>
+					</div>
+				</div>
+
+				@*<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+				<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+					<span class="icon icon-external-link"></span>
+					<span class="count-text">Exportar</span>
+				</a>
+			</div>*@
+
+				<div class="row gutter-xs">
+					<div class="col-xs-12">
+						<div class="card">
+							<div class="card-body">
+								<table id="tblRegistros" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true" data-detail-view="true" data-detail-formatter="detailFormatter">
+									<caption class="caption text-left">
+										<span>Roles por Producto</span>
+									</caption>
+									<thead>
+										<tr>
+											<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+											<th data-field="DominioStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="DominioStr" data-width="15%">Dominio</th>
+											<th data-field="SubDominioStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="SubDominioStr" data-width="20%">SubDominio</th>
+											<th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Nombre" data-width="38%">Producto</th>
+											<th data-field="CantidadRoles" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="CantidadRoles" data-width="20%">Roles asociados</th>
+											<th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Agregar</th>
+											@*<th data-field="NombreUsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreUsuarioCreacion" data-width="20%">Usuario Creación</th>*@
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<div id="modalAgregarRol" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalAgregarRol" aria-hidden="true">
+					<div class="modal-dialog " role="document">
+						<form id="formEli">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+									<h5 class="modal-title" id="titulo">Agregar Rol</h5>
+								</div>
+								<div class="modal-body">
+
+
+									<div class="row">
+										<div class="col-md-3">
+											<p>Producto</p>
+										</div>
+										<div class="col-md-7">
+											<input id="txtProducto2" name="txtProducto2" class="form-control" type="text" placeholder="" disabled>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-3">
+											<p>Rol</p>
+										</div>
+										<div class="col-md-7">
+											<input id="txtRol" name="txtRol" class="form-control" type="text" placeholder="">
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-3">
+											<p>Descripción</p>
+										</div>
+										<div class="col-md-7">
+											<textarea id="txtDescripcion" name="txtDescripcion" class="form-control" rows="4" placeholder="">		  </textarea>
+										</div>
+									</div>
+
+
+									<div class="row">
+										<div class="col-md-3">
+											<p>Grupo de Red</p>
+										</div>
+										<div class="col-md-7">
+											<input id="txtGrupoRed" name="txtGrupoRed" class="form-control" type="text" placeholder="">
+										</div>
+									</div>
+
+
+
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+									<button id="btnAgregar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Agregar</button>
+								</div>
+							</div>
+
+
+						</form>
+					</div>
+				</div>
+
+				<div id="modalEditarRol" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEditarRol" aria-hidden="true">
+					<div class="modal-dialog " role="document">
+						<form id="formEli2">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+									<h5 class="modal-title" id="titulo">Editar Rol</h5>
+								</div>
+								<div class="modal-body">
+
+
+									<div class="row">
+										<div class="col-md-3">
+											<p>Producto</p>
+										</div>
+										<div class="col-md-7">
+											<input id="txtProducto3" name="txtProducto3" class="form-control" type="text" placeholder="" disabled>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-3">
+											<p>Rol</p>
+										</div>
+										<div class="col-md-7">
+											<input id="txtRol3" name="txtRol3" class="form-control" type="text" placeholder="">
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-3">
+											<p>Descripción</p>
+										</div>
+										<div class="col-md-7">
+											<textarea id="txtDescripcion2" name="txtDescripcion2" class="form-control" rows="4" placeholder="">		  </textarea>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-3">
+											<p>Grupo de Red</p>
+										</div>
+										<div class="col-md-7">
+											<input id="txtGrupoRed3" name="txtGrupoRed3" class="form-control" type="text" placeholder="">
+										</div>
+									</div>
+
+
+
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+									<button id="btnEditar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Editar</button>
+								</div>
+							</div>
+
+
+						</form>
+					</div>
+				</div>
+
+				<input type="hidden" name="hdProductoId" id="hdProductoId" value="0" />
+				<input type="hidden" name="hdRolProductoId" id="hdRolProductoId" value="0" />
+
+
+				<script src="~/app/ConfiguracionPortafolio/rolesProducto.js?v=2.1.0"></script>

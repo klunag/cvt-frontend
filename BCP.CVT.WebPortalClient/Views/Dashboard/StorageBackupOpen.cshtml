@@ -1,0 +1,226 @@
+﻿
+@{
+    ViewBag.Title1 = "Backup - Infraestructura Open";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Storage";
+    ViewBag.Title3 = "Backup - Infraestructura Open";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+</style>
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <form id="formFiltros">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Aplicación: </h5>
+                                        <input type="text" name="txtAplicacion" id="txtAplicacion" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Servidor: </h5>
+                                        <input type="text" name="txtServidor" id="txtServidor" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Servidor de backup: </h5>
+                                        <input type="text" name="txtBackup" id="txtBackup" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Target: </h5>
+                                        <input type="text" name="txtTarget" id="txtTarget" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>                               
+                            </div>
+                            <div class="row gutter-xs">
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Level: </h5>
+                                        <select id="txtLevel" name="txtLevel" class="form-control">
+                                            <option value="" selected="selected">Todos</option>
+                                            <option value="Archival">Archival</option>
+                                            <option value="Differential">Differential</option>
+                                            <option value="Full">Full</option>
+                                            <option value="Incremental">Incremental</option>
+                                            <option value="Manual">Manual</option>
+                                            <option value="Other">Other</option>
+                                            <option value="Restore">Restore</option>
+                                            <option value="Synthetic Full">Synthetic Full</option>
+                                        </select>
+                                        @*<input type="text" name="txtLevel" id="txtLevel" class="form-control" value="" maxlength="80" />*@
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Resultado: </h5>
+                                        <select id="txtResultado" name="txtResultado" class="form-control">
+                                            <option value="" selected="selected">Todos</option>
+                                            <option value="Failed">Failed</option>
+                                            <option value="Partial">Partial</option>
+                                            <option value="Success">Success</option>
+                                        </select>
+                                        @*<input type="text" name="txtResultado" id="txtResultado" class="form-control" value="" maxlength="80" />*@
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Fecha de la consulta: (*)</h5>
+                                        <div class="input-group date" id="divFechaFiltro">
+                                            <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                            @*<span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-xs-2 col-sm-2 text-right">
+                                    <h5>&nbsp;</h5>
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Buscar()">Buscar</button>
+                                </div>
+                                <div class="col-md-1 col-xs-2 col-sm-1 text-right">
+                                    <h5>&nbsp;</h5>
+                                    <button id="btnExportar" type="button" class="btn btn-primary btn-width-custom" onclick="ExportarInfo()">Exportar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Resultado de la búsqueda</strong>
+                </div>
+                <div class="card-body">
+                    <table id="tblRegistro" class="table" data-mobile-responsive="true">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="serverName" data-formatter="linkFormatter" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="serverName" data-width="300">Servidor</th>
+                                <th data-field="groupname" data-halign="center" data-valign="middle" data-align="left" data-sortable="groupname" data-sort-name="jobname">Grupo</th>
+                                <th data-field="total" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="total" data-width="70">Ejecuciones</th>
+                                <th data-field="totalAppsRelacionadas" data-formatter="linkAppsFormatter" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="totalAppsRelacionadas" data-width="70">Aplicaciones relacionadas</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdAddOrEditModal" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Ejecuciones</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hdId" name="hdId" value="0" />
+                <div class="form-group">
+                    <table id="tblRegistrosDetalle" data-mobile-responsive="true" data-check-on-init="true" data-pagination="true" data-page-size="10" data-page-list="[10, 20, 50, 100, 200]" style="font-size:11px !important;">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="zone" data-halign="center" data-valign="middle" data-align="left">zone</th>
+                                <th data-field="startdatetime" data-halign="center" data-valign="middle" data-align="left">startdatetime</th>
+                                <th data-field="finishdatetime" data-halign="center" data-valign="middle" data-align="left">finishdatetime</th>
+                                <th data-field="product" data-halign="center" data-valign="middle" data-align="left">product</th>
+                                <th data-field="backupserver" data-halign="center" data-valign="middle" data-align="left">backupserver</th>
+                                <th data-field="target" data-halign="center" data-valign="middle" data-align="left">target</th>
+                                <th data-field="levelbackup" data-halign="center" data-valign="middle" data-align="left">levelbackup</th>
+                                <th data-field="datatransferredkb" data-halign="center" data-valign="middle" data-align="left">datatransferredkb</th>
+                                <th data-field="outcome" data-formatter="semaforoFormatter" data-halign="center" data-valign="middle" data-align="left">outcome</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdAddOrEditModalApps" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Aplicaciones</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hdId" name="hdId" value="0" />
+                <div class="form-group">
+                    <table id="tblRegistrosDetalleApps" data-mobile-responsive="true" data-check-on-init="true" data-pagination="true" data-page-size="10" data-page-list="[10, 20, 50, 100, 200]" style="font-size:11px !important;">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left">Código</th>
+                                <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left">Nombre</th>
+                                <th data-field="EstadoAplicacion" data-halign="center" data-valign="middle" data-align="left">Estado aplicación</th>
+                                <th data-field="Equipo" data-halign="center" data-valign="middle" data-align="left">Equipo</th>
+                                <th data-field="Ambiente" data-halign="center" data-valign="middle" data-align="left">Ambiente</th>
+                                <th data-field="EstadoRelacion" data-halign="center" data-valign="middle" data-align="left">Estado relación</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/app/storagebackupopen.js?v=2.1.0"></script>
+
+

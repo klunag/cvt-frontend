@@ -1,0 +1,511 @@
+﻿@{
+    var param = MetodosUtiles.ObtenerParametroCVT("DEPENDENCIAS_APPS_GRAFOS_ACCESOS");
+}
+
+@{
+    ViewBag.Title1 = "Consultas";
+    ViewBag.Title2 = "Dependencia de Aplicaciones";
+    ViewBag.Title3 = "Consultas";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="~/Scripts/vis/vis-network.min.js"></script>
+<style type="text/css">
+    #vgdEquipo {
+        width: 100%;
+        height: 550px;
+        display: flex;
+        justify-content: center;
+    }
+
+    #vgdApp {
+        width: 100%;
+        height: 550px;
+        display: flex;
+        justify-content: center;
+    }
+
+    #vgdAppToApp {
+        width: 100%;
+        height: 550px;
+        display: flex;
+        justify-content: center;
+    }
+
+    #vDiagramaInfra {
+        width: 100%;
+        height: 550px;
+        display: flex;
+        justify-content: center;
+    }
+</style>
+
+<style>
+    .nombreDom {
+        min-width: 180px;
+    }
+
+    .nombreTec {
+        min-width: 280px;
+    }
+
+    .opcTecnologia {
+        min-width: 150px;
+    }
+
+    .accesoDirecto {
+        min-width: 200px;
+    }
+
+    .tecnologia-label {
+        padding: 0px;
+    }
+
+    /*.input-with-icon-search {
+         padding-left: 26px;
+     }*/
+
+    .tec {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .tooltip {
+        z-index: 2000 !important;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .multiselect-native-select .btn-group {
+        max-width: 100%;
+    }
+
+    .card-search .fieldset hr {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border: 0;
+        border-top: 1px solid #ddd;
+    }
+</style>
+
+
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <form id="formFiltros">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Tipo de Busqueda: </h5>
+                                        <select id="ddlTipoConsultaFiltro" name="ddlTipoConsultaFiltro" class="form-control">
+                                            <option value="1">Relación</option>
+                                            <option value="2" selected>Impacto</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Aplicación: </h5>
+                                        <div class="input-with-icon filAppContainer">
+                                            <input id="txtFilApp" name="txtFilApp" class="form-control input-thick pill input-with-icon-search" type="text">
+                                            <span class="icon icon-search input-icon"></span>
+                                        </div>
+                                        <input type="hidden" id="hdFilAppId" name="hdFilAppId" value="" />
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Componente (Servidores, Servicios Nube, Tecnologías, Flujos Broker) : </h5>
+                                        <div class="input-with-icon filCompContainer">
+                                            <input id="txtFilComp" name="txtFilComp" class="form-control input-thick pill input-with-icon-search" type="text">
+                                            <span class="icon icon-search input-icon"></span>
+                                        </div>
+                                        <input type="hidden" id="hdFilCompId" name="hdFilCompId" value="0" />
+                                        <input type="hidden" id="hdTipoCompId" name="hdTipoCompId" value="0" />
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="row gutter-xs">
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Tipo de Relacionamiento: </h5>
+                                        <select id="ddlTipoRelacionamientoFiltro" name="ddlTipoRelacionamientoFiltro" class="form-control">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Agrupación: </h5>
+                                        <select id="ddlTipoEtiquetaFiltro" name="ddlTipoEtiquetaFiltro" class="form-control">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-xs-4">
+                                    <br />
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Buscar()">Buscar</button>
+
+                                    <a id="btnExportar" class="btn btn-primary" href="javascript: void(0)" onclick="Exportar()">
+                                        <span class="icon icon-external-link"></span>
+                                        <span class="count-text">Exportar</span>
+                                    </a>
+                                    @if (ViewBag.AccesoDiagramaInfra)
+                                    {
+                                        <button id="btn_VistaDiagramaInfra" type="button" class="btn btn-primary btn-width-custom" style="width: fit-content;" onclick="verDiagramaInfra()">Diagr. Infraestructura</button>
+                                    }
+                                    
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    </div>
+
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-tabs nav-justified otros">
+                        <li id="tabAplicaciones" class="active tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datApp" data-toggle="tab"><label class="control-label">Relación entre Aplicaciones </label></a></li>
+                        <li id="tabComponentes" class="tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datCompo" data-toggle="tab"><label class="control-label">Relación Aplicación - Componente </label></a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade active in" id="datApp">
+                            <div class="row">
+                                @*<div class="panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+                                        <div class="col-xs-9 col-md-9 text-left">
+                                            <h4 id="tituloResultado" name="tituloResultado"></h4>
+                                        </div>
+
+                                    </div>*@
+                                <div class="col-md-12" style="margin-bottom: 15px; margin-top: 15px;">
+
+                                    @if (ViewBag.AccesoGrafico)
+                                    {
+                                        <button id="btn_vgdApp" type="button" class="btn btn-primary btn-width-custom" onclick="vgdApp()" style="display:none">Vista Gráfica</button> <br /><br />
+                                    }
+
+
+                                    <table id="tblDependenciasRelacion" data-toggle="table" class="table table-striped table-nowrap dataTable" style="display: none;" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatterServerApps" data-valign="middle" data-align="center" data-width="5%">#</th>
+                                                <th data-field="AplicacionDuenaRelacion" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Codigo APT Dueña la de la Relación</th>
+                                                <th data-field="AplicacionDuenaRelacionNombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="AplicacionDuenaRelacionNombre" data-width="20%">Aplicación Dueña de la Relación</th>
+                                                <th data-field="AplicacionGeneraImpacto" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Codigo APT Relacionada</th>
+                                                <th data-field="AplicacionGeneraImpactoNombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="AplicacionGeneraImpactoNombre" data-width="20%">Aplicación Relacionada</th>
+                                                <th data-field="TipoRelacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TipoRelacion" data-width="15%">Tipo de Relacionamiento</th>
+                                                @*<th data-field="TipoConexion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TipoConexion" data-width="10%">Tipo de Conexión</th>*@
+                                                <th data-field="EtiquetaAplicacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EtiquetaAplicacion" data-width="15%">Agrupación</th>
+
+
+                                                <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%" class="opcionesStyle">Ver Detalle</th>
+                                                @if (ViewBag.AccesoGrafico)
+                                                {
+                                                    <th data-formatter="vistaGrafica" data-field="VistaGrafica" data-halign="center" data-valign="middle" data-align="center" data-width="5%" class="opcionesStyle">Vista Gráfica</th>
+                                                }
+
+
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <table id="tblDependenciasImpacto" data-toggle="table" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatterServerAppsImpacto" data-valign="middle" data-align="center" data-width="5%">#</th>
+                                                <th data-field="AplicacionGeneraImpacto" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Codigo APT que Genera Impacto</th>
+                                                <th data-field="AplicacionGeneraImpactoNombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="AplicacionGeneraImpactoNombre" data-width="20%">Aplicación que Genera Impacto</th>
+                                                <th data-field="AplicacionDuenaRelacion" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Codigo APT Impactado</th>
+                                                <th data-field="AplicacionDuenaRelacionNombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="AplicacionDuenaRelacionNombre" data-width="20%">Aplicación Impactada</th>
+                                                <th data-field="TipoRelacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TipoRelacion" data-width="15%">Tipo de Relacionamiento</th>
+                                                @*<th data-field="TipoConexion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TipoConexion" data-width="10%">Tipo de Conexión</th>*@
+                                                <th data-field="EtiquetaAplicacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EtiquetaAplicacion" data-width="15%">Agrupación</th>
+
+                                                <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%" class="opcionesStyle">Ver Detalle</th>
+                                                @if (ViewBag.AccesoGrafico)
+                                                {
+                                                    <th data-formatter="vistaGrafica" data-field="VistaGrafica" data-halign="center" data-valign="middle" data-align="center" data-width="5%" class="opcionesStyle">Vista Gráfica</th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="datCompo">
+                            <div class="row">
+                                <div class="col-md-12" style="margin-bottom: 15px; margin-top: 15px;">
+
+                                    @if (ViewBag.AccesoGrafico)
+                                    {
+                                        <button id="btn_vgdEquipo" type="button" class="btn btn-primary btn-width-custom" onclick="vgdEquipo()" style="display:none">Vista Gráfica</button> <br /><br />
+                                    }
+
+                                    <table id="tblDependenciasComponentes" data-toggle="table" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatterServerComp" data-valign="middle" data-align="center" data-width="5%">#</th>
+                                                <th data-field="CodigoApt" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Codigo APT</th>
+                                                <th data-field="Aplicacion" data-halign="center" data-valign="middle" data-align="center" data-width="35%">Aplicación</th>
+                                                <th data-field="TipoComponente" data-halign="center" data-valign="middle" data-align="center" data-width="15%" data-sort-name="TipoComponente">Tipo de Componente</th>
+                                                <th data-field="Equipo" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="Equipo">Equipo</th>
+                                                <th data-field="Estado" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="Estado">Estado</th>
+                                                <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="Dominio">Dominio</th>
+                                                <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="Subdominio">Subdominio</th>
+                                                <th data-field="Tecnologia" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="Tecnologia">Tecnología</th>
+                                                <th data-field="TipoTecnologia" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="TipoTecnologia">Estado de Estandarización</th>
+                                                <th data-field="Relevancia" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="Relevancia">Relevancia</th>
+                                                <th data-field="TipoRelacionamiento" data-halign="center" data-valign="middle" data-align="center" data-sort-name="TipoRelacionamiento" data-width="15%">Tipo de Relacionamiento</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--Modal Modulo-->
+<div id="MdConsultaAplicacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="width: auto;">
+        <div class="modal-content" style="margin-top: 0px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="titleFormAplicacion"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-search">
+                            <fieldset class="fieldset">
+                                <legend class="legend">Dependencia de Aplicaciones</legend>
+                                <div class="card-search-box">
+                                    <div class="row">
+                                        <div class="col-md-12">
+
+                                            <form id="formConsultaAplicacion">
+                                                <div class="row">
+                                                    <div class="panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+                                                        <div class="col-xs-9 col-md-9 text-left">
+                                                            <h4 id="tituloResultadoDependencia" name="tituloResultadoDependencia"></h4>
+                                                        </div>
+                                                        @*<div class="col-xs-3 col-md-3 ">
+                                                                <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarEquiposDesactivados()">
+                                                                    <span class="icon icon-external-link"></span>
+                                                                    <span class="count-text">Exportar</span>
+                                                                </a>
+                                                            </div>*@
+                                                    </div>
+                                                    <div class="col-md-12" style="margin-bottom: 15px; margin-top: 15px;">
+                                                        <table id="tblDependenciasDetalle" data-toggle="table" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th data-formatter="rowNumFormatterServerAppsDetalle" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                                                    <th data-field="CodigoAptOrigen" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Aplicación Origen</th>
+                                                                    <th data-field="EquipoOrigen" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DatosTI">Equipo origen</th>
+                                                                    <th data-field="IPEquipoOrigen" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DatosTI">IP Origen</th>
+                                                                    <th data-field="ProcesoOrigen" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DatosTI">Proceso Origen</th>
+                                                                    <th data-field="CodigoAptDestino" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Aplicación Destino</th>
+                                                                    <th data-field="EquipoDestino" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DatosTI">Equipo Destino</th>
+                                                                    <th data-field="IPEquipoDestino" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DatosTI">IP Destino</th>
+                                                                    <th data-field="ProcesoDestino" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DatosTI">Proceso Destino</th>
+                                                                    <th data-field="Puerto" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DatosTI">Puerto</th>
+                                                                    <th data-field="Protocolo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DatosTI">Protocolo</th>
+                                                                    @*<th data-field="TipoConexion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DatosTI">Tipo de Conexión</th>
+                                                                        <th data-field="TipoRelacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DatosTI">Tipo de Relación</th>*@
+
+                                                                    @*<th data-field="Sistema" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Brecha">Sistema Operativo / Tecnología</th>*@
+
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Vista Grafica Dependencia - Equipo -->
+<div id="Md_VGD_Equipo" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="width: auto;">
+        <div class="modal-content" style="margin-top: 0px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="titleForm_VGD_Equipo"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="vgdEquipo"></div>
+            </div>
+            <div class="modal-footer">
+                <table>
+                    <tr>
+                        <td style="width:fit-content">
+                            Leyenda:&nbsp;&nbsp;<img src="../images/Leyenda_API.png" alt="Leyenda del gráfico">
+                        </td>
+                        <td style="width:50px;"></td>
+                        <td style="width:fit-content; font-size: 100%;">
+                            Puedes mover el el gráfico haciendo clic y arrastrando con el mouse.<br />
+                            Para hacer zoom utiliza la rueda del mouse. Pasa el puntero por encima de un ítem para más información.
+                        </td>
+                        @*<td style="width:fit-content">
+                                <select id="ddlVisualizacion_Equipo" name="ddlVisualizacion_Equipo" class="form-control">
+                                    <option value="1" selected>Nivel 1</option>
+                                    <option value="2">Nivel 2</option>
+                                </select>
+                            </td>*@
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Vista Grafica Dependencia - App -->
+<div id="Md_VGD_App" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="width: auto;">
+        <div class="modal-content" style="margin-top: 0px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="titleForm_VGD_App"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="vgdApp"></div>
+            </div>
+            <div class="modal-footer">
+                <table>
+                    <tr>
+                        <td style="width:fit-content">
+                            Leyenda:&nbsp;&nbsp;<img src="../images/Leyenda_App.png" alt="Leyenda del gráfico">
+                        </td>
+                        <td style="width:50px;"></td>
+                        <td style="width:fit-content; font-size: 100%;">
+                            Puedes mover el el gráfico haciendo clic y arrastrando con el mouse.<br />
+                            Para hacer zoom utiliza la rueda del mouse. Pasa el puntero por encima de un ítem para más información.
+                        </td>
+                        @*<td style="width:fit-content">
+                                <select id="ddlVisualizacion_App" name="ddlVisualizacion_App" class="form-control">
+                                <option value="1" selected>Nivel 1</option>
+                                <option value="2">Nivel 2</option>
+                                </select>
+                            </td>*@
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Vista Grafica Dependencia - AppToApp -->
+<div id="Md_VGD_AppToApp" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="width: auto;">
+        <div class="modal-content" style="margin-top: 0px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="titleForm_VGD_AppToApp"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="vgdAppToApp"></div>
+            </div>
+            <div class="modal-footer">
+                <table>
+                    <tr>
+                        <td style="width:fit-content">
+                            Leyenda:&nbsp;&nbsp;<img src="../images/Leyenda_AppToApp.png" alt="Leyenda del gráfico">
+                        </td>
+                        <td style="width:200px;"></td>
+                        <td style="width:fit-content; font-size: 100%;">
+                            Puedes mover el el gráfico haciendo clic y arrastrando con el mouse.<br />
+                            Para hacer zoom utiliza la rueda del mouse. Pasa el puntero por encima de un ítem para más información.
+                        </td>
+                        @*<td style="width:fit-content">
+                                <select id="ddlVisualizacion_AppToApp" name="ddlVisualizacion_AppToApp" class="form-control">
+                                <option value="1" selected>Nivel 1</option>
+                                <option value="2">Nivel 2</option>
+                                </select>
+                            </td>*@
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Vista DiagramaInfraestructura -->
+<div id="Md_DiagramaInfraestructura" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="width: auto;">
+        <div class="modal-content" style="margin-top: 0px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="titleForm_DiagramaInfra"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="vDiagramaInfra"></div>
+            </div>
+            <div class="modal-footer">
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="width:fit-content; font-size: 100%;">
+                            Puedes mover el el gráfico haciendo clic y arrastrando con el mouse.<br />
+                            Para hacer zoom utiliza la rueda del mouse. Pasa el puntero por encima de un ítem para más información.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/app/DependenciasApps/Consultas.js?v=0.1.1"></script>

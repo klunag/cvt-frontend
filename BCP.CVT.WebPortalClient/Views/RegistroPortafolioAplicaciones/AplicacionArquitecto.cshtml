@@ -1,0 +1,321 @@
+﻿
+@{
+	//int _idAplicacion = (int)ViewBag.AplicacionId;
+	//string layout = _idAplicacion == 0 ? "_Layout" : "_EmptyLayout";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+
+	ViewBag.Title1 = "Bandeja";
+	ViewBag.Title2 = "Aplicaciones";
+	ViewBag.Title3 = "Solicitudes Asignadas";
+}
+
+@using BCP.CVT.Cross
+
+
+<div class="card">
+
+	<div class="card-body">
+		<div class="card-search">
+			<fieldset class="fieldset">
+				<legend class="legend">Filtros</legend>
+				<div class="card-search-box">
+					<form action="javascript:void(0);">
+
+						<div class="form-group row">
+							<div class="col-md-7 col-xs-8 col-sm-9">
+								<h5>Código:</h5>
+								<div class="input-with-icon">
+									<input id="txtBusApp" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre de Aplicación...">
+									<span class="icon icon-search input-icon"></span>
+								</div>
+							</div>
+							<div class="col-xs-3 col-md-3">
+								<div class="text-left" data-toggle="match-height">
+									<h5>Estado de la solicitud: </h5>
+									<select id="ddlEstado" name="ddlEstado" class="form-control"></select>
+								</div>
+							</div>
+							<div class="col-md-2 col-xs-4 col-sm-3">
+								<h5> </h5>
+								<button id="btnBusApp" class="btn btn-primary btn-width-custom" onclick="buscarAplicacion()">Buscar</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+	<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddAplicacion()">
+		<span class="icon icon-plus"></span>
+		<span class="count-text">Nuevo</span>
+	</a>
+</div>
+
+<div class="row gutter-xs">
+	<div class="col-xs-12">
+		<div class="card">
+			<div class="card-header">
+				<strong>Registros de Aplicaciones</strong>
+			</div>
+			<div class="card-body">
+				<table id="tbl-parametricas" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="WorkerId" data-mobile-responsive="true">
+					<thead>
+						<tr>
+							<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+							<th data-field="Id" data-halign="center" data-visible="false" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Id">ID</th>
+							<th data-field="Codigo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Código</th>
+							<th data-formatter="linkFormatter" data-field="NombreAplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="NombreAplicacion">Nombre de la Aplicación</th>
+							<th data-field="GestionadoPor" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="GestionadoPor">GestionadoPor</th>
+							<th data-field="ModeloEntrega" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="ModeloEntrega">Modelo Entrega</th>
+							<th data-field="Estado" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Estado">Fecha de <br />Estado</th>
+							<th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--Modal Add-->
+<div id="MdAddOrEditApp" tabindex="-1" role="dialog" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title" id="titleFormApp">Nueva Aplicación</h4>
+			</div>
+			<div class="modal-body">
+				<form id="formAddOrEditApp">
+
+					<div class="form-group">
+						@*<label class="control-label">Código: </label>*@
+						@*<input id="txtCodPar" class="form-control" type="text" name="txtCodPar">*@
+						<input type="hidden" id="txtCodApp" class="form-control" name="txtCodApp">
+						<input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+					</div>
+					<div class="form-row">
+						<div class="form-group col-md-6">
+							<label class="control-label">Código APT (*): </label>
+							<input id="txtCodigo" class="form-control" type="text" name="txtCodigo">
+						</div>
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Gestionado Por (*): </label>
+							<select id="ddlGestionadoPor" class="form-control" name="ddlGestionadoPor"></select>
+						</div>
+
+
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Nombre (*): </label>
+							<input id="txtNombreAplicacion" class="form-control" type="text" name="txtNombreAplicacion">
+						</div>
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Tipo de Implementación (*): </label>
+							<select id="ddlTipoImplementacion" class="form-control" name="ddlTipoImplementacion"></select>
+						</div>
+						<div class="form-group col-md-6">
+							<label class="control-label">Descripción: </label>
+							<input id="txtDescripcion" class="form-control" type="text" name="txtDescripcion">
+						</div>
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Modelo de Entrega (*): </label>
+							<select id="ddlModeloEntrega" class="form-control" name="ddlModeloEntrega"></select>
+						</div>
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Código APT Padre: </label>
+							<input id="txtCodigoAPTPadre" class="form-control" type="text" name="txtCodigoAPTPadre">
+						</div>
+
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Estado de la aplicación: </label>
+							<select id="ddlEstadoAplicacion" class="form-control" name="ddlEstadoAplicacion"></select>
+						</div>
+
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Arquitecto de negocio: </label>
+							<input id="txtArquitectoNegocio" class="form-control" type="text" name="txtArquitectoNegocio">
+						</div>
+
+
+						<div class="form-group col-md-6">
+							<label class="control-label">
+								¿Requiere Codigo de Interfaz?
+							</label>
+							<div class="input-group" id="divReqCodInt">
+							</div>
+						</div>
+
+
+						<div class="form-group col-md-6">
+							<label class="control-label">
+								Fecha de Registro
+							</label>
+
+							<div class="input-group date" id="dpFechaRegistro-btn">
+								<input type="text" id="dpFechaRegistro" name="dpFechaRegistro" class="form-control" />
+								<span class="input-group-addon">
+									<span class="icon icon-calendar"></span>
+								</span>
+							</div>
+
+						</div>
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Registrado Por: </label>
+							<input id="txtRegistradoPor" class="form-control" type="text" name="txtRegistradoPor">
+						</div>
+					</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				<button id="btnRegApp" class="btn btn-primary" onclick="guardarAddOrEditAplicacion()" type="button" data-loading-text="Procesando...">Registrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--Modal Edit)-->
+<div id="MdEditApp" tabindex="-1" role="dialog" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title" id="titleFormApp">Nueva Aplicación</h4>
+			</div>
+			<div class="modal-body">
+				<form id="formEditApp">
+
+					<div class="form-group">
+
+						<input type="hidden" id="txtCodApp" class="form-control" name="txtCodApp">
+						<input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+					</div>
+					<div class="form-row">
+						<div class="form-group col-md-6">
+							<label class="control-label">Código APT: </label>
+							<input id="txtCodigo" class="form-control" type="text" name="txtCodigo">
+						</div>
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Nombre: </label>
+							<input id="txtNombreAplicacion" class="form-control" type="text" name="txtNombreAplicacion">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label">Descripción: </label>
+						<input id="txtDescripcion" class="form-control" type="text" name="txtDescripcion">
+					</div>
+					<div class="form-row">
+						<div class="form-group col-md-6">
+							<label class="control-label">Tipo Activo (*): </label>
+							<select id="ddlTipoActivo" class="form-control" name="ddlTipoActivo"></select>
+						</div>
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Área BIAN (*): </label>
+							<select id="ddlAreaBIAN" class="form-control" name="ddlAreaBIAN"></select>
+						</div>
+						<div class="form-group col-md-6">
+							<label class="control-label">Dominio BIAN (*): </label>
+							<select id="ddlDominioBIAN" class="form-control" name="ddlDominioBIAN"></select>
+						</div>
+						<div class="form-group col-md-6">
+							<label class="control-label">Jefatura ATI (*): </label>
+							<select id="ddlJefaturaATI" class="form-control" name="ddlJefaturaATI"></select>
+						</div>
+						<div class="form-group col-md-6">
+							<label class="control-label">TOBE: </label>
+							<select id="ddlTOBE" class="form-control" name="ddlTOBE"></select>
+						</div>
+
+					
+
+
+
+						<div class="form-group col-md-6">
+							<label class="control-label">
+								Fecha de Actualización
+							</label>
+
+							<div class="input-group date" id="dpFechaRegistro-btn">
+								<input type="text" id="dpFechaActualizacion" name="dpFechaActualizacion" class="form-control" />
+								<span class="input-group-addon">
+									<span class="icon icon-calendar"></span>
+								</span>
+							</div>
+
+						</div>
+
+						<div class="form-group col-md-6">
+							<label class="control-label">Actualizado Por: </label>
+							<input id="txtActualizadoPor" class="form-control" type="text" name="txtActualizadoPor">
+						</div>
+
+						<div class="form-group col-md-6">
+							<label class="control-label">(*) Campos Obligatorios </label>
+
+						</div>
+
+						<div class="form-group col-md-6">
+							<label class="control-label">
+								¿Requiere Codigo de Interfaz?
+							</label>
+							<div class="input-group" id="divReqCodInt">
+							</div>
+						</div>
+					</div>
+
+
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				<button id="btnActApp" class="btn btn-primary" onclick="guardarEditAplicacion()" type="button" data-loading-text="Procesando...">Actualizar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@*<script>
+		const id_Aplicacion = @_idAplicacion;
+		const ENTIDAD_PARAMETRICA = {
+			APPLIANCE: @Html.Raw((int)EEntidadParametrica.APPLIANCE),
+			PORTAFOLIO: @Html.Raw((int)EEntidadParametrica.PORTAFOLIO)
+		};
+		const ENTIDAD_MANTENIMIENTO = @Html.Raw((int)EConfiguracionPortafolio.Parametrica)
+	</script>*@
+
+<script src="~/app/ConfiguracionPortafolio/Aplicacion.js?v=2.0.0"></script>

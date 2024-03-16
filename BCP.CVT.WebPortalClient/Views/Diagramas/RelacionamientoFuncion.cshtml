@@ -1,0 +1,125 @@
+﻿
+@{
+    ViewBag.Title1 = "Reglas de Relacionamiento";
+    ViewBag.Title2 = "Configuración > Diagramas";
+    ViewBag.Title3 = "Reglas de Relacionamiento";
+}
+
+<style>
+    .disabled_a {
+        color: gray !important;
+    }
+</style>
+
+<div class="card-search">
+    <fieldset class="fieldset">
+        <legend class="legend">Filtro de búsqueda</legend>
+        <div class="card-search-box">
+            <form action="javascript:void(0);">
+                <div class="form-group row">
+                    <div class="col-md-8 col-xs-8 col-sm-8">
+                        <div class="input-with-icon">
+                            <input id="txtBusRegla" class="form-control input-thick pill input-with-icon-search" type="text" maxlength="255" placeholder="Origen o Destino ..." onkeypress="return checkCaracteres(event)">
+                            <span class="icon icon-search input-icon"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-3 col-sm-3">
+                        <div class="text-left" data-toggle="match-height">
+                            <button id="btnBusRegla" class="btn btn-primary btn-width-custom" onclick="Buscar()">Buscar</button>
+                            <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddRelacionamiento()">
+                                <span class="icon icon-plus"></span>
+                                <span class="count-text">Nuevo</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+    </fieldset>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="row">
+                        <div class="panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+                            <div class="col-xs-9 col-md-9 text-left">
+                                <h4 id="tituloResultado" name="tituloResultado"></h4>
+                            </div>
+
+                        </div>
+                        <div class="col-md-8" style="margin-bottom: 15px; margin-top: 15px;">
+                            <table id="tblRegla" class="table table-striped table-nowrap dataTable" data-mobile-responsive="true">
+                                <thead>
+                                    <tr>
+                                        <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="5%">#</th>
+                                        <th data-field="AplicaEnStr" data-halign="center" data-valign="middle" data-align="center">Aplica en</th>
+                                        <th data-field="Origen" data-halign="center" data-valign="middle" data-align="center">Origen</th>
+                                        <th data-field="Destino" data-halign="center" data-valign="middle" data-align="center">Destino</th>
+                                        <th data-field="FechaModificacionStr" data-halign="center" data-valign="middle" data-align="center">Fecha de ultima actualización</th>
+                                        <th data-formatter="opcionesActivo" data-field="FlagActivo" data-halign="center" data-valign="middle" data-align="center" data-width="10%">Activo</th>
+                                        <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-width="10%" data-valign="middle" data-align="center">Opciones</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Regla)-->
+<div id="MdAddOrEditRegla" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormRegla"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditRegla">
+                    <div class="form-group">
+                        <label class="control-label" style="display:block">Regla general para: </label>
+                        @*<select id="ddlAplicaEn" name="ddlAplicaEn" class="form-control" onchange="RefrescarCombos()">
+                            <option value="-1">-- Seleccione --</option>
+                            <option value="1">Servidores</option>
+                            <option value="2">Recursos Nube</option>
+                        </select>*@
+                        <select id="cbTipoEquipo" name="cbTipoEquipo" class="form-control div-tipo-equipo" onchange="RefrescarCombos()"></select>
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" name="hdRelacionReglasGeneralesId" id="hdRelacionReglasGeneralesId" value="0" />
+                        <label class="control-label" style="display:block">Origen: </label>
+                        <select id="ddlOrigen" name="ddlOrigen" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="display:block">Destino: </label>
+                        <select id="ddlDestino" name="ddlDestino" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Activo?
+                        </label>
+                        <div class="input-group" id="divActRegla">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegRegla" class="btn btn-primary" onclick="guardarAddOrEditRegla()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/relacionamientoFuncion.js?v=1.0.0"></script>

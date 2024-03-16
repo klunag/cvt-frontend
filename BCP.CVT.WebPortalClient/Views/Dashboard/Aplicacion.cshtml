@@ -1,0 +1,320 @@
+﻿@{
+    ViewBag.Title1 = "Gráficos por Aplicación";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Aplicación";
+    ViewBag.Title3 = "Gráficos por Aplicación";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<!-- Plotly JS -->
+<script src="~/Scripts/plotly-latest.min.js"></script>
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<style>
+    .mycontent-left {
+        border-right: 1px solid #ddd;
+        height: 140px;
+        margin-right: -16px;
+    }
+
+    .card-search .fieldset hr {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border: 0;
+        border-top: 1px solid #ddd;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <form id="formAplicacion">
+                    <div class="row col-md-6  card-search-box">
+
+                        <div class="col-xs-6 col-md-6">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Soportado por/Tribu: (*)</h5>
+                                <select id="cbFilGestionadoPor" name="cbFilGestionadoPor" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-md-6">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Líder Usuario: </h5>
+                                <select id="cbFilUsuarioLider" name="cbFilUsuarioLider" class="form-control" multiple="multiple"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-md-6">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Usuario autorizador: </h5>
+                                <select id="cbFilAutorizador" name="cbFilAutorizador" class="form-control" multiple="multiple"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-md-6">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Experto especialista: </h5>
+                                <select id="cbFilExpertoEspecialista" name="cbFilExpertoEspecialista" class="form-control" multiple="multiple"></select>
+                            </div>
+                        </div>
+                        <div class="mycontent-left">
+                        </div>
+
+                    </div>
+
+                    <div class=" col-md-6  card-search-box">
+                        <div class="row"></div>
+                        <div class="row"></div>
+                        <div class="row"></div>
+
+                        <div class="row">
+                            <div class="col-xs-5 col-md-5">
+                                <div class="text-right" data-toggle="match-height">
+                                    <input type="button" id="btnBuscarAplicaciones" name="btnBuscarAplicaciones" value="Buscar aplicaciones" class="btn btn-primary" />
+                                </div>
+                            </div>
+                            <div class="col-xs-7 col-md-7">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado de Aplicación: </h5>
+                                    <select id="cbFilEstadoAplicacion" name="cbFilEstadoAplicacion" class="form-control"></select>
+                                </div>
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Aplicaciones: </h5>
+                                    <select id="cbFilAplicacion" name="cbFilAplicacion" class="form-control" multiple="multiple"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="col-xs-12 col-md-12">
+                            <a class="btn btn-primary pull-right" href="javascript: void(0)" onclick="GetReporte()">
+                                <span class="icon icon-external-link"></span>
+                                <span class="count-text">Generar Gráficos</span>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+                
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="row">
+</div>
+
+<div id="divGraficos" style="display: none">
+
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">
+                Tecnologías absolutas
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">
+                Grupo de Aplicaciones
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab">
+                Aplicaciones
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="tab1">
+            <div class="row"></div>
+            <div class="row gutter-xs">
+                <div class="col-xs-12 div-report">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong>Relación de aplicaciones que utilizan y no utilizan tecnologías absolutas</strong>
+                        </div>
+                        <div class="card-body">
+                            <div id="reportHorizontalBar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="tab2">
+            <div class="row"></div>
+            <div class="row">
+                <div class=" col-md-5">
+                    <div class="clearfix"></div>
+                    <div class="row col-md-12">
+                        <table id="tblPromedioSituacionActual" class="table" data-unique-id="Id">
+                            <caption class="caption">
+                                Situación actual
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-field="Valor" data-halign="center" data-valign="middle" data-align="right" data-width="14%">KPI <br>Obsolescencia del Grupo</th>
+                                    <th data-formatter="formatterEstadoObs" data-field="Valor" data-halign="center" data-valign="middle" data-align="center" data-width="8%">Estado <br />del Grupo</th>
+
+                                    @*<th data-field="X" data-halign="center" data-valign="middle" data-align="right">Riesgo de Obsolescencia <br />del grupo</th>
+                                        <th data-field="Y" data-halign="center" data-valign="middle" data-align="right">Índice de Obsolescencia <br /> del grupo</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="row col-md-7">
+
+                    <div id="divPlotlyPromedioSituacionActual">
+                    </div>
+                    <div id="divPlotlyPromedioSituacionActual_alt" style='margin-top: -360px;'>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class=" col-md-5">
+                    <div class="clearfix"></div>
+                    <div class="row col-md-12">
+                        <table id="tblPromedioProyeccion1" class="table" data-unique-id="Id">
+                            <caption class="caption">
+                                <span id="lblPromedioProyeccion1"></span>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-field="Valor" data-halign="center" data-valign="middle" data-align="right" data-width="14%">KPI <br>Obsolescencia del Grupo</th>
+                                    <th data-formatter="formatterEstadoObs" data-field="Valor" data-halign="center" data-valign="middle" data-align="center" data-width="8%">Estado <br />del Grupo</th>
+                                    @*<th data-field="X" data-halign="center" data-valign="middle" data-align="right">Riesgo de Obsolescencia <br />del grupo</th>
+                                        <th data-field="Y" data-halign="center" data-valign="middle" data-align="right">Índice de Obsolescencia <br /> del grupo</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="row col-md-7">
+                    <div id="divPlotlyPromedioProyeccion1">
+                    </div>
+                    <div id="divPlotlyPromedioProyeccion1_alt" style='margin-top: -360px;'>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class=" col-md-5">
+                    <div class="clearfix"></div>
+                    <div class="row col-md-12">
+                        <table id="tblPromedioProyeccion2" class="table" data-unique-id="Id">
+                            <caption class="caption">
+                                <span id="lblPromedioProyeccion2"></span>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    @*<th data-field="X" data-halign="center" data-valign="middle" data-align="right">Riesgo de Obsolescencia <br />del grupo</th>
+                                        <th data-field="Y" data-halign="center" data-valign="middle" data-align="right">Índice de Obsolescencia <br /> del grupo</th>*@
+                                    <th data-field="Valor" data-halign="center" data-valign="middle" data-align="right" data-width="14%">KPI <br>Obsolescencia del Grupo</th>
+                                    <th data-formatter="formatterEstadoObs" data-field="Valor" data-halign="center" data-valign="middle" data-align="center" data-width="8%">Estado <br />del Grupo</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="row col-md-7">
+                    <div id="divPlotlyPromedioProyeccion2">
+                    </div>
+                    <div id="divPlotlyPromedioProyeccion2_alt" style='margin-top: -360px;'>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="tab3">
+            <div class="row"></div>
+            <div class="row">
+                <div class=" col-md-5">
+                    <div class="clearfix"></div>
+                    <div class="row col-md-12">
+                        <table id="tblSituacionActual" class="table" data-unique-id="Id">
+                            <caption class="caption">
+                                Situación actual
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-formatter="linkFormatterAplicacion" data-field="Value" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                                    <th data-field="Valor" data-halign="center" data-valign="middle" data-align="right" data-width="14%">KPI <br>Obsolescencia</th>
+                                    <th data-formatter="formatterEstadoObs" data-field="Valor" data-halign="center" data-valign="middle" data-align="center" data-width="8%">Estado</th>
+
+                                    @*<th data-field="X" data-halign="center" data-valign="middle" data-align="right">Riesgo Obsolescencia</th>
+                                        <th data-field="Y" data-halign="center" data-valign="middle" data-align="right">Índice Obsolescencia</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="row col-md-7">
+                    <div id="divPlotlySituacionActual">
+                    </div>
+                    <div id="divPlotlySituacionActual_alt" style='margin-top: -400px;'>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="clearfix"></div>
+                    <div class="row col-md-12">
+                        <table id="tblProyeccion1" class="table" data-unique-id="Id">
+                            <caption class="caption">
+                                <span id="lblProyeccion1"></span>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-formatter="linkFormatterAplicacion" data-field="Value" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                                    <th data-field="Valor" data-halign="center" data-valign="middle" data-align="right" data-width="14%">KPI <br>Obsolescencia</th>
+                                    <th data-formatter="formatterEstadoObs" data-field="Valor" data-halign="center" data-valign="middle" data-align="center" data-width="8%">Estado</th>
+
+                                    @*<th data-field="X" data-halign="center" data-valign="middle" data-align="right">Riesgo Obsolescencia</th>
+                                        <th data-field="Y" data-halign="center" data-valign="middle" data-align="right">Índice Obsolescencia</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="row col-md-7">
+                    <div id="divPlotlyProyeccion1">
+                    </div>
+                    <div id="divPlotlyProyeccion1_alt" style='margin-top: -400px;'>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class=" col-md-5">
+                    <div class="clearfix"></div>
+                    <div class="row col-md-12">
+                        <table id="tblProyeccion2" class="table" data-unique-id="Id">
+                            <caption class="caption">
+                                <span id="lblProyeccion2"></span>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-formatter="linkFormatterAplicacion" data-field="Value" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                                    <th data-field="Valor" data-halign="center" data-valign="middle" data-align="right" data-width="14%">KPI <br>Obsolescencia</th>
+                                    <th data-formatter="formatterEstadoObs" data-field="Valor" data-halign="center" data-valign="middle" data-align="center" data-width="8%">Estado</th>
+                                    @*<th data-field="X" data-halign="center" data-valign="middle" data-align="right">Riesgo Obsolescencia</th>
+                                        <th data-field="Y" data-halign="center" data-valign="middle" data-align="right">Índice Obsolescencia</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="row col-md-7">
+                    <div id="divPlotlyProyeccion2">
+                    </div>
+                    <div id="divPlotlyProyeccion2_alt" style='margin-top: -400px;'>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="~/app/dashboardAplicacion.js?v=v=2.1.0"></script>

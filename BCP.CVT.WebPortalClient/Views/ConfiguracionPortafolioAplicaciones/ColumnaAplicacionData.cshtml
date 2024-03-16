@@ -1,0 +1,373 @@
+﻿@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Gestión de campos de aplicación";
+	ViewBag.Title2 = "Configuración de Portafolio";
+	ViewBag.Title3 = "Gestión de campos de aplicación";
+}
+
+@using BCP.CVT.Cross
+
+<style>
+	.bloq-element {
+		pointer-events: none;
+		opacity: 0.7;
+	}
+
+	.card-body .caption {
+		padding: 8px;
+		background-color: #fff;
+		font-weight: 600;
+		font-size: 16px;
+		border-right: 1px solid #ddd;
+		border-top: 1px solid #ddd;
+		border-left: 1px solid #ddd;
+	}
+
+		.card-body .caption span {
+			margin-top: 5px;
+		}
+
+		.card-body .caption button {
+			margin-left: 20px;
+		}
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+	<div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height containerAplicacion">
+                                <h5>Nombre a mostrar: </h5>
+                                <input type="text" name="ddlFiltroNombre" id="ddlFiltroNombre" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                <input type="hidden" name="hdNombreId" id="hdNombreId" value="" />
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Se visualiza/exporta: </h5>
+                                <select id="ddlFiltroVerExportar" name="ddlFiltroVerExportar" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Activo al que aplica: </h5>
+                                <select id="ddlActivoAplicaF" name="ddlActivoAplicaF" class="form-control">
+                                    <option value="0">-- Todos --</option>
+                                    <option value="1">Para Todas</option>
+                                    <option value="2">Solo APP IT</option>
+                                    <option value="3">Solo User IT</option>
+                                    <option value="-1">Ninguno</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-right">
+                                <h5>&nbsp;</h5>
+                                <button id="btnBuscar" class="btn btn-primary">
+                                    <span class="icon icon-search"></span>
+                                    <span class="count-text">Buscar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Modo de Llenado: </h5>
+                                <select id="ddlModoLlenadoF" name="ddlModoLlenadoF" class="form-control">
+                                    <option value="0">-- Todos --</option>
+                                    <option value="1">Automático</option>
+                                    <option value="2">Manual</option>
+                                    <option value="3">Manual - Automático</option>
+                                    <option value="-1">Ninguno</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Tipo de registro: </h5>
+                                <select id="ddlTipoRegistroF" name="ddlTipoRegistroF" class="form-control">
+                                    <option value="0">-- Todos --</option>
+                                    <option value="1">Obligatorio</option>
+                                    <option value="2">Opcional</option>
+                                    <option value="-1">Ninguno</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Nivel de confiabilidad del dato: </h5>
+                                <select id="ddlNivelConfiabilidadF" name="ddlNivelConfiabilidadF" class="form-control">
+                                    <option value="0">-- Todos --</option>
+                                    <option value="1">Alto</option>
+                                    <option value="2">Medio</option>
+                                    <option value="3">Bajo</option>
+                                    <option value="-1">Ninguno</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+	</div>
+</div>
+
+<div class="row gutter-xs" style="margin-top:20px;">
+	<div class="col-xs-12">
+		<div class="card">
+			<div class="card-body">
+				<div class="caption text-left">
+					<span>Registro de campos de la entidad aplicación</span>
+					<button id="btnReordenamiento" type="button" class="btn btn-primary btn-sm disabled" data-loading-text="Procesando..." disabled>Guardar reordenamiento</button>
+					<br />
+					<span style="font-size:11px !important;">Los cambios en el orden solo se verán reflejados al guardar el reordenamiento</span>
+				</div>
+				<table id="tblColumnaAplicacion" class="table" data-unique-id="Id" data-mobile-responsive="true"
+					   data-use-row-attr-func="true" data-reorderable-rows="true">
+					<thead>
+						<tr>
+							<th data-field="OrdenColumnaStr" data-halign="center" data-valign="middle" data-align="center">Orden en  <br />publicación</th>
+							<th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+							<th data-field="NombreExcel" data-halign="center" data-valign="middle" data-align="left">Nombre a mostrar</th>
+							<th data-field="FlagVerExportarStr" data-halign="center" data-valign="middle" data-align="left">Visualización / <br /> Exportación</th>
+							<th data-field="NombreBDEntidadRelacion" data-halign="center" data-valign="middle" data-align="center">Modificado por</th>
+							<th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de modificación</th>
+
+							<th data-field="ActivoAplicaToString" data-halign="center" data-valign="middle" data-align="center">Activo que aplica</th>
+							<th data-field="ModoLlenadoToString" data-halign="center" data-valign="middle" data-align="center">Modo de llenado</th>
+							<th data-field="TipoRegistroToString" data-halign="center" data-valign="middle" data-align="center">Tipo de registro</th>
+							<th data-field="RolRegistra" data-halign="center" data-valign="middle" data-align="center">Rol que registra</th>
+							<th data-field="RolAprueba" data-halign="center" data-valign="middle" data-align="center">Rol que aprueba</th>
+							<th data-field="DescripcionCampo" data-halign="center" data-valign="middle" data-align="center">Descripción del campo</th>
+							<th data-field="NivelConfiabilidadToString" data-halign="center" data-valign="middle" data-align="center">Nivel de confiabilidad</th>
+							<th data-field="RolResponsableActualizacion" data-halign="center" data-valign="middle" data-align="center">Rol responsable de actualización</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--Modal Observar Solicitud-->
+<div id="mdOS" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h5 class="modal-title" id="title-modal">Editar registro</h5>
+			</div>
+			<div class="modal-body">
+				<form id="formOS">
+					<div class="form-group all field-register field-edit">
+						<label class="control-label">Nombre del campo</label>
+						<textarea id="txtNombre" name="txtNombre" maxlength="50" rows="2" class="form-control all field-register field-edit"></textarea>
+					</div>
+					<div class="form-group all field-register field-edit divFlagNuevo">
+						<label class="control-label">Tipo de input</label>
+						<div>
+							<select id="ddlTipoInput" name="ddlTipoInput" class="form-control all field-register field-edit divFlagNuevo"></select>
+						</div>
+					</div>
+					<div class="form-group divListBox" style="display:none;">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="input-group">
+									<input id="txtItemListBox" name="txtItemListBox" type="text" class="form-control" maxlength="50"placeholder="Debes ingresar un item">
+									<span class="input-group-btn">
+										<button id="btnAddItemListBox" class="btn btn-primary" type="button" title="Agregar item" disabled>
+											<span id="spIconButton" class="glyphicon glyphicon-plus"></span>
+										</button>
+									</span>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<table id="tblDataListBox"
+									   class="table"
+									   data-unique-id="Id"
+									   data-pagination="true"
+									   data-page-size="5"
+									   data-mobile-responsive="true">
+									<thead>
+										<tr>
+											<th data-formatter="actionFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="2%">Acciones</th>
+											<th data-field="Valor" data-halign="center" data-valign="middle" data-align="center">Item</th>
+
+										</tr>
+									</thead>
+								</table>
+								<input type="hidden" id="msjTable" name="msjTable" class="form-control divListBox" style="display:none;" />
+							</div>
+						</div>
+					</div>
+					<div class="form-group all field-register field-edit divFlagNuevo">
+						<div class="row">
+							<div class="col-md-6">
+								<label class="control-label">Tipo de registro</label>
+								<div>
+									<select id="ddlTipoFlujo" name="ddlTipoFlujo" class="form-control all field-register field-edit divFlagNuevo" multiple="multiple"></select>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<label class="control-label">Obligatorio</label>
+								<div class="input-group" id="divObligatorio"></div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group all field-register field-edit">
+						<label class="control-label">Tooltip</label>
+						<textarea id="txtToolTip" name="txtToolTip" rows="4" class="form-control all field-register field-edit"></textarea>
+					</div>
+					<div class="form-group all field-register field-edit">
+						<label class="control-label">Activo al que aplica</label>
+						<select id="ddlActivoAplica" name="ddlActivoAplica" class="form-control">
+						</select>
+					</div>
+					<div class="form-group all field-register field-edit">
+						<label class="control-label">Modo de llenado</label>
+						<select id="ddlModoLlenado" name="ddlModoLlenado" class="form-control">
+						</select>
+					</div>
+					<div class="form-group all field-register field-edit">
+						<label class="control-label">Tipo de registro</label>
+						<select id="ddlTipoRegistro" name="ddlTipoRegistro" class="form-control">
+						</select>
+					</div>
+					<div class="form-group all field-register field-edit">
+						<label class="control-label">Rol que registra</label>
+						<textarea id="txtRolRegistra" name="txtRolRegistra" rows="4" class="form-control all field-register field-edit"></textarea>
+					</div>
+					<div class="form-group all field-register field-edit">
+						<label class="control-label">Rol que aprueba</label>
+						<textarea id="txtRolAprueba" name="txtRolAprueba" rows="4" class="form-control all field-register field-edit"></textarea>
+					</div>
+					<div class="form-group all field-register field-edit">
+						<label class="control-label">Descripción de campo</label>
+						<textarea id="txtDescripcionCampo" name="txtDescripcionCampo" rows="4" class="form-control all field-register field-edit"></textarea>
+					</div>
+					<div class="form-group all field-register field-edit">
+						<label class="control-label">Nivel de confiabilidad del dato</label>
+						<select id="ddlNivelConfiabilidad" name="ddlNivelConfiabilidad" class="form-control">
+						</select>
+					</div>
+					<div class="form-group all field-register field-edit">
+						<label class="control-label">Rol responsable de actualización</label>
+						<textarea id="txtRolResponsableActualizacion" name="txtRolResponsableActualizacion" rows="4" class="form-control all field-register field-edit"></textarea>
+					</div>
+
+					@*<div class="form-group all field-edit">
+							<label class="control-label">
+								Activar la edición por parte del usuario final
+								<span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Para campos únicos no modificables esta opción se encuentra deshabilitada"></span>
+							</label>
+							<div class="divModificable">
+								<div class="input-group" id="divEdicion"></div>
+							</div>
+						</div>*@
+					<div class="form-group all field-edit">
+						<label class="control-label">
+							Activar la visualización/exportación por parte del usuario final
+						</label>
+						<div class="input-group" id="divVisualizacion"></div>
+					</div>
+					<div class="form-group all field-edit">
+						<label class="control-label">Orden de publicación: (para modificar el orden utilice el ordenamiento en el listado) </label>
+						<input id="txtOrden" name="txtOrden" class="form-control all field-edit" type="text" disabled="disabled">
+					</div>
+					<input type="hidden" name="hdRegistroId" id="hdRegistroId" value="0" />
+					<input type="hidden" name="hdOrdenActual" id="hdOrdenActual" value="0" />
+					<input type="hidden" name="hdInfoCampoId" id="hdInfoCampoId" value="0" />
+					<input type="hidden" name="hdTipoInputId" id="hdTipoInputId" value="0" />
+					<input type="hidden" name="hdTablaProcedenciaId" id="hdTablaProcedenciaId" value="0" />
+					<input type="hidden" name="hdMantenimentoPfId" id="hdMantenimentoPfId" value="0" />
+					<input type="hidden" name="hdCodigoPr" id="hdCodigoPr" value="" />
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				<button id="btnOS" type="button" class="btn btn-primary" data-loading-text="Procesando..." title="Guardar observación">Guardar</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Modal Observar Solicitud-->
+
+<div id="modalEditarItem" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEditarItem" aria-hidden="true">
+	<div class="modal-dialog " role="document">
+		<form id="formEli2">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="titulo">Editar Item</h5>
+				</div>
+				<div class="modal-body">
+
+					<input type="hidden" name="hdItemId" id="hdItemId" value="0" />
+
+					<div class="row">
+						<div class="col-md-3">
+							<p>Valor anterior</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtItemValAnt" name="txtItemValAnt" class="form-control" type="text" placeholder="" disabled>
+						</div>
+					</div>
+
+
+					<div class="row">
+						<div class="col-md-3">
+							<p>Nuevo Valor</p>
+						</div>
+						<div class="col-md-7">
+							<input id="txtItemVal" name="txtItemVal" class="form-control" type="text" placeholder="">
+						</div>
+					</div>
+
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+					<button id="btnEditarItem" class="btn btn-primary" type="button" data-loading-text="Procesando...">Editar</button>
+				</div>
+			</div>
+
+
+		</form>
+	</div>
+</div>
+
+
+<script>
+    const TABLA_PROCEDENCIA_ID = {
+        CVT_APLICACION: @Html.Raw((int)ETablaProcedenciaAplicacion.Aplicacion),
+        APP_APLICACIONDETALLE: @Html.Raw((int)ETablaProcedenciaAplicacion.AplicacionDetalle),
+        DATA_APLICACION: @Html.Raw((int)ETablaProcedenciaAplicacion.AplicacionData),
+        APP_INFOCAMPOAPLICACION: @Html.Raw((int)ETablaProcedenciaAplicacion.InfoCampoPortafolio)
+    };
+    const ENTIDAD_MANTENIMIENTO = @Html.Raw((int)EConfiguracionPortafolio.GestionCampo);
+    const TIPO_INPUT_ID = {
+        TextBox: @Html.Raw((int)ETipoInputHTML.TextBox),
+        ListBox: @Html.Raw((int)ETipoInputHTML.ListBox),
+        Otros: @Html.Raw((int)ETipoInputHTML.Otros)
+    };
+</script>
+
+
+<script src="/Scripts/jquery.tablednd.js"></script>
+<link href="/Content/bootstrap-table-reorder-rows.css" rel="stylesheet" />
+<script src="/Scripts/bootstrap-table-reorder-rows.js"></script>
+
+<script src="~/app/ConfiguracionPortafolio/columnaAplicacionData.js?v=2.1.0"></script>

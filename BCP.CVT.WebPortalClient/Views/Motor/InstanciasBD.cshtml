@@ -1,0 +1,130 @@
+﻿
+@{
+    ViewBag.Title1 = "Instancias BD ";
+    ViewBag.Title2 = "Motor";
+    ViewBag.Title3 = ViewBag.Title1;
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .tec {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div id="SearchContainer" class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+
+                        <div class="form-group row">
+                            <div class="col-xs-6 col-md-6 containerFiltroEquipo">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Equipo: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtEquipo" id="txtEquipo" class="form-control input-thick pill input-with-icon-search" value="" maxlength="200" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="0" id="hEquipo" name="hEquipo" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 containerFiltroAplicacion">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Aplicación: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtAplicacion" id="txtAplicacion" class="form-control input-thick pill input-with-icon-search" value="" maxlength="180" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Procedencia: </label>
+                                    <div class="input-with-icon">
+                                        <select class="form-control" id="cbProcedencia" name="cbProcedencia">
+                                            <option value="0">--Todos--</option>
+                                            <option value="1">ADDM/HELIX</option>
+                                            <option value="2">AZURE</option>
+                                            <option value="3">MANUAL</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group ">
+                            <div class="col-md-6 col-xs-6">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Nombre de BD: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtNombre" id="txtNombre" class="form-control input-thick pill input-with-icon-search" value="" maxlength="200" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3" style="padding-top:24px">
+                                <div class="text-left" data-toggle="match-height">
+                                    <button id="btnBusRegistro" class="btn btn-primary btn-width-custom" onclick="buscarRegistros()">Buscar</button>
+                                    <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarInfo()">
+                                        <span class="icon icon-external-link"></span>
+                                        <span class="count-text">Exportar</span>
+                                    </a>
+                                </div>
+                            </div>
+                           
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros identificados</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistros" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="5%">#</th>
+                            <th data-field="NombreEquipo" data-halign="center" data-valign="middle" data-align="left" data-width="25%" data-sortable="true" data-sort-name="NombreEquipo">Equipo</th>
+                            <th data-field="InstanciaBD" data-halign="center" data-valign="middle" data-align="left" data-width="25%" data-sortable="true" data-sort-name="InstanciaBD">Instancia BD</th>
+                            <th data-field="InventarioStr" data-halign="center" data-valign="middle" data-align="left" data-width="15%" data-sortable="true" data-sort-name="InventarioStr">Procedencia</th>
+                            <th data-field="FechaModificacionStr" data-halign="center" data-valign="middle" data-align="center" data-width="15%" data-sortable="true" data-sort-name="FechaModificacionStr">Fecha Modificación</th>
+                            <th data-field="Estado" data-halign="center" data-valign="middle" data-align="center" data-width="10%" data-sortable="true" data-sort-name="Estado">Estado</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/Motor/instanciasBD.js?v=1.0.0"></script>

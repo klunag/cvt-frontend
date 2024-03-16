@@ -1,0 +1,227 @@
+﻿@{
+    ViewBag.Title1 = "Vista por aplicaciones";
+    ViewBag.Title2 = "Equipos y aplicaciones";
+    ViewBag.Title3 = "Vista por aplicaciones";
+    string codigoApp = ViewBag.codigoApp;
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <div class="card-search-box">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Gerencia: </h5>
+                                    <select id="cbFiltroGerencia" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>División: </h5>
+                                    <select id="cbFiltroDivision" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Unidad: </h5>
+                                    <select id="cbFiltroUnidad" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Área: </h5>
+                                    <select id="cbFiltroArea" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3 appContainer">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Aplicación (código): </h5>
+                                    <input type="text" value="" maxlength="100" autocomplete="off" id="txtAplicacion" name="txtAplicacion" class="form-control" />
+                                    <input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 tribuContainer">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Jefe de equipo</h5>
+                                    <input type="text" value="" maxlength="100" autocomplete="off" id="txtLiderTribu" name="txtLiderTribu" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 usuarioContainer">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Líder usuario/Owner</h5>
+                                    <input type="text" value="" maxlength="100" autocomplete="off" id="txtProduct" name="txtProduct" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado de la aplicación                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </h5>
+                                    <select id="cbFiltroEstado" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-2">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tratamiento PCI DSS </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                                    <select id="ddlPCI" name="ddlPCI" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row gutter-xs">
+                            <div class="col-md-12">
+                                <div class="text-right">
+                                    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="RefrescarListado()">
+                                        <span class="count-text">Buscar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+        @*<a class="btn btn-primary" href="javascript: void(0)" onclick="RefrescarListado()">
+                <span class="count-text">Buscar</span>
+            </a>*@
+        <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+            <span class="icon icon-external-link"></span>
+            <span class="count-text">Exportar</span>
+        </a>
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Relación de aplicaciones</strong>
+                </div>
+                <div class="card-body">
+                    <table id="tblRegistro" class="table" data-mobile-responsive="true" data-unique-id="Id" style="width:2000px !important; font-size:11px !important;">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="20">#</th>
+                                <th data-formatter="linkFormatterName" data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="50" data-sort-name="CodigoAPT">Código</th>
+                                <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="200">Nombre</th>
+                                <th data-field="EstadoAplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Estado aplicación</th>
+                                <th data-field="TotalEquiposRelacionados" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="100">Total de servidores<br /> relacionados</th>
+                                <th data-field="CriticidadToString" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="80">Criticidad</th>
+                                <th data-field="GestionadoPor" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="GestionadoPor" data-width="200">Gestionado por</th>
+                                <th data-field="NombreEquipo_Squad" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreEquipo_Squad" data-width="200">Nombre de equipo</th>
+                                @*<th data-field="Owner_LiderUsuario_ProductOwner" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Owner_LiderUsuario_ProductOwner" data-width="200">Owner</th>*@
+                                <th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TipoActivoInformacion" data-width="80">Tipo activo</th>
+                                <th data-field="GerenciaCentral" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="GerenciaCentral" data-width="200">Gerencia central</th>
+                                <th data-field="Division" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Division" data-width="200">División</th>
+                                <th data-field="Area" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Area" data-width="200">Área</th>
+                                <th data-field="Unidad" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Unidad" data-width="200">Unidad</th>
+                                <th data-field="ListaPCI" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="ListaPCI" data-width="200">PCI DSS</th>
+                                @*<th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="120">Fecha de última <br />actualización</th>*@
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="hdFiltro" id="hdFiltro" value="" />
+    </div>
+</div>
+<div class="view-detalle col-md-12 col-sm-12 col-xs-12" style="display:none">
+    <div class="x_panel">
+        <div class="row"></div>
+        <div class="x_title">
+            <div class="pull-right" style="display: inline-flex">
+                <a href="javascript:CerrarVistaDetalle()" class="btn btn-default">Regresar</a>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row"></div>
+            <input type="hidden" id="hdId" name="hdId" value="0" />
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-8">
+                        <div class="col-md-12">
+                            <div class="col-md-4"><label>Cod app:</label></div>
+                            <div class="col-md-8"><input type="text" id="txtCodApp" name="txtCodApp" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-4"><label>Nombre:</label></div>
+                            <div class="col-md-8"><input type="text" id="txtNombre" name="txtNombre" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-4"><label>Criticidad:</label></div>
+                            <div class="col-md-8"><input type="text" id="txtCriticidad" name="txtCriticidad" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-4"><label>Gestionado Por:</label></div>
+                            <div class="col-md-8"><input type="text" id="txtGestionadoPor" name="txtGestionadoPor" class="form-control" readonly /></div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-4"><label>RoadMap:</label></div>
+                            <div class="col-md-8"><input type="text" id="txtRoadMap" name="txtRoadMap" class="form-control" readonly /></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12" style="margin-bottom:15px;">
+                    <div class="col-md-4">
+                        <label class="control-label">Servidores relacionados:</label>
+                    </div>
+                    <table id="tbl-servidoresRelacionadas" class="table" data-unique-id="Id">
+                        <thead>
+                            <tr>
+                                <th data-field="tbl-servidoresRelacionadas" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Equipo</th>
+                                <th data-field="Ambiente" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Ambiente</th>
+                                <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">TipoEquipo</th>
+                                <th data-field="FlagObsoleto" data-formatter="semaforoFormatter" data-halign="center" data-valign="middle" data-align="center">Estado</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-md-12" style="margin-bottom:15px;">
+                    <label class="control-label">Tecnologías:</label>
+                    <table id="tbl-aplicacionTecnologias" class="table" data-unique-id="Id">
+                        <thead>
+                            <tr>
+                                <th data-field="tbl-aplicacionTecnologias" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="DominioNomb" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Dominio</th>
+                                <th data-field="SubdominioNomb" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Subdominio</th>
+                                <th data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Tecnología</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-md-12" style="margin-bottom:15px;">
+                    <label class="control-label">Expertos:</label>
+                    <table id="tbl-aplicacionExpertos" class="table" data-unique-id="Id">
+                        <thead>
+                            <tr>
+                                <th data-field="tbl-aplicacionExpertos" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="Matricula" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Matrícula</th>
+                                <th data-field="Nombres" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Nombres</th>
+                                <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Fecha Creación</th>
+                                <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Creado Por</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var codigoAplicacion = '@codigoApp';
+</script>'
+<script src="~/app/vistaAplicacion.js?v1.3.3"></script>

@@ -1,0 +1,315 @@
+﻿
+@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Actualización de Aplicaciones UserIT";
+	ViewBag.Title2 = "Flujo de aprobación";
+	ViewBag.Title3 = "Actualización de Aplicaciones UserIT";
+
+	string nombreApp = (string)ViewBag.Nombre_App;
+	int paginaActual = (int)ViewBag.PaginaActual;
+	int paginaTamanio = (int)ViewBag.PaginaTamanio;
+	int estado = (int)ViewBag.Estado;
+}
+
+<style>
+	.width-des {
+		min-width: 300px;
+	}
+
+	.bloq-element {
+		pointer-events: none;
+		opacity: 0.7;
+	}
+
+	/* Chat containers */
+	.container {
+		border: 2px solid #dedede;
+		background-color: #f1f1f1;
+		border-radius: 5px;
+		padding: 10px;
+		margin: 10px 0;
+	}
+
+	/* Darker chat container */
+	.darker {
+		border-color: #f7a033;
+		background-color: #ddd;
+	}
+
+	/* Clear floats */
+	.container::after {
+		content: "";
+		clear: both;
+		display: table;
+	}
+
+	/* Style images */
+	.container img {
+		float: left;
+		max-width: 60px;
+		width: 100%;
+		margin-right: 20px;
+		border-radius: 50%;
+	}
+
+		/* Style the right image */
+		.container img.right {
+			float: right;
+			margin-left: 20px;
+			margin-right: 0;
+		}
+
+	/* Style time text */
+	.time-right {
+		float: right;
+		color: #aaa;
+	}
+
+	/* Style time text */
+	.time-left {
+		float: left;
+		color: #999;
+	}
+
+	.user-name {
+		font-weight: bold;
+		text-transform: uppercase;
+	}
+</style>
+
+@*<div class="col-md-12">
+	<nav class="navbar navbar-default">
+		<div class="container">
+			<a class="navbar-brand" href="#">
+				<img class="navbar-brand-logo" src="~/images/logo-bcp.svg" alt="BCP">
+			</a>
+			<h3 class="navbar-text navbar-brand-center">
+				<strong>Aplicaciones User IT</strong>
+			</h3>
+			<p class="navbar-text navbar-right">
+				<a id="btnShowHideFilter" href="#filters-box" data-toggle="collapse" title="Filtros">
+					<span class="icon icon-2x icon-search"></span>
+				</a>
+			</p>
+		</div>
+	</nav>
+</div>*@
+<div class="card">
+	@*<div id="filters-box" class="card-body collapse">*@
+		<div class="card-body">
+
+		<div class="card-search">
+			<fieldset class="fieldset">
+				<legend class="legend">Filtro de búsqueda</legend>
+				<div class="card-search-box">
+					<form id="formFiltros">
+						<div class="row gutter-xs">
+							<div class="col-xs-4 col-md-3">
+								<div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+									<h5>Aplicación (código) </h5>
+									<input type="text" id="txtAplicacionFiltro" name="txtAplicacionFiltro" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+									<input type="hidden" name="hdAplicacionFiltroId" id="hdAplicacionFiltroId" />
+								</div>
+							</div>
+							<div class="col-xs-4 col-md-3">
+								<div class="text-left ui-widget" data-toggle="match-height">
+									<h5>Estado de la aplicación</h5>
+									<select id="cbFilEstado" name="cbFilEstado" class="form-control">
+										<option value="-1" selected="selected">Todos</option>
+										<option value="1">En Desarrollo</option>
+										<option value="2">Vigente</option>
+										<option value="3">No Vigente</option>
+										<option value="4">Eliminada</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-xs-4 col-md-3 text-right">
+								<h5>&nbsp;</h5>
+								<button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+							</div>
+							<div class="col-xs-4 col-md-3 text-right">
+								<h5>&nbsp;</h5>
+								<a id="btnExportar" class="btn btn-primary" href="javascript: void(0)" title="Exportar aplicaciones">
+									<span class="icon icon-file-excel-o"></span>
+									<span class="count-text">Exportar</span>
+								</a>
+							</div>
+
+						</div>
+					</form>
+				</div>
+			</fieldset>
+			</div>
+		</div>
+	@*</div>*@
+</div>
+<hr />
+@*<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+	<a id="btnExportar" class="btn btn-primary" href="javascript: void(0)" title="Exportar aplicaciones">
+		<span class="icon icon-file-excel-o"></span>
+		<span class="count-text">Exportar</span>
+	</a>
+</div>*@
+<div class="row gutter-xs">
+	<div class="col-xs-12">
+		<div class="card">
+			<div class="card-body">
+				<ul class="nav nav-tabs nav-justified otros">
+					<li class="active tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datGen" data-toggle="tab">Enviar solicitud de modificación</a></li>
+					<li class="tab-panel-tecnologia"><a class="tab-panel-tecnologia" href="#datTran" data-toggle="tab">Atender solicitud de modificación</a></li>
+				</ul>
+
+				<div class="tab-content">
+					<div class="tab-pane fade active in" id="datGen">
+						<table id="tblRegistro" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+							<caption class="caption text-left">
+								<span>Aplicaciones registradas</span>
+							</caption>
+							<thead>
+								<tr>
+									<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>									
+									<th data-field="commentDetail" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Estado revisión del portafolio</th>
+									<th data-field="applicationId" data-formatter="linkFormatter" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationId">Código</th>
+									<th data-field="name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Nombre</th>
+									<th data-field="description" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="description">Descripción</th>
+									<th data-field="assetTypeName" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="assetTypeName">Tipo de Activo</th>
+									<th data-field="statusDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="status">Estado de la aplicación</th>
+
+								</tr>
+							</thead>
+						</table>
+					</div>
+
+
+
+
+					<div class="tab-pane" id="datTran">
+						<table id="tblRegistro2" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true" data-detail-view="true" data-detail-formatter="detailFormatter" >
+							<caption class="caption text-left">
+								<span>Solicitudes registradas</span>
+							</caption>
+							<thead>
+								<tr>
+									<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+									<th data-formatter="situacionFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Estado de atención</th>
+									<th data-field="typeFlowDetail" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Flujo</th>
+									<th data-field="applicationId"  data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationId">Código APT</th>
+									<th data-field="applicationName" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationName">Nombre</th>
+									<th data-field="managedBy" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="managedBy">Gestionado por</th>
+									<th data-field="statusDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="status">Estado de la aplicación</th>
+									<th data-field="registeredBy" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="status">Modificado por</th>
+									<th data-field="dateCreation" data-formatter="dateFormat2" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="dateCreation">Fecha de registro <br /> de la solicitud</th>																		
+									<th data-field="isApprovedDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="isApproved">Situación de <br /> la solicitud</th>
+									<th data-field="comments" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="comments">Comentarios</th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="modalVerFlujosAprobacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalVerFlujosAprobacion" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="title-md">Información detallada de los responsables de aprobación de la aplicación: <span id="spanApp"></span></h5>
+				</div>
+				<div class="modal-body">
+					<div class="row gutter-xs">
+						<div class="col-xs-12">
+							<div class="card">
+								<div class="card-body">
+									<table id="tblFlujosAprobacion" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+										<caption class="caption text-left">
+											<span>Solicitudes registradas para la aplicación</span>
+										</caption>
+										<thead>
+											<tr>
+												<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+												<th data-formatter="estadoFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Estado de atención</th>
+												<th data-field="nameDetail" data-halign="center" data-valign="middle" data-align="center">Responsable</th>
+												<th data-field="typeRegisterDetail2" data-halign="center" data-valign="middle" data-align="center">Rol asignado</th>
+												<th data-field="isApprovedDetail" data-halign="center" data-valign="middle" data-align="center">Situación de <br /> la solicitud</th>
+												<th data-field="dateApprovedStr" data-halign="center" data-valign="middle" data-align="center">Fecha de Aprobación</th>
+												<th data-field="dateRejectedStr" data-halign="center" data-valign="middle" data-align="center">Fecha de Rechazo</th>
+												<th data-field="comments" data-halign="center" data-valign="middle" data-align="center">Comentarios</th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="modalRechazarSolicitante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRechazarSolicitante" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formRechazarSolicitante">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Ingrese el comentario indicando el rechazo de la solicitud</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a este cambio de estado: </label>
+                                <textarea id="txtDescripcionRechazo" name="txtDescripcionRechazo" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnProcesarRechazoSolicitante" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+<input type="hidden" name="hdFlowAppId" id="hdFlowAppId" value="0" />
+<input type="hidden" name="hdPreviousState" id="hdPreviousState" />
+
+<script>
+	const REGISTRO_PARCIAL = 1;
+	const REGISTRO_COMPLETO = 2;
+
+	const REGISTRO_APROBADO = 1;
+	const REGISTRO_PENDIENTE = 2;
+	const REGISTRO_RECHAZADO = 3;
+
+	const ESTADO_ENDESARROLLO = 1;
+	const ESTADO_VIGENTE = 2;
+	const ESTADO_NOVIGENTE = 3;
+	const ESTADO_ELIMINADA = 4;
+
+	var nombre_app = '@nombreApp';
+    var PAGINA_ACTUAL = @paginaActual;
+    var PAGINA_TAMANIO = @paginaTamanio;
+	var FLUJO_REGISTRO = 2;
+	var ESTADO = '@estado';
+
+    const ACCION_REGISTRAR = 1;
+    const ACCION_RECHAZAR = 2;
+    const ACCION_TRANSFERIR = 3;  
+</script>
+<script src="~/app/GestionPortafolio/catalogoAplicacionesUserIT.js?v=2.0.0"></script>

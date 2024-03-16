@@ -1,0 +1,753 @@
+﻿@using BCP.CVT.WebPortalClient.Models;
+@using System.Configuration;
+@using BCP.CVT.Cross;
+
+@{
+    Usuario_Storage eUsuario = (Usuario_Storage)Session["Usuario"];
+    UsuarioCurrent user = MetodosUtiles.getCurrentUser();
+    string eusername = eUsuario == null ? "" : eUsuario.UsuarioBCP_Dto.Name;
+    int perfilId = user == null ? 0 : user.PerfilId;
+    string title_site = eUsuario == null ? "" : eUsuario.SiteTitle;
+    bool flagPortafolio = false;
+    bool flagAdmin = user == null ? false : user.FlagAdmin;
+    bool detalle = user == null ? false : user.VerDetalle;
+    int detalleId = detalle == true ? 1 : 0;
+    int perfil = perfilId == 2 ? 0 : 1;
+
+    var secciones = MetodosUtiles.ObtenerSeccionesPaginas();
+    var paginas = MetodosUtiles.ObtenerPaginas();
+
+    string rol_aplicacion = MetodosUtiles.ObtenerRolAplicacion();
+
+    var activeTextMessageHome = MetodosUtiles.getParametro("ACTIVAR_TEXTO_MENSAJE_HOME");
+    var textMessageHome = MetodosUtiles.getParametro("TEXTO_MENSAJE_HOME");
+    string style = "inline-block";
+    string top = "0px";
+
+    if(activeTextMessageHome == "SI")
+    {
+        style = "revert";
+        top = "60px";
+    }
+    else
+    {
+        style = "inline-block";
+        top = "0px";
+    }
+}
+<!DOCTYPE html>
+<html lang="es-ES">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/png" href="~/favicon.ico" />
+
+    <!--Bootstrap 4.3.1-->
+    @*<link href="~/content/bootstrap4/css/bootstrap.min.css" rel="stylesheet" />*@
+    <link href="~/content/fontawesome.css" rel="stylesheet" />
+    <link href="~/content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/content/site.css" rel="stylesheet" />
+    <link href="~/content/stylesheet.css" rel="stylesheet" />
+    <link href="~/content/select2.min.css" rel="stylesheet" />
+    <link href="~/content/metismenu.min.css" rel="stylesheet" />
+    <link href="~/content/jquery-jvectormap-2.0.3.css" rel="stylesheet" />
+    <link href="~/Content/toastr.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
+    <title>@title_site</title>
+
+    @*<script src="~/scripts/jquery-1.10.2.min.js"></script>
+        <script src="~/Scripts/jqueryUI/jquery-ui.min.js"></script>
+        <script src="~/scripts/bootstrap.min.js"></script>
+    *@
+
+    <style>
+        /*ui-menu ui-widget ui-widget-content ui-autocomplete ui-front*/
+        /*ui-menu-item*/
+        /*ui-menu-item-wrapper*/
+        ul.ui-autocomplete {
+            z-index: 1100;
+        }
+
+        .my-error-class {
+            color: #dc3545;
+            font-weight: bold !important;
+            font-size: 12px;
+        }
+
+        .my-valid-class {
+        }
+
+        .btn-scroll-horizontal-container-buttons {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            top: 0;
+            height: 100%;
+        }
+
+            .btn-scroll-horizontal-container-buttons:first-of-type {
+                left: 0;
+            }
+
+            .btn-scroll-horizontal-container-buttons:last-of-type {
+                right: 0;
+            }
+
+            .btn-scroll-horizontal-container-buttons .btn {
+                background-color: #00000080;
+                color: #fff;
+                height: 100%;
+                display: flex;
+                align-items: center;
+            }
+    </style>
+
+    <!-- Bootstrap table -->
+    @Styles.Render("~/Content/bootstrap-table.min.css")
+    <!-- Bootstrap toggle -->
+    @Styles.Render("~/Content/bootstrap-toggle.min.css")
+    <!-- Bootstrap datetimepicker -->
+    @Styles.Render("~/Content/bootstrap-datetimepicker.min.css")
+    <!-- jQuery -->
+    @*@Scripts.Render("~/bundles/jquery")*@
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    @Scripts.Render("~/Scripts/bootstrap-table.min.js")
+    @Scripts.Render("~/Scripts/bootstrap-toggle.min.js")
+    @Scripts.Render("~/Scripts/jwt-decode.js")
+    @Scripts.Render("~/Scripts/util.js?v=2.0.0")
+
+    <!-- Moment -->
+    @Scripts.Render("~/Scripts/moment.min.js")
+    @Scripts.Render("~/Scripts/moment-with-locales.min.js")
+
+    <script src="~/app/common.js?v=3.0.1"></script>
+    <script>
+        var URL_LOGIN_SERVER = '@Url.Content("~/Login")';
+        var URL_API = "@BCP.CVT.Cross.Utilitarios.URL_API";
+        var REGISTRO_PAGINACION = "10";
+        var OPCIONES_PAGINACION = "[10,20,30]";
+
+        var REGISTRO_PAGINACION_ALT = "30";
+        var OPCIONES_PAGINACION_ALT = "[30,60,90]";
+        USUARIO = getCache(NAME_CACHE_USUARIO);
+        var FLAG_ADMIN = @perfil;
+        var FLAG_DETALLE = @detalleId;
+
+        var URL_PREGUNTA = '@Url.Content("~/Alertas/Ayuda")';
+        var URL_CATALOGO_APP = '@Url.Content("~/Configuracion/CatalogoAplicacion")';
+        var URL_BANDEJA_APP = '@Url.Content("~/Configuracion/BandejaAprobacionSolicitud")';
+        var URL_BANDEJA_CREACION_APP = '@Url.Content("~/Configuracion/SolicitudCreacionAplicacion")';
+        var PERFIL_ID = -1;
+
+    </script>
+</head>
+
+<body class="layout layout-header-fixed">
+    @*@if (Request.IsAuthenticated)
+        {*@
+
+    <div class="layout-header">
+        @if (activeTextMessageHome == "SI")
+        {
+            <marquee behavior="scroll" direction="left" scrolldelay="150" style="background: #E70026; height:50px; font-size: 30px; color: white;">@textMessageHome</marquee>
+        }
+        <div class="navbar navbar-default">
+            <div class="navbar-header">
+                <a class="navbar-brand navbar-brand-center" href="/">
+                    <img class="navbar-brand-logo" src="~/images/logo-bcp.svg" alt="">
+                </a>
+                <button class="navbar-toggler visible-xs-block collapsed" type="button" data-toggle="collapse" data-target="#sidenav">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="bars">
+                        <span class="bar-line bar-line-1 out"></span>
+                        <span class="bar-line bar-line-2 out"></span>
+                        <span class="bar-line bar-line-3 out"></span>
+                    </span>
+                    <span class="bars bars-x">
+                        <span class="bar-line bar-line-4"></span>
+                        <span class="bar-line bar-line-5"></span>
+                    </span>
+                </button>
+                <button class="navbar-toggler visible-xs-block collapsed" type="button" data-toggle="collapse" data-target="#navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="arrow-up"></span>
+                    <span class="ellipsis ellipsis-vertical">
+                        <img class="ellipsis-object" width="32" height="32" src="/images/user.png" alt="Usuario">
+                    </span>
+                </button>
+                @*<br /><br />
+                <span style="color:#ffffff;">Información actualizada al <strong>@fechaactualizacion</strong></span>*@
+            </div>
+            <div class="navbar-toggleable">
+                <nav id="navbar" class="navbar-collapse collapse">
+                    <button class="sidenav-toggler hidden-xs" title="Colapsar menu ( [ )" aria-expanded="true" type="button">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="bars">
+                            <span class="bar-line bar-line-1 out"></span>
+                            <span class="bar-line bar-line-2 out"></span>
+                            <span class="bar-line bar-line-3 out"></span>
+                            <span class="bar-line bar-line-4 in"></span>
+                            <span class="bar-line bar-line-5 in"></span>
+                            <span class="bar-line bar-line-6 in"></span>
+                        </span>
+                    </button>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="visible-xs-block">
+                            <h4 class="navbar-text text-center">Hola, usuario</h4>
+                        </li>
+                        <li class="dropdown">
+                            <a @*class="dropdown-toggle"*@ href="#" onclick="activarModalDejarMensaje()" role="button" @*data-toggle="dropdown"*@ aria-haspopup="true" title="Déjanos un mensaje">
+                                <span class="icon-with-child hidden-xs">
+                                    @*<span class="icon icon-envelope-o icon-lg"></span>*@
+                                    <span class="icon icon-commenting-o icon-lg"></span>
+                                    @*<span class="badge badge-primary badge-above right"> </span>*@
+                                </span>
+                                <span class="visible-xs-block">
+                                    <span class="icon icon-envelope icon-lg icon-fw"></span>
+                                    <span class="badge badge-primary pull-right"> </span>
+                                    Comentarios
+                                </span>
+                            </a>
+                        </li>
+                        @if (perfilId == 1)
+                        {
+                            <li class="dropdown menuAprobador">
+                                <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true">
+                                    <span class="icon-with-child hidden-xs">
+                                        <span class="icon icon-envelope-o icon-lg"></span>
+                                        <span class="badge badge-primary badge-above right"> </span>
+                                    </span>
+                                    <span class="visible-xs-block">
+                                        <span class="icon icon-envelope icon-lg icon-fw"></span>
+                                        <span class="badge badge-primary pull-right"> </span>
+                                        Alertas
+                                    </span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg">
+                                    <div class="dropdown-header">
+                                        <h5 class="dropdown-heading">Alertas recientes</h5>
+                                    </div>
+                                    <div class="dropdown-body">
+                                        <div class="lisDashboardt-group list-group-divided custom-scrollbar">
+                                            <div id="divAlertasHome" class="kt-notification kt-margin-t-20 kt-margin-b-20 kt-scroll ps ps--active-y" data-scroll="true" data-height="270" data-mobile-height="220" style="height: 270px; overflow: hidden;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="dropdown menuAprobador">
+                                <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true">
+                                    <span class="icon-with-child hidden-xs">
+                                        <span class="icon icon-bell-o icon-lg"></span>
+                                        <span class="badge badge-primary badge-above right"></span>
+                                    </span>
+                                    <span class="visible-xs-block">
+                                        <span class="icon icon-bell icon-lg icon-fw"></span>
+                                        <span class="badge badge-primary pull-right">0</span>
+                                        Notificaciones
+                                    </span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg">
+                                    <div class="dropdown-header">
+                                        <h5 class="dropdown-heading">Notificaciones recientes</h5>
+                                    </div>
+                                    <div class="dropdown-body">
+                                        <div class="list-group list-group-divided custom-scrollbar">
+                                        </div>
+                                    </div>
+                                    <div class="dropdown-footer">
+                                        <a class="dropdown-btn" href="#">Ver todos</a>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                        <li class="dropdown">
+                            <a @*class="dropdown-toggle"*@ href="@Url.Content("~/Vista/Ayuda")" role="button" @*data-toggle="dropdown"*@ aria-haspopup="true" title="Ayuda">
+                                <span class="icon-with-child hidden-xs">
+                                    @*<span class="icon icon-envelope-o icon-lg"></span>*@
+                                    <span class="icon icon-question-circle-o icon-lg"></span>
+                                    @*<span class="badge badge-primary badge-above right"> </span>*@
+                                </span>
+                                <span class="visible-xs-block">
+                                    <span class="icon icon-envelope icon-lg icon-fw"></span>
+                                    <span class="badge badge-primary pull-right"> </span>
+                                    Ayuda
+                                </span>
+                            </a>
+                            @*<div class="dropdown-menu dropdown-menu-right dropdown-menu-lg">
+                                <div class="dropdown-header">
+                                    <h5 class="dropdown-heading">Ayuda</h5>
+                                </div>
+                                <div class="dropdown-body">
+                                    <div class="lisDashboardt-group list-group-divided custom-scrollbar">
+                                        <div id="divOpcionAyuda" class="kt-notification kt-margin-t-20 kt-margin-b-20 kt-scroll ps ps--active-y" data-scroll="true" data-height="270" data-mobile-height="220" style="height: 270px; overflow: hidden;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>*@
+                        </li>
+
+                        <li class="dropdown hidden-xs">
+                            <button class="navbar-account-btn" data-toggle="dropdown" aria-haspopup="true">
+                                <img class="circle" width="36" height="36" src="/images/user.png" alt="">
+                                <text id="lblUserName">
+                                    @eusername
+                                </text>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="javascript: void(0)" onclick="LoginUsuario()">@eusername</a></li>
+                                <li><a href="@Url.Content("~/logout")">Cerrar Sesión</a></li>
+                            </ul>
+                        </li>
+                        <li class="visible-xs-block">
+                            <a href="#">
+                                <span class="icon icon-power-off icon-lg icon-fw"></span>
+                                Salir
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="title-bar">
+                        <h1 class="title-bar-title">
+                            <span class="d-ib">@ViewBag.Title1</span>
+                            @*<span class="d-ib">
+                                <a class="title-bar-shortcut" href="#" title="Add to shortcut list" data-container="body" data-toggle-text="Remove from shortcut list" data-trigger="hover" data-placement="right" data-toggle="tooltip">
+                                    <span class="sr-only">Add to shortcut list</span>
+                                </a>
+                            </span>*@
+                        </h1>
+                        <p class="title-bar-description">
+                            @if (!string.IsNullOrEmpty(ViewBag.Title2) && !string.IsNullOrEmpty(ViewBag.Title3))
+                            {
+                                <small>@ViewBag.Title2</small><small> > @ViewBag.Title3</small>
+                            }
+                        </p>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="layout-main" style="display: @style; top: @top;">
+        <div class="layout-sidebar">
+            <div class="layout-sidebar-backdrop"></div>
+            <div class="layout-sidebar-body">
+                <nav id="sidenav" class="sidenav-collapse collapse">
+                    <ul class="sidenav level-1">
+
+                        @{
+                            foreach (var item in secciones)
+                            {
+                                var primeroEquipos = 0;
+                                var primeroTecnologias = 0;
+                                var primeroAplicaciones = 0;
+                                var primeroEstandares = 0;
+                                var primeroIndicadores = 0;
+                                var primeroStorage = 0;
+                                var primeroGestionAplicacion = 0;
+                                var primeroIntegraciones = 0;
+                                var primeroGuardicore = 0;
+                                var primeroQualys = 0;
+                                var primeroDependencia = 0;
+                                var primeroMotor = 0;
+                                var primeroDiagramas = 0;
+
+                                <li class="sidenav-item has-subnav active">
+                                    @if (flagPortafolio)
+                                    {
+                                        //if (item.GrupoMenu == "Portafolio de aplicaciones")
+                                        if (item.Icono == "book")
+                                        {
+                                            <a href="#" aria-haspopup="true">
+                                                <span class="@(string.Format("sidenav-icon icon icon-{0}", item.Icono)) "></span>
+                                                <span class="sidenav-label">@item.GrupoMenu</span>
+                                            </a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //if (item.GrupoMenu != "Portafolio de aplicaciones")
+                                        if (item.Icono != "book")
+                                        {
+                                            <a href="#" aria-haspopup="true">
+                                                <span class="@(string.Format("sidenav-icon icon icon-{0}", item.Icono)) "></span>
+                                                <span class="sidenav-label">@item.GrupoMenu</span>
+                                            </a>
+                                        }
+                                    }
+                                    <!--TODO-->
+                                    @*<a href="#" aria-haspopup="true">
+                                            <span class="@(string.Format("sidenav-icon icon icon-{0}", item.Icono)) "></span>
+                                            <span class="sidenav-label">@item.GrupoMenu</span>
+                                        </a>*@
+
+                                <ul class="sidenav level-2 collapse">
+                                    <li class="sidenav-heading">@item.GrupoMenu</li>
+                                    @{
+                                        foreach (var pagina in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && !string.IsNullOrEmpty(x.LinkMenu)))
+                                        {
+                                            if (string.IsNullOrEmpty(pagina.SubgrupoMenu))
+                                            {
+                                                if (flagPortafolio)
+                                                {
+                                                    @*<li><a href="@Url.Content(pagina.LinkMenu)">@pagina.Menu</a></li>*@
+
+                                                    if (pagina.Icono == "book")
+                                                    {
+                                                        if (flagAdmin) //perfilId == 1
+                                                        {
+                                                            <li><a href="@Url.Content(pagina.LinkMenu)">@pagina.Menu</a></li>
+                                                        }
+                                                        else
+                                                        {
+                                                            if (pagina.Menu != "Parámetros" && pagina.Menu != "Bandeja de solicitudes" && pagina.Menu != "Catálogo de aplicaciones" && pagina.Menu != "Gestión de campos de aplicación")
+                                                            {
+                                                                <li><a href="@Url.Content(pagina.LinkMenu)">@pagina.Menu</a></li>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (pagina.Icono != "book")
+                                                    {
+                                                        if (pagina.Menu == "Vista de estándares" || pagina.Menu == "Listado de aplicaciones" || pagina.Menu == "Reporte por estados y áreas BIAN")
+                                                        {
+                                                            <li><a href="@Url.Content(pagina.LinkMenu)" target="_blank">@pagina.Menu</a></li>
+                                                        }
+                                                        else
+                                                        {
+                                                            <li><a href="@Url.Content(pagina.LinkMenu)">@pagina.Menu</a></li>
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (pagina.SubgrupoMenu == "Dependencias de Aplicaciones")
+                                                {
+                                                    if (primeroDependencia == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">Dependencias de Aplicaciones</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Dependencias de Aplicaciones"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroDependencia++;
+                                                    }
+                                                }
+                                                if (pagina.SubgrupoMenu == "Motor de Relacionamiento")
+                                                {
+                                                    if (primeroMotor == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">Motor de Relacionamiento</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Motor de Relacionamiento"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroMotor++;
+                                                    }
+                                                }
+                                                if (pagina.SubgrupoMenu == "Diagramas")
+                                                {
+                                                    if (primeroDiagramas == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">Diagramas</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Diagramas"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroDiagramas++;
+                                                    }
+                                                }
+
+                                                if (pagina.SubgrupoMenu == "Tecnologías")
+                                                {
+                                                    if (primeroTecnologias == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">Tecnologías</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Tecnologías"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroTecnologias++;
+                                                    }
+                                                }
+                                                else if (pagina.SubgrupoMenu == "Aplicaciones")
+                                                {
+                                                    if (primeroAplicaciones == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">Aplicaciones</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Aplicaciones"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroAplicaciones++;
+                                                    }
+                                                }
+                                                else if (pagina.SubgrupoMenu == "Equipos")
+                                                {
+                                                    if (primeroEquipos == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">Equipos</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Equipos"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroEquipos++;
+                                                    }
+                                                }
+                                                else if (pagina.SubgrupoMenu == "Estándares y Consolidado")
+                                                {
+                                                    if (primeroEstandares == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">Estándares y Consolidado</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Estándares y Consolidado"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroEstandares++;
+                                                    }
+                                                }
+                                                if (pagina.SubgrupoMenu == "Indicadores gerenciales")
+                                                {
+                                                    if (primeroIndicadores == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">Indicadores gerenciales</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Indicadores gerenciales"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroIndicadores++;
+                                                    }
+                                                }
+                                                if (pagina.SubgrupoMenu == "Storage & Backups")
+                                                {
+                                                    if (primeroStorage == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">Storage & Backups</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Storage & Backups"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroStorage++;
+                                                    }
+                                                }
+                                                if (pagina.SubgrupoMenu == "Integraciones")
+                                                {
+                                                    if (primeroIntegraciones == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">Integraciones: Guardicore &Aacute; Qualys</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Integraciones"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroIntegraciones++;
+                                                    }
+                                                }
+                                                else if (pagina.SubgrupoMenu == "Gestión de Aplicaciones")
+                                                {
+                                                    if (primeroGestionAplicacion == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">@pagina.SubgrupoMenu</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Gestión de Aplicaciones"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroGestionAplicacion++;
+                                                    }
+                                                }
+                                                if (pagina.SubgrupoMenu == "Guardicore")
+                                                {
+                                                    if (primeroGuardicore == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">@pagina.SubgrupoMenu</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Guardicore"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroGuardicore++;
+                                                    }
+                                                }
+                                                else if (pagina.SubgrupoMenu == "Qualys")
+                                                {
+                                                    if (primeroQualys == 0)
+                                                    {
+                                                        <li class="sidenav-item has-subnav active">
+                                                            <a href="#" aria-haspopup="true">@pagina.SubgrupoMenu</a>
+                                                            <ul class="sidenav level-3 collapse">
+                                                                @{
+                                                                    foreach (var pagina2 in paginas.Where(x => x.GrupoMenu == item.GrupoMenu && x.SubgrupoMenu == "Qualys"))
+                                                                    {
+                                                                        <li><a href="@Url.Content(pagina2.LinkMenu)">@pagina2.Menu</a></li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                        primeroQualys++;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                </ul>
+                                </li>
+                            }
+                        }
+                        @*<li class="sidenav-item active">
+                                <a href="@(BCP.CVT.Cross.Settings.Get<string>("Menu.FichaMEP"))" target="_blank">
+                                    <span class="sidenav-icon icon icon-link"></span>
+                                    <span class="sidenav-label">Ficha MEP</span>
+                                </a>
+                            </li>*@
+                        @*<li class="sidenav-item has-subnav active">
+                                <a href="#" aria-haspopup="true">
+                                    <span class="sidenav-icon icon icon-link"></span>
+                                    <span class="sidenav-label">Guardicore</span>
+                                </a>
+                                <ul class="sidenav level-2 collapse">
+                                    <li><a href="@Url.Content("~/Guardicore/Assets")">Servidores</a></li>
+                                    <li><a href="@Url.Content("~/Guardicore/Connection")">Interacciones entre servidores</a></li>
+                                </ul>
+                            </li>*@
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+        <div class="layout-content">
+            <div class="layout-content-body">
+                @RenderBody()
+            </div>
+        </div>
+        @*<div class="layout-footer">
+                <div class="layout-footer-body">
+                    <small class="version">Version 1.4.0</small>
+                    <small class="copyright">2019 © Banco de Crédito del Perú</small>
+                </div>
+            </div>*@
+    </div>
+
+    @Html.Partial("_ModalDejarMensaje");
+
+    <script src="~/Scripts/jqueryUI/jquery-ui.min.js"></script>
+    <script src="~/scripts/fontawesome.min.js"></script>
+
+    <script src="~/scripts/peity.min.js"></script>
+    <script src="~/scripts/jquery.matchheight-min.js"></script>
+    <script src="~/scripts/metismenu.min.js"></script>
+    <script src="~/scripts/jquery.slimscroll.min.js"></script>
+    <script src="~/scripts/select2.min.js"></script>
+    <script src="~/scripts/jquery-jvectormap-2.0.3.min.js"></script>
+    <script src="~/scripts/js/application.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/bootbox.min.js")
+    @Scripts.Render("~/Scripts/bootbox.locales.min.js")
+    @Scripts.Render("~/Scripts/bootbox.all.js")
+
+    @Scripts.Render("~/Scripts/locale/bootstrap-table-es-SP.min.js")
+
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+
+    <script src="~/Scripts/bootstrap.js"></script>
+    @RenderSection("scripts", required: false)
+
+    <script src="~/app/home.js"></script>
+
+    <script type="text/javascript">
+        const pathRoot = '@Url.Content("~")';
+        $(function () {
+            if (!window.console) window.console = {};
+            var methods = ["log", "debug", "warn", "info", "dir", "dirxml", "trace", "profile"];
+            for (var i = 0; i < methods.length; i++) {
+                console[methods[i]] = function () { };
+            }
+
+            MethodValidarSinEspacios();
+
+            if ("@eusername" == "" || USUARIO == null)
+                LoginUsuario();
+
+            if (USUARIO !== null) GuardarVisitaSite(USUARIO);
+
+            activeMenu();
+        });
+
+    </script>
+</body>
+</html>

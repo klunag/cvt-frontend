@@ -1,0 +1,738 @@
+﻿
+@{ ViewBag.Title1 = "Roles por Producto";
+    ViewBag.Title2 = "Roles por producto - Función";
+    ViewBag.Title3 = "Roles por Producto"; }
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<style>
+    button.multiselect { text-align: left !important;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <fieldset class="fieldset">
+            <legend class="legend" style="margin-bottom: 0;">Instrucciones de uso</legend>
+            <div class="card-search-box">
+                <form action="javascript:void(0);">
+                    <ul>
+                        <li style="margin-bottom: 4px;"><span>Paso 1: Registrar un rol haciendo click en el botón <i class="iconoVerde glyphicon glyphicon-user"></i> ubicado en la columna <b>Agregar</b>.</span></li>
+                        <li style="margin-bottom: 4px;"><span>Paso 2: Para visualizar las funciones dentro de un rol, hacer click en el botón <i class="iconoNaranja glyphicon glyphicon-plus icon-plus"></i> ubicado en la primera columna de la tabla.</span></li>
+                        <li style="margin-bottom: 4px;"><span>Paso 3: Registrar una función haciendo click en el botón <i class="iconoVerde glyphicon glyphicon-plus"></i> ubicado en la columna <b>Opciones</b>.</span></li>
+                        <li style="margin-bottom: 4px;"><span>Paso 4: Para enviar una solicitud de aprobación, hacer click en el botón <i class="iconoVerde glyphicon glyphicon-book"></i> ubicado en la columna <b>Agregar</b>. </br><b>Nota: Los roles deberán tener al menos una función para enviar una solicitud.</b></span></li>
+                    </ul>
+                </form>
+            </div>
+        </fieldset>
+
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <div class="panel-group" id="accordion-filtro" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default" style="overflow: inherit;">
+
+                    <a class="panel-heading" role="tab" id="heading-filtro" data-toggle="collapse" data-parent="#accordion-filtro" href="#collapse-filtro" aria-expanded="true" aria-controls="collapse-filtro" style="display: flex">
+                        <h4 class="panel-title">Filtro de búsqueda</h4>
+                    </a>
+                    <div id="collapse-filtro" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro">
+                        <div class="panel-body">
+                            <div class="card-search-box">
+                                <form action="javascript:void(0);">
+                                    <div class="row gutter-xs">
+
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left divFiltro" data-toggle="match-height">
+                                                <h5>Tribu/COE: </h5>
+                                                <select id="ddlTribus" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left divFiltro" data-toggle="match-height">
+                                                <h5>Squad: </h5>
+                                                <select id="ddlSquads" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Dominio: </h5>
+                                                <select id="ddlDominio" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Subdominio: </h5>
+                                                <select id="ddlSubDominio" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        @*<div class="col-xs-4 col-md-3">
+        </div>*@
+                                    </div>
+                                    <div class="row gutter-xs">
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Producto: </h5>
+                                                <input id="txtProducto" name="txtProducto" class="form-control" type="text" placeholder="">
+                                                <input type="hidden" name="hdProd" id="hdProd" />
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-3">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Código: </h5>
+                                                <input id="txtCodigo" name="txtCodigo" class="form-control" type="text" placeholder="">
+                                            </div>
+                                        </div>
+                                        @*<div class="col-xs-4 col-md-3">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Dominio: </h5>
+                                                    <select id="ddlDominio" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-md-3">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Subdominio: </h5>
+                                                    <select id="ddlSubDominio" class="form-control"></select>
+                                                </div>
+                                            </div>*@
+                                        <div class="col-xs-4 col-md-1">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>&nbsp;</h5>
+                                                <button id="btnBuscar" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">
+                                                    <span class="icon icon-search"></span>
+                                                    <span class="count-text">Buscar</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-4 col-md-1">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>&nbsp;</h5>
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <span class="icon icon-external-link"></span>
+                                                        <span class="count-text">Exportar</span>&nbsp;
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" style="min-width: initial">
+                                                        <li><a href="javascript:exportarConsolidadoRolesProducto()" class="text-center">Consolidado</a></li>
+                                                        <li><a href="javascript:exportarDetalladoRolesProducto()" class="text-center">Detallado</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*</fieldset>*@
+            </div>
+        </div>
+    </div>
+</div> @*<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+    <span class="icon icon-external-link"></span>
+    <span class="count-text">Exportar</span>
+    </a>
+    </div>*@
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistros" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true" data-detail-view="true" data-detail-formatter="detailFormatter">
+                    <caption class="caption text-left">
+                        <span>Roles por Producto</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="DominioStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="DominioStr" data-width="15%">Dominio</th>
+                            <th data-field="SubDominioStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="SubDominioStr" data-width="20%">SubDominio</th>
+                            <th data-field="Codigo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Codigo" data-width="10%">Código de </br>Producto</th>
+                            <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Nombre" data-width="38%">Producto</th>
+                            <th data-field="CantidadRoles" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="CantidadRoles" data-width="10%">Roles </br>Asociados</th>
+                            <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Agregar</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="modalAgregarRol" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalAgregarRol" aria-hidden="true">
+    <div class="modal-dialog " role="document" style="width:650px">
+        <form id="formEli">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Agregar Rol</h5>
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Producto</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtProducto2" name="txtProducto2" class="form-control" type="text" placeholder="" disabled>
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Rol</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtRol" name="txtRol" class="form-control" type="text" placeholder="" maxlength="300">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Descripción</p>
+                        </div>
+                        <div class="col-md-7">
+                            <textarea id="txtDescripcion" name="txtDescripcion" class="form-control" rows="4" placeholder="" maxlength="500">		  </textarea>
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Tipo de Cuenta</p>
+                        </div>
+                        <div class="col-md-7">
+                            <select id="ddlTipoCuentaAgregar" name="ddlTipoCuentaAgregar" class="form-control"></select>
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Ambiente</p>
+                        </div>
+                        <div class="col-md-7">
+                            <select id="ddlAmbienteAgregar" name="ddlAmbienteAgregar" class="form-control" multiple="multiple"></select>
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group ">
+                                <table id="tbl-ambientes" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="AmbienteId" data-mobile-responsive="true">
+                                    <thead>
+                                        <tr>
+                                            <th data-field="Ambiente.Nombre" data-halign="center" data-valign="middle" data-align="left">Ambiente</th>
+                                            <th data-formatter="formatOpcAmbiente" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Grupo de Red</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                <input type="text" id="msjValidTblAmbiente" name="msjValidTblAmbiente" class="form-control field-tecnologia" style="display:none;" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="display:none">
+                        <div class="col-md-3">
+                            <p>Grupo de Red</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtGrupoRed" name="txtGrupoRed" class="form-control" type="text" placeholder="">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="checkbox" id="chkNoAplica" name="chkNoAplica">
+                            <label for="chkNoAplica"> No aplica</label><br>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnAgregar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Agregar</button>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+</div>
+
+<div id="modalEditarRol" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEditarRol" aria-hidden="true">
+    <div class="modal-dialog " role="document" style="width:650px">
+        <form id="formEli2">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Editar Rol</h5>
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Producto</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtProducto3" name="txtProducto3" class="form-control" type="text" placeholder="" disabled>
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Rol</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtRol3" name="txtRol3" class="form-control" type="text" placeholder="" maxlength="300">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Descripción</p>
+                        </div>
+                        <div class="col-md-7">
+                            <textarea id="txtDescripcion2" name="txtDescripcion2" class="form-control" rows="4" placeholder="" maxlength="500">		  </textarea>
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Tipo de Cuenta</p>
+                        </div>
+                        <div class="col-md-7">
+                            <select id="ddlTipoCuentaEditar" name="ddlTipoCuentaEditar" class="form-control"></select>
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Ambiente</p>
+                        </div>
+                        <div class="col-md-7">
+                            <select id="ddlAmbienteEditar" name="ddlAmbienteEditar" class="form-control" multiple="multiple"></select>
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group ">
+                                <table id="tbl-ambientesEditar" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="AmbienteIdEditar" data-mobile-responsive="true">
+                                    <thead>
+                                        <tr>
+                                            <th data-field="AmbienteEditar.Nombre" data-halign="center" data-valign="middle" data-align="left">Ambiente</th>
+                                            <th data-formatter="formatOpcAmbienteEditar" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Grupo de Red</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                <input type="text" id="msjValidTblAmbienteEditar" name="msjValidTblAmbienteEditar" class="form-control field-tecnologia" style="display:none;" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="display:none">
+                        <div class="col-md-3">
+                            <p>Grupo de Red</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtGrupoRed3" name="txtGrupoRed3" class="form-control" type="text" placeholder="">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="checkbox" id="chkNoAplica_Editar" name="chkNoAplica_Editar">
+                            <label for="chkNoAplica_Editar"> No aplica</label><br>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnEditar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Editar</button>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+</div>
+
+<div id="modalAgregarFuncion" class="modal fade" role="dialog" aria-labelledby="modalAgregarFuncion" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <form id="formEli3">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Agregar Función</h5>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Producto</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtProductoDetalle" name="txtProductoDetalle" class="form-control" type="text" placeholder="" disabled>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Rol</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtRol4" name="txtRol4" class="form-control" type="text" placeholder="" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group ">
+                                <table id="tbl-ambientesListar" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="AmbienteIdListar" data-mobile-responsive="true">
+                                    <thead>
+                                        <tr>
+                                            <th data-field="AmbienteListar.AmbienteStr" data-halign="center" data-valign="middle" data-align="left">Ambiente</th>
+                                            <th data-field="AmbienteListar.GrupoRed" data-halign="center" data-valign="middle" data-align="left">Grupo de Red</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Tribu/COE</p>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-control">
+                                <select class="js-example-basic-single" name="ddlTribuAgregar" id="ddlTribuAgregar"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Chapter/Squad</p>
+                        </div>
+                        <div class="col-md-7">
+
+                            <div class="form-control">
+                                <select class="js-example-basic-single" name="ddlChapterAgregar" id="ddlChapterAgregar"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Función</p>
+                        </div>
+                        <div class="col-md-7">
+                            <select id="ddlFuncionAgregar" name="ddlFuncionAgregar" class="form-control" multiple="multiple"></select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnAgregarFuncion" class="btn btn-primary" type="button" data-loading-text="Procesando...">Agregar</button>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+</div>
+
+
+<div id="modalFunciones" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalPersonas" aria-hidden="true">
+    <div class="modal-dialog modal-lg " role="document">
+        <form id="formEli4">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Funciones Relacionadas al Rol</h5>
+                </div>
+                <div class="modal-body">
+
+                    <table id="tblFunciones" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                        <caption class="caption text-left">
+                            <span>Funciones</span>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                <th data-field="Producto" data-halign="center" data-valign="middle" data-align="left" data-width="30%" data-visible="false">Producto</th>
+                                <th data-field="Tribu" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Tribu/COE</th>
+                                <th data-field="Chapter" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Chapter</th>
+                                <th data-field="Funcion" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Funcion</th>
+                                <th data-field="EstadoFuncionStr" data-halign="center" data-valign="middle" data-align="left" data-width="25%">Estado</th>
+                                <th data-formatter="opciones3Formatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button id="btnCerrarFunciones" type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+<div id="modalEnviarSolicitud" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEnviarSolicitud" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <form id="formEnvSolicitud">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Enviar Solicitud</h5>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Comentario</p>
+                        </div>
+                        <div class="col-md-7">
+                            <textarea id="txtObservacion" name="txtObservacion" class="form-control" rows="4" placeholder=""></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Owner</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtOwner" name="txtOwner" class="form-control" type="text" placeholder="" readonly>
+                            <input type="hidden" name="hdOwner" id="hdOwner" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Analista de Seguridad</p>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-control">
+                                <select class="js-example-basic-singleSeg" name="ddlSeguridadAgregar" id="ddlSeguridadAgregar"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnEnviar" class="btn btn-primary" type="button" data-loading-text="Enviando...">Enviar</button>
+                </div>
+            </div>
+
+
+        </form>
+
+
+    </div>
+</div>
+
+<div id="modalEnviarSolicitudAct" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEnviarSolicitudAct" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <form id="formEnvSolicitud2">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Enviar Solicitud Actualizada de Registro</h5>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Comentario</p>
+                        </div>
+                        <div class="col-md-7">
+                            <textarea id="txtObservacion2" name="txtObservacion2" class="form-control" rows="4" placeholder=""></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Owner</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtOwner2" name="txtOwner2" class="form-control" type="text" placeholder="" readonly>
+                            <input type="hidden" name="hdOwner2" id="hdOwner2" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Analista de seguridad</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtSeguridad2" name="txtSeguridad2" class="form-control" type="text" placeholder="" readonly>
+                            <input type="hidden" name="hdSeguridad2" id="hdSeguridad2" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Nro. de solicitud</p>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-control">
+                                <select class="js-example-basic-single" name="ddlSolicitud" id="ddlSolicitud"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnEnviar2" class="btn btn-primary" type="button" data-loading-text="Enviando...">Enviar</button>
+                </div>
+            </div>
+
+
+        </form>
+
+
+    </div>
+</div>
+
+<div id="modalEnviarSolicitudEliminar" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEnviarSolicitudEliminar" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <form id="formEnvSolicitud3">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Enviar Solicitud</h5>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Comentario</p>
+                        </div>
+                        <div class="col-md-7">
+                            <textarea id="txtObservacion3" name="txtObservacion3" class="form-control" rows="4" placeholder=""></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Owner</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtOwner3" name="txtOwner3" class="form-control" type="text" placeholder="" readonly>
+                            <input type="hidden" name="hdOwner3" id="hdOwner3" />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnEnviar3" class="btn btn-primary" type="button" data-loading-text="Enviando...">Enviar</button>
+                </div>
+            </div>
+
+
+        </form>
+
+
+    </div>
+</div>
+
+<div id="modalEnviarSolicitudAct2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEnviarSolicitudAct2" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <form id="formEnvSolicitud4">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Enviar Solicitud Actualizada de Eliminación</h5>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Comentario</p>
+                        </div>
+                        <div class="col-md-7">
+                            <textarea id="txtObservacion4" name="txtObservacion4" class="form-control" rows="4" placeholder=""></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Owner</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input id="txtOwner4" name="txtOwner4" class="form-control" type="text" placeholder="" readonly>
+                            <input type="hidden" name="hdOwner4" id="hdOwner4" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Nro. de solicitud</p>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-control">
+                                <select class="js-example-basic-single" name="ddlSolicitud2" id="ddlSolicitud2"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnEnviar4" class="btn btn-primary" type="button" data-loading-text="Enviando...">Enviar</button>
+                </div>
+            </div>
+
+
+        </form>
+
+
+    </div>
+</div>
+
+
+<input type="hidden" name="hdProductoId" id="hdProductoId" value="0" />
+<input type="hidden" name="hdProductoId2" id="hdProductoId2" value="0" />
+<input type="hidden" name="hdRolProductoId" id="hdRolProductoId" value="0" />
+<input type="hidden" name="hTipoSolicitudId" id="hTipoSolicitudId" value="0" />
+<input type="hidden" name="hTipoSolicitudId2" id="hTipoSolicitudId2" value="0" />
+
+
+<script src="~/app/ConfiguracionPortafolio/rolesProducto.js?v=2.8.2"></script>

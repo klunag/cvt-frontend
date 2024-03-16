@@ -1,0 +1,402 @@
+﻿
+@{
+    ViewBag.Title1 = "Qualys - Vulnerabilidades";
+    ViewBag.Title2 = "Integraciones";
+    ViewBag.Title3 = "Qualys - Comparación contra servidores";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<style>
+    .opcionesStyle {
+        width: 500px;
+    }
+
+    .fondoRojo {
+        background-color: #E33D01 !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoNaranja {
+        background-color: #FF7F0D !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoAmarillo {
+        background-color: #FFDD5B !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoVerdeLeve {
+        background-color: #91C337 !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoVerdeFuerte {
+        background-color: #22A71C !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoCeleste {
+        background-color: #bfd9eb !important;
+        color: #000000 !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoBlanco {
+        text-align: center;
+        width: 10%;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    #chartdiv {
+        width: 100%;
+        height: 400px;
+        font-size: 11px;
+    }
+
+    .card {
+        border-radius: 4px;
+    }
+
+    .p-x {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .fw-l {
+        font-weight: 300 !important;
+    }
+
+    .bg-info {
+        background-color: #1976d2;
+        border-color: #1976d2;
+        color: #fff;
+    }
+
+    .bg-danger {
+        background-color: #e64a19;
+        border-color: #e64a19;
+        color: #fff;
+    }
+
+    .bg-primary {
+        background-color: #f7a033 !important;
+        border-color: #f7a033 !important;
+        color: #fff;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <div class="panel-group" id="accordion-filtro" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default" style="overflow: inherit;">
+                    <a class="panel-heading" role="tab" id="heading-filtro" data-toggle="collapse" data-parent="#accordion-filtro" href="#collapse-filtro" aria-expanded="true" aria-controls="collapse-filtro" style="display: flex">
+                        <h4 class="panel-title">
+                            Filtro de búsqueda
+                        </h4>
+                    </a>
+                    <div id="collapse-filtro" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro">
+                        <div class="panel-body">
+                            <div class="card-search-box">
+                                <form action="javascript:void(0);">
+                                    <div class="row" style="margin-bottom: 0;">
+                                        <div class="col-sm-9">
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-sm-4">
+                                                    <label>Dominio: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusDominioTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                                            <option value="-1">Todos</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>SubDominio: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusSubDominioTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                                            <option value="-1">Todos</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-sm-4">
+                                                    <label>Tribu/Coe/Unidad Organizativa: </label>
+                                                    <div class="input-with-icon searchOwnerContainer">
+                                                        <input id="txtBusOwnerTecnologia" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Owner..." onkeydown="ValidaEnters(event)">
+                                                        <input id="hdBusOwnerTecnologiaId" type="hidden">
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>Squad: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusSquadTecnologia" class="form-control input-thick pill input-with-icon-search">
+                                                            <option value="-1">Todos</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>Estado Vulnerabilidad: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusVulnStatusTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                                            <option value="-1">Todos</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-sm-4">
+                                                    <label>Tiene Equipo Asignado: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusEquipoAsignadoTecnologia" class="form-control input-thick pill input-with-icon-search">
+                                                            <option value="-1">Todos</option>
+                                                            <option value="1">Sí</option>
+                                                            <option value="0">No</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>Tiene Producto Asignado: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusProductoAsignadoTecnologia" class="form-control input-thick pill input-with-icon-search">
+                                                            <option value="-1">Todos</option>
+                                                            <option value="1">Sí</option>
+                                                            <option value="0">No</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>Tiene Tecnología Asignada: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusTecnologiaAsignadaTecnologia" class="form-control input-thick pill input-with-icon-search">
+                                                            <option value="-1">Todos</option>
+                                                            <option value="1">Sí</option>
+                                                            <option value="0">No</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-sm-4">
+                                                    <label>Equipo: </label>
+                                                    <div class="input-with-icon searchEquipoContainer">
+                                                        <input id="txtBusEquipoTecnologia" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Equipo..." onkeydown="ValidaEnters(event)">
+                                                        <input id="hdBusEquipoTecnologiaId" type="hidden">
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>Producto: </label>
+                                                    <div class="input-with-icon searchProductoContainer">
+                                                        <input id="txtBusNombreTecnologia" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Producto..." onkeydown="ValidaEnters(event)">
+                                                        <input id="hdBusNombreTecnologiaId" type="hidden">
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>Tecnología: </label>
+                                                    <div class="input-with-icon searchTecnologiaContainer">
+                                                        <input id="txtBusClaveTecnologia" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Tecnología..." onkeydown="ValidaEnters(event)">
+                                                        <input id="hdBusClaveTecnologiaId" type="hidden">
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-sm-12">
+                                                    @*<div class="row">
+                                                            <button id="btnBusTipo" class="btn btn-primary btn-width-custom" onclick="AddProducto()">Nuevo</button>
+                                                        </div>*@
+                                                    @*<div class="row" style="margin-bottom: 0;">*@
+                                                    <div class="row">
+                                                        <label>&nbsp;</label><div class="clear"></div>
+                                                        <button id="btnBusBuscar" class="btn btn-primary btn-width-custom" onclick="listar()">Buscar</button>
+                                                    </div>
+                                                    <div class="row">
+                                                        <a id="btnBusExportar" class="btn btn-primary btn-width-custom" download="Reporte_Qualys.xlsx" target="_blank">Exportar<br/>Todo</a>
+                                                        @*<button id="btnBusExportar" class="btn btn-primary btn-width-custom" onclick="exportar()">Exportar Todo</button>*@
+                                                    </div>
+                                                    <div class="row">
+                                                        <a id="btnBusExportarActive" class="btn btn-primary btn-width-custom" download="Reporte_Qualys_All.xlsx" target="_blank">Exportar<br/>Activas</a>
+                                                        @*<button id="btnBusExportarActive" class="btn btn-primary btn-width-custom" onclick="exportarActivas()">Exportar Activas</button>*@
+                                                    </div>
+                                                    @*<div class="row" style="margin-bottom: 0;">
+                                                            <label>&nbsp;</label><div class="clear"></div>
+                                                        </div>*@
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row"></div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-6 col-md-4">
+        <div class="card bg-warning no-border">
+            <div class="card-values">
+                <div class="p-x">
+                    <small>Equipos encontrados en CVT</small>
+                    <h3 class="card-title fw-l"><span id="spanEquiposCVT">0</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div class="col-xs-6 col-md-3">
+        <div class="card bg-danger no-border">
+            <div class="card-values">
+                <div class="p-x">
+                    <small>Equipos no encontrados en CVT</small>
+                    <h3 class="card-title fw-l"><span id="spanEquiposNoCVT">0</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>*@
+    <div class="col-xs-6 col-md-4">
+        <div class="card bg-primary no-border">
+            <div class="card-values">
+                <div class="p-x">
+                    <small>Vulnerabilidades con Tecnologías asignadas</small>
+                    <h3 class="card-title fw-l"><span id="spanTecnologiasAsignadas">0</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-md-4">
+        <div class="card bg-info no-border">
+            <div class="card-values">
+                <div class="p-x">
+                    <small>Vulnerabilidades con Productos asignados</small>
+                    <h3 class="card-title fw-l"><span id="spanProductosAsignados">0</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-6 col-md-4">
+        <div class="card bg-warning no-border">
+            <div class="card-values">
+                <div class="p-x">
+                    <small>Equipos no encontrados en CVT</small>
+                    <h3 class="card-title fw-l"><span id="spanEquiposNoCVT">0</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div class="col-xs-6 col-md-3">
+            <div class="card bg-danger no-border">
+                <div class="card-values">
+                    <div class="p-x">
+                        <small>Equipos no encontrados en CVT</small>
+                        <h3 class="card-title fw-l"><span id="spanEquiposNoCVT">0</span></h3>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    <div class="col-xs-6 col-md-4">
+        <div class="card bg-primary no-border">
+            <div class="card-values">
+                <div class="p-x">
+                    <small>Vulnerabilidades sin Tecnologías asignadas</small>
+                    <h3 class="card-title fw-l"><span id="spanTecnologiasNoAsignadas">0</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-md-4">
+        <div class="card bg-info no-border">
+            <div class="card-values">
+                <div class="p-x">
+                    <small>Vulnerabilidades sin Productos asignados</small>
+                    <h3 class="card-title fw-l"><span id="spanProductosNoAsignados">0</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<div class="row gutter-xs" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-striped table-nowrap table-bordered" cellspacing="0" style="width:100%; margin-bottom:0 !important;">
+                        <caption class="caption text-left">
+                            <span>Consolidado de Vulnerabilidades - Qualys</span>
+                        </caption>
+                    </table>
+                    <table id="table" data-detail-view="true" class="table table-striped table-nowrap" cellspacing="0" style="width:100%;">
+                        <thead>
+                            <tr></tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+<!--Modal Ver Más-->
+<div id="MdVerMas" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormVerMas"></h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit (Producto)-->
+
+<script src="~/app/Qualys/reporteConsolidado.js"></script>

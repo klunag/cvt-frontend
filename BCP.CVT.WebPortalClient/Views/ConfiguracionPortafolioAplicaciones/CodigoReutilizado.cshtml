@@ -1,0 +1,117 @@
+﻿﻿﻿@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Código de Interfaz a Reutilizar";
+    ViewBag.Title2 = "Configuración de Portafolio";
+    ViewBag.Title3 = "Código de Interfaz a Reutilizar";
+}
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+    textarea.form-control {
+        height : 120px
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-7 col-xs-8 col-sm-6">
+                                <div class="input-with-icon">
+                                    <h5>Código interfaz a reutilizar: </h5>
+                                    <input id="txtBusCod" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Código interfaz a reutilizar...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <br /> <br />
+                                <button id="btnBusCod" class="btn btn-primary btn-width-custom" onclick="buscarCodigo()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a id="btnNuevo" class="btn btn-primary btn-width-custom" href="javascript: void(0)" title="Nuevo registro">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tbl-codigo" class="table" data-unique-id="WorkerId" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Códigos de Interfaz a Reutilizar Registrados</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="10">#</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="30">Acciones</th>
+                            <th data-field="Id" data-halign="center" data-visible="false" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Id">Código</th>
+                            <th data-field="Codigo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Codigo">Código</th>
+                            <th data-field="Comentarios" data-halign="center" data-valign="middle" data-align="left" data-sortable="true">Descripcion</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Activos)-->
+<div id="MdAddOrEditCod" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormAct">Nuevo registro</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditCod">
+                    <div class="form-group">
+                        <input type="hidden" id="txtCodCod" class="form-control" name="txtCodCod">
+                        <input type="hidden" name="hdCodigoId" id="hdCodigoId" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            Código:
+                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Código a Reutilizar"></span>
+                        </label>
+                        <input id="txtCodigo" class="form-control" type="text" name="txtCodigo" maxlength="4">
+
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">
+                            Comentario asociado a reutilizar el código:
+                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Comentario."></span>
+                        </label>
+                        <textarea id="txtComentario" class="form-control" type="text" name="txtComentario" maxlength="500">	   </textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegAct" class="btn btn-primary" onclick="guardarAddOrEditCodigo()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/ConfiguracionPortafolio/codigoReutilizado.js?v=1.0.0"></script>

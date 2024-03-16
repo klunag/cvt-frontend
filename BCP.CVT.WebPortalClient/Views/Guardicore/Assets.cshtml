@@ -1,0 +1,93 @@
+﻿
+@{
+    ViewBag.Title1 = "Servidores";
+    ViewBag.Title2 = "Guardicore";
+    ViewBag.Title3 = "Listado de Servidores";
+}
+
+<style>
+    .bg-amarillo {
+        background-color: #ffe494 !important;
+    }
+    .bg-rojo {
+        background-color: #ff9ea7 !important;
+    }
+    .bg-verde {
+        background-color: #a3ffb9 !important;
+    }
+</style>
+
+<div class="card" style="margin-bottom:25px;">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row form-group">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon containerFiltro">
+                                    <input id="txtBusEq" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Búsqueda por nombre del Equipo...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                                <input id="hdBusEqId" type="hidden">
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusEq" class="btn btn-primary btn-width-custom" onclick="buscarEquipo()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+ 
+<div class="card" style="display:flex;flex-direction: column; margin-bottom: 16px;font-size: 14px;">
+    <label style="font-weight:600">Leyenda: </label>
+    <label style="margin-bottom: 0px">
+        <i class='glyphicon glyphicon-ok text-success' style="margin-right: 3px; font-size:14px;" aria-hidden="true"></i>Se encuentra en el catalogo de CVT
+    </label>
+    <label style="margin-bottom: 0px">
+        <i class='glyphicon glyphicon-question-sign text-warning' style="margin-right: 3px; font-size:14px;" aria-hidden="true"></i>El equipo se encuentra inactivo en el catalogo de CVT
+    </label>
+    <label style="margin-bottom: 0px">
+        <i class='glyphicon glyphicon-remove text-danger' style="margin-right: 3px; font-size:14px;" aria-hidden="true"></i>El equipo no se encuentra en el catalogo de CVT
+    </label>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            
+            <div class="card-body">
+                <div class="table-responsive">
+                    <div class="">
+                        <table id="tbRegistros" class="table" data-mobile-responsive="true" data-detail-view="false" data-detail-formatter="detailFormatter" data-row-style="rowStyle" style="font-size:11px !important;">
+                            <caption class="caption text-left">
+                                <span>Servidores</span>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-formatter="EstadoFormatter" data-field="estado" data-halign="center" data-valign="middle" data-align="center" data-width="40">Estado en CVT</th>
+                                    <th data-field="name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="object.name">Equipo</th>
+                                    <th data-field="guest_agent_details.os_details.os_display_name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="240" data-sort-name="guest_agent_details.os_details.os_display_name">Sistema Operativo</th>
+                                    <th data-field="last_guest_agent_details_update" data-formatter="formatearFecha" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="last_guest_agent_details_update" data-width="130">Fecha <br /> Scaneo</th>
+                                    <th data-field="ip_addresses" data-formatter="ipFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="90">Direcciones <br />de IP</th>
+                                    <th data-field="labels" data-formatter="labelsFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="120">Etiquetas</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+</script>
+@*<script src="~/Scripts/jquery.json-editor.min.js"></script>*@
+<script src="~/app/Guardicore/Assets.js"></script>

@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title1 = "Blobs";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Blobs";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+<style>
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+     
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>Fecha: </h5>
+                            <div id="dpDate-btn" class="input-group date">
+                                <span class="input-group-addon">
+                                    <span class="icon icon-calendar"></span>
+                                </span>
+                                <input type="text" id="dpDateFilter" name="dpDateFilter" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                <span class="input-group-btn">
+                                    <button id="btnSearch" class="btn btn-primary">Buscar</button>
+                                </span>
+                            </div>
+                        </div>
+                        @*<div class="col-md-4">
+                            <h5>Contenedor: </h5>
+                            <select id="ddlContainerFilter" name="ddlContainerFilter" class="form-control"></select>
+                        </div>*@
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Explorador de archivos</legend>
+                <div class="row">
+                    <div class="col-md-3">
+                        <fieldset class="fieldset">
+                            <div class="row">
+                                <div id="jstree_demo_div"></div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-md-9">
+                        <fieldset class="fieldset">
+                            <legend class="legend">Group Name</legend>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="toolbar">
+                                        <button id="btnGoUp" class="btn btn-default" title="Atrás">
+                                            <span class="icon icon-arrow-left"></span>
+                                        </button>
+                                        <button id="btnGoBack" class="btn btn-default" title="Arriba">
+                                            <span class="icon icon-arrow-up"></span>
+                                        </button>
+                                    </div>
+                                    <table 
+                                           id="tblGroupName" 
+                                           class="table" 
+                                           data-unique-id="Id"
+                                           data-mobile-responsive="true"
+                                           data-toolbar="#toolbar">
+                                        <caption id="cptBlobs" class="caption text-left">                                            
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                                <th data-formatter="nameFormatter" data-field="Name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                                                <th data-field="SizeStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Size" data-width="20%">Tamaño</th>
+                                                <th data-field="LastModifiedStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="LastModified" data-width="10%">Fecha</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+<script src="~/app/blob.js?v=1.0.1"></script>

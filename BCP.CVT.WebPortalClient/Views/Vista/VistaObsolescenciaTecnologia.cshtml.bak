@@ -1,0 +1,199 @@
+﻿@{
+    ViewBag.Title1 = "KPI Obsolescencia Tecnología (Serv + Azure)";
+    ViewBag.Title2 = "Vista Owner";
+    ViewBag.Title3 = "KPI Obsolescencia Tecnología";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<style>
+    .opcionesStyle {
+        width: 500px;
+    }
+
+    .fondoRojo {
+        background-color: #E33D01 !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoNaranja {
+        background-color: #FF7F0D !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoAmarillo {
+        background-color: #FFDD5B !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoVerdeLeve {
+        background-color: #91C337 !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoVerdeFuerte {
+        background-color: #22A71C !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoCeleste {
+        background-color: #bfd9eb !important;
+        color: #000000 !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoBlanco {
+        text-align: center;
+        width: 10%;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    #chartdiv {
+        width: 100%;
+        height: 400px;
+        font-size: 11px;
+    }
+
+    .detail-view td div.bootstrap-table {
+        margin-left: 30px;
+    }
+
+    .bootstrap-table .table:not(.table-condensed) > tbody > tr.detail-view > td {
+        padding: 0;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <div class="panel-group" id="accordion-filtro" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default" style="overflow: inherit;">
+                    <a class="panel-heading" role="tab" id="heading-filtro" data-toggle="collapse" data-parent="#accordion-filtro" href="#collapse-filtro" aria-expanded="true" aria-controls="collapse-filtro" style="display: flex">
+                        <h4 class="panel-title">
+                            Filtro de búsqueda
+                        </h4>
+                    </a>
+                    <div id="collapse-filtro" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro">
+                        <div class="panel-body">
+                            <div class="card-search-box">
+                                <form action="javascript:void(0);">
+                                    <div class="row" style="margin-bottom: 0;">
+                                        <div class="col-sm-9">
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-sm-4">
+                                                    <label>Dominio: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusDominioTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                                            <option value="-1">Todos</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>SubDominio: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusSubDominioTecnologia" class="form-control input-thick pill input-with-icon-search" multiple>
+                                                            <option value="-1">Todos</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>Producto: </label>
+                                                    <div class="input-with-icon searchProductoContainer">
+                                                        <input id="txtBusNombreTecnologia" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Producto..." onkeydown="ValidaEnters(event)">
+                                                        <input id="hdBusNombreTecnologiaId" type="hidden">
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-sm-4">
+                                                    <label>Tecnología: </label>
+                                                    <div class="input-with-icon searchTecnologiaContainer">
+                                                        <input id="txtBusClaveTecnologia" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Tecnología..." onkeydown="ValidaEnters(event)">
+                                                        <input id="hdBusClaveTecnologiaId" type="hidden">
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>Tribu/Coe/Unidad Organizativa: </label>
+                                                    <div class="input-with-icon searchOwnerContainer">
+                                                        <input id="txtBusOwnerTecnologia" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Tribu/Coe/Unidad Organizativa..." onkeydown="ValidaEnters(event)">
+                                                        <input id="hdBusOwnerTecnologiaId" type="hidden">
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label>Squad: </label>
+                                                    <div class="input-with-icon">
+                                                        <select id="cbBusSquadTecnologia" class="form-control input-thick pill input-with-icon-search">
+                                                            <option value="-1">Todos</option>
+                                                        </select>
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="row" style="margin-bottom: 0;">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <label>&nbsp;</label><div class="clear"></div>
+                                                        <button id="btnBusBuscar" class="btn btn-primary btn-width-custom" onclick="listar()">Buscar</button>
+                                                        <button id="btnBusExportar" class="btn btn-primary btn-width-custom" onclick="exportar()">Exportar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs" style="margin-top:20px;">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-striped table-nowrap table-bordered" cellspacing="0" style="width:100%; margin-bottom:0 !important;">
+                    <caption class="caption text-left">
+                        <span>Obsolescencia por owner</span>
+                    </caption>
+                </table>
+                <table id="table" data-detail-view="true" class="table table-striped table-nowrap table-responsive" cellspacing="0" style="width:100%;"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/Tecnologia/vistaObsolescenciaOwner.js"></script>
+

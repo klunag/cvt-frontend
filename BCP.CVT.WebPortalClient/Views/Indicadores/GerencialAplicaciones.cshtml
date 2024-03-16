@@ -1,0 +1,474 @@
+﻿
+@{
+
+    ViewBag.Title1 = "Indicador Gerencial de Aplicaciones";
+    ViewBag.Title2 = "Indicadores";
+    ViewBag.Title3 = "Aplicaciones";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<style>
+    .reportPie {
+        width: 98%;
+        height: 185px;
+    }
+
+    .lblBottomChart {
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .lblTitleChart {
+        text-align: center;
+        font-size: 17px;
+        font-weight: 600;
+        color: #000;
+        margin-top: 5px;
+    }
+
+    .div-report-subdominio {
+        margin-bottom: 30px;
+    }
+
+    .media {
+        margin-top: 15px;
+    }
+
+    .media, .media-body {
+        zoom: 1;
+        overflow: hidden;
+    }
+
+    :first-child.media {
+        margin-top: 0px;
+    }
+
+    .list-group-item {
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid #e7e7ec;
+    }
+
+    :first-child.list-group-item {
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+    }
+
+    .list-group-divided .list-group-item {
+        background-color: transparent;
+        border-width: 1px 0;
+    }
+
+    .list-group-divided :first-child.list-group-item {
+        border-top-right-radius: 0px;
+        border-top-left-radius: 0px;
+        border-top: none;
+    }
+
+    ol, ul {
+        margin-top: 0px;
+        margin-bottom: 10px;
+    }
+
+    .list-group {
+        margin-bottom: 20px;
+        padding-left: 0px;
+    }
+
+    .card .list-group {
+        margin-bottom: 0px;
+    }
+
+    .card-body {
+        padding: 15px;
+        position: relative;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #f1f1f1;
+        border-radius: 4px;
+        display: block;
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .media-body {
+        width: 10000px;
+    }
+
+    .media-right, .media > .pull-right {
+        padding-left: 10px;
+    }
+
+    .media-body, .media-left, .media-right {
+        display: table-cell;
+        vertical-align: top;
+    }
+
+    .media-middle {
+        vertical-align: middle;
+    }
+
+    .bg-primary {
+        background-color: #f7a033;
+        border-color: #f7a033;
+        color: #fff;
+    }
+
+
+    .circle {
+        border-radius: 50%;
+    }
+
+    .sq-40 {
+        display: inline-block;
+        font-size: 20px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        width: 40px;
+    }
+
+    .icon {
+        display: inline-block;
+        font-family: FontAwesome;
+        font-size: inherit;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1;
+        text-align: center;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .media-heading {
+        margin-top: 0px;
+        margin-bottom: 5px;
+    }
+</style>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="form-group">
+
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left">
+                                        <h5>Estado de Aplicación: (*)</h5>
+                                        <select id="cbFilEstadoAplicacion" name="cbFilEstadoAplicacion" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left ui-widget containerJefeEquipo" data-toggle="match-height">
+                                        <h5>Jefe de equipo: @*<br />&nbsp;*@</h5>
+                                        <input type="text" id="txtJefeEquipo" name="txtJefeEquipo" value="" class="form-control ui-autocomplete-input" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left ui-widget containerOwner" data-toggle="match-height">
+                                        <h5>Lider usuario: @*<br />&nbsp;*@</h5>
+                                        <input type="text" id="txtOwner" name="txtOwner" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left ui-widget containerTTL" data-toggle="match-height">
+                                        <h5>Líder de tribu (TTL): </h5>
+                                        <input type="text" id="txtTTL" name="txtTTL" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="form-group">
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left ui-widget containerGerencia" data-toggle="match-height">
+                                        <h5>Gerencia central: </h5>
+                                        <input type="text" id="txtGerencia" name="txtGerencia" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left ui-widget containerDivision" data-toggle="match-height">
+                                        <h5>División: </h5>
+                                        <input type="text" id="txtDivision" name="txtDivision" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left ui-widget containerUnidad" data-toggle="match-height">
+                                        <h5>Unidad: </h5>
+                                        <input type="text" id="txtUnidad" name="txtUnidad" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="form-group">
+
+                                <div class="col-xs-2 col-md-2">
+                                    <div class="text-left">
+                                        <h5>Nro. Meses: (*)</h5>
+                                        <select id="cbNroMeses" name="cbNroMeses" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-2 col-md-2">
+                                    <div class="text-left">
+                                        <h5>Nro. Subdominios: (*)</h5>
+                                        <select id="cbNroSubdominios" name="cbNroSubdominios" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left">
+                                        <h5>Fecha de la consulta: (*)</h5>
+                                        <div class="input-group date" id="divFechaFiltro">
+                                            <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                            @*<span class="input-group-addon">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>*@
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-xs-2 col-md-3">
+                                    <div class="text-left ui-widget containerGestionado" data-toggle="match-height">
+                                        <h5>Soportado por/Tribu: (*)</h5>
+                                        @*<input type="text" id="txtGestionado" name="txtGestionado" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />*@
+                                        <select id="cbFilGestionadoPor" name="cbFilGestionadoPor" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-1 col-md-2">
+                                    <h5 style="color:transparent"> .</h5>
+                                    <a class="btn btn-primary pull-right" href="javascript: void(0)" onclick="GetReporte()">
+                                        <span class="icon icon-external-link"></span>
+                                        <span class="count-text">Generar Gráficos</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="row">
+</div>
+
+<div id="divGraficos" style="display: none">
+    <div class="row gutter-xs">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Detalle de aplicaciones</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 m-y">
+                            <ul class="list-group list-group-divided">
+                                <li class="list-group-item">
+                                    <div class="media">
+                                        <div class="media-middle media-body">
+                                            <h6 class="media-heading">
+                                                <span>Total de aplicaciones</span>
+                                            </h6>
+                                            <h4 class="media-heading total-app">
+                                                3995
+                                            </h4>
+                                        </div>
+                                        <div class="media-middle media-right">
+                                            <span class="bg-primary circle sq-40">
+                                                <span class="icon icon-arrow-right"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6 m-y">
+                            <table class="table table-borderless table-fixed">
+                                <tbody>
+                                    <tr>
+                                        <td class="col-xs-1 text-left"></td>
+                                        <td class="col-xs-7 text-left">
+                                            <a class="link-muted" href="#">
+                                                <span class="truncate">Eliminada</span>
+                                            </a>
+                                        </td>
+                                        <td class="col-xs-4 text-right total-app-est0">
+                                            1969
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-xs-1 text-left"></td>
+                                        <td class="col-xs-7 text-left">
+                                            <a class="link-muted" href="#">
+                                                <span class="truncate">Vigente</span>
+                                            </a>
+                                        </td>
+                                        <td class="col-xs-4 text-right total-app-est2">
+                                            1738
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-xs-1 text-left"></td>
+                                        <td class="col-xs-7 text-left">
+                                            <a class="link-muted" href="#">
+                                                <span class="truncate">En desarrollo</span>
+                                            </a>
+                                        </td>
+                                        <td class="col-xs-4 text-right total-app-est1">
+                                            243
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-xs-1 text-left"></td>
+                                        <td class="col-xs-7 text-left">
+                                            <a class="link-muted" href="#">
+                                                <span class="truncate">No vigente</span>
+                                            </a>
+                                        </td>
+                                        <td class="col-xs-4 text-right total-app-est3">
+                                            45
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Aplicaciones y equipos</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 m-y">
+                            <ul class="list-group list-group-divided">
+                                <li class="list-group-item">
+                                    <div class="media">
+                                        <div class="media-middle media-body">
+                                            <h6 class="media-heading">
+                                                <span>Aplicaciones (En Desarrollo, Vigente y No vigente) sin relaciones</span>
+                                            </h6>
+                                            <h4 class="media-heading">
+                                                <div id="lblTotalAplicacionesSinRelacion" class="lblTitleChart">
+                                                    <span></span>
+                                                </div>
+                                            </h4>
+                                        </div>
+                                        <div class="media-middle media-right">
+                                            <span class="bg-primary circle sq-40">
+                                                <span class="icon icon-arrow-right"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Aplicaciones y equipos</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 m-y">
+                            <ul class="list-group list-group-divided">
+                                <li class="list-group-item">
+                                    <div class="media">
+                                        <div class="media-middle media-body">
+                                            <h6 class="media-heading">
+                                                <span>Aplicaciones eliminadas con relaciones activas</span>
+                                            </h6>
+                                            <h4 class="media-heading">
+                                                <div id="lblTotalAplicacionesConRelacion" class="lblTitleChart">
+                                                    <span></span>
+                                                </div>
+                                            </h4>
+                                        </div>
+                                        <div class="media-middle media-right">
+                                            <span class="bg-primary circle sq-40">
+                                                <span class="icon icon-arrow-right"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </div>
+
+    <div class="row gutter-xs">
+        <div class="col-xs-6 div-report">
+            <div class="card" id="divChartActual">
+                <div class="card-body">
+                    <div id="divPieActualLbl" class="lblTitleChart">Hoy</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-6 div-report">
+            <div class="card" id="divChartMesesAtras">
+                <div class="card-body">
+                    <div id="divPieMesesAtrasLbl" class="lblTitleChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+    </div>
+
+    <h3 id="lblTituloTopSubdominios"></h3>
+    <div class="row">
+    </div>
+
+    <div id="divPieSubdominios" class="row gutter-xs">
+        <div class="col-xs-6 div-report">
+            <div class="card">
+                <div class="card-body">
+                    <div id="divPieSubdominioActual" class="reportPie"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-6 div-report">
+            <div class="card">
+                <div class="card-body">
+                    <div id="divPieSubdominioActual" class="reportPie"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+<script src="~/app/IndicadoresGerencialAplicaciones.js?v=2.1.0"></script>

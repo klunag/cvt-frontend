@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title1 = "Alertas";
+    ViewBag.Title2 = "Notificaciones";
+    ViewBag.Title3 = "Tipo de Notificaciones";
+}
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript:Exportar();">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+<div class="view-principal">
+    <div class="container">
+        <div id="divNotificaciones" class="row">
+            <table id="tblRegistros" class="table table-striped table-nowrap dataTable" sort-name="Nombre" cellspacing="0" width="100%"
+                   data-unique-id="Id">
+                <thead>
+                    <tr>
+                        <th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="30">#</th>
+                        <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                        <th data-field="Componente" data-halign="center" data-valign="middle" data-align="left">Componente</th>
+                        <th data-field="DetalleComponente" data-halign="center" data-valign="middle" data-align="left">Observación</th>
+                        <th data-field="FechaEjecucionToString" data-halign="center" data-valign="middle" data-align="center">Fecha de registro</th>                        
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script src="~/app/userIT.js"></script>
+
+

@@ -1,0 +1,326 @@
+﻿@{
+    ViewBag.Title1 = "Gestión de las familias de tecnologías";
+    ViewBag.Title2 = "Gestión de las Tecnologías";
+    ViewBag.Title3 = "Familias";
+}
+<style>
+    span.input-group-addon {
+        z-index: 2;
+        margin-left: -1px;
+        position: relative;
+        background-color: #f7a033;
+        border-color: #f7a033;
+        color: #fff;
+    }
+</style>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row">
+                            <div class="col-md-10 col-xs-8 col-sm-9">
+                                <div class="input-with-icon">
+                                    <input id="txtBusFamilia" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre o descripción de la familia...">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-4 col-sm-3">
+                                <button id="btnBusFamilia" class="btn btn-primary btn-width-custom" onclick="BuscarFamilia()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+            
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddFamilia()">
+        <span class="icon icon-plus"></span>
+        <span class="count-text">Nuevo</span>
+    </a>
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de familias</strong>
+            </div>
+            <div class="card-body">
+                <table id="tbl-familias" class="table">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="linkFormatterName" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                            <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Descripción</th>
+                            <th data-formatter="linkFormatterTec" data-field="NumTecAsociadas" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NumTecAsociadas" data-width="10%"># Tecnologías</th>
+                            @*<th data-field="FechaFinSoporteToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaFinSoporte" data-width="10%">F. Fin</th>
+                                <th data-field="FechaExtendidaToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaExtendida" data-width="10%">F.Extendida</th>
+                                <th data-field="FechaInternaToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaInterna" data-width="10%">F. Interna</th>*@
+                            <th data-field="Existencia" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Existencia" data-width="10%">Existencia</th>
+                            <th data-field="Facilidad" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Facilidad" data-width="10%">Facilidad</th>
+                            <th data-field="Riesgo" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Riesgo" data-width="10%">Riesgo</th>
+                            <th data-field="Vulnerabilidad" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Vulnerabilidad" data-width="10%">Vulnerabilidad</th>
+                            <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Activo" data-width="10%">Estado</th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Add or Edit (Familia)-->
+<div id="MdAddOrEditFamilia" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormFamilia"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditFamilia">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Fabricante:
+                            @*<span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el nombre del fabricante."></span>*@
+                        </label>
+                        <input id="txtFabricante" name="txtFabricante" class="form-control" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Nombre: </label>
+                        <input id="txtNomFamilia" class="form-control" type="text" name="txtNomFamilia" maxlength="120">
+                        <input type="hidden" name="hIdFamilia" id="hIdFamilia" value="0" />
+                        <input type="hidden" name="hdTecVin" id="hdTecVin" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Descripción: </label>
+                        <textarea id="txtDesFamilia" class="form-control" rows="3" name="txtDesFamilia" maxlength="300"></textarea>
+                    </div>
+                    @*<div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label">Fecha fin de soporte de la familia</label>
+                    <div class="input-group date" id="dpFecSopFamilia-btn">
+                        <input type="text" id="dpFecSopFamilia" name="dpFecSopFamilia" class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="icon icon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label">Fecha extendida de la familia</label>
+                    <div class="input-group date" id="dpFecExtFamilia-btn">
+                        <input type="text" id="dpFecExtFamilia" name="dpFecExtFamilia" class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="icon icon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label">Fecha interna de la familia</label>
+                    <div class="input-group date" id="dpFecIntFamilia-btn">
+                        <input type="text" id="dpFecIntFamilia" name="dpFecIntFamilia" class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="icon icon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label">
+                        ¿Activo?
+                    </label>
+                    <div class="input-group" id="divActivo">
+                    </div>
+                    <input type="hidden" name="hdNumTecAsoc" id="hdNumTecAsoc" value="0" />
+                    <input type="text" id="msjActivo" name="msjActivo" class="form-control clActivo" style="display:none;" />
+                </div>
+            </div>
+        </div>*@
+
+                    <div class="row">
+                        <div class="col-md-12" style="margin-bottom:10px;">
+                            <label class="control-label">
+                                Criterios para el riesgo del cálculo de la tecnología
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <select id="cbExisTec" name="cbExisTec" class="form-control"></select>
+                                    </div>
+                                    <div class="col-md-8 tecnologia-label">
+                                        Existencia de profesionales/vendors con conocimiento de Tecnología
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la existencia de profesionales/vendors con conocimiento de tecnología"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <select id="cbFacAcTec" name="cbFacAcTec" class="form-control"></select>
+                                    </div>
+                                    <div class="col-md-8 tecnologia-label">
+                                        Facilidad de actualización
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la facilidad de actualización"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <select id="cbRiesgTec" name="cbRiesgTec" class="form-control"></select>
+                                    </div>
+                                    <div class="col-md-8 tecnologia-label">
+                                        Riesgo de mantenerse obsoleto
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica el riesgo de mantenerse obsoleto"></span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <input id="txtVulTec" name="txtVulTec" type="text" class="form-control" />
+                                    </div>
+                                    <div class="col-md-8 tecnologia-label">
+                                        Vulnerabilidad de seguridad
+                                        <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="Se especifica la vulnerabilidad de seguridad"></span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            ¿Activo?
+                        </label>
+                        <div class="input-group" id="divActivo">
+                        </div>
+                        <input type="hidden" name="hdNumTecAsoc" id="hdNumTecAsoc" value="0" />
+                        <input type="text" id="msjActivo" name="msjActivo" class="form-control clActivo" style="display:none;" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegFamilia" class="btn btn-primary" onclick="GuardarAddOrEditFamilia()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit (Familia)-->
+<!--Modal Tecnologias Asociadas (Familia)-->
+<div id="MdTecByFam" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Tecnologías asociadas</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTecByFam">
+                    <div class="form-group">
+                        <label class="control-label">Tecnología: </label>
+                        <div class="form-group ui-widget tecContainer">
+                            <input id="txtTecnologia" name="txtTecnologia" class="form-control ui-autocomplete-input" type="text">
+                            <input type="hidden" name="hdTecnologiaId" id="hdTecnologiaId" value="0" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button id="btnRegTec" type="button" class="btn btn-primary" onclick="guardarTecnologia()" data-loading-text="Procesando...">Registrar tecnología</button>
+                        <button id="btnExportar" type="button" class="btn btn-primary" onclick="ExportarTecAsociadas()">Exportar</button>
+                    </div>
+                    <div class="form-group">
+                        <table id="tblTecByFam" data-locale="es-SP" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="DominioNomb" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DominioNomb">Dominio</th>
+                                    <th data-field="SubdominioNomb" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="SubdominioNomb">Subdominio</th>
+                                    <th data-formatter="linkFormatterTecnologiaFamilia" data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="ClaveTecnologia">Tecnología</th>
+                                    <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="UsuarioCreacion">Asignado por</th>
+                                    <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion">Fecha de asignación</th>
+                                    <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EstadoId">Estado de <br/>tecnología</th>
+                                    <th data-field="TipoTecNomb" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TipoTecNomb">Estado de <br/>estandarización</th>
+                                    <th data-formatter="opcionesTecAsoc" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Tecnologias Asociadas (Familia)-->
+
+<!--Modal Tecnologias Viculadas (Familia)-->
+<div id="mdTecVin" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Tecnologías vinculadas</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTecVin">
+                    <div class="form-group">
+                        <table id="tblTecVin" data-locale="es-SP" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="DominioNomb" data-halign="center" data-valign="middle" data-align="center">Dominio</th>
+                                    <th data-field="SubdominioNomb" data-halign="center" data-valign="middle" data-align="center">Subdominio</th>
+                                    <th data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="center">Tecnología</th>
+                                    <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center">Asignado por</th>
+                                    <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de asignacion</th>
+                                    <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="center">Estado de <br/>tecnología</th>
+                                    <th data-field="TipoTecNomb" data-halign="center" data-valign="middle" data-align="center">Estado de <br />estandarización</th>                                  
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Tecnologias Vinculadas (Familia)-->
+
+<script src="~/app/familias.js"></script>

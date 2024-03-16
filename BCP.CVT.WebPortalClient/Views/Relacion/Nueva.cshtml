@@ -1,0 +1,348 @@
+﻿
+@{
+    ViewBag.Title1 = "Nueva relación";
+    ViewBag.Title2 = "Relaciones y formatos";
+    ViewBag.Title3 = "Nueva relación";
+
+    string IdRelacion = ViewBag.IdRelacion;
+}
+@using BCP.CVT.Cross
+
+<style>
+    .list-group-item-heading {
+        font-size: 12px;
+    }
+
+    .lbl-custom {
+        margin: 0px !important;
+        padding: 0px !important;
+    }
+
+    .legend {
+        margin: 0px !important;
+    }
+
+    .indice-width {
+        min-width: 50px;
+    }
+
+    .tecnologia-width {
+        min-width: 150px;
+    }
+
+    .relevancia-width {
+        min-width: 50px;
+    }
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.8;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .list-group-item.active {
+        background-color: #ee8809 !important;
+        border-color: #ee8809 !important;
+    }
+</style>
+
+@*<div class="panel panel-body text-left" style="background-color: transparent;" data-toggle="match-height">
+    <a id="btnAgregar" class="btn btn-primary btn-width-custom" href="/Relacion/Bandeja">
+        <span class="icon icon-arrow-left"></span>
+        <span class="count-text">Volver</span>
+    </a>
+</div>*@
+<div class="row">
+    <div class="col-md-10">
+        <h3>¿Qué necesitas registrar?</h3>
+    </div>
+    <div class="col-md-2 text-right">
+        <a id="btnAgregar" class="btn btn-primary btn-width-custom" href="/Relacion/Bandeja">
+            <span class="icon icon-arrow-left"></span>
+            <span class="count-text">Volver</span>
+        </a>
+    </div>
+</div>
+
+<hr>
+
+<div class="row gutter-xs" style="margin-top:15px;">
+    <div class="col-md-3">
+        <div class="list-group">
+            <a id="sideFil01" href="javascript: void(0)" class="list-group-item active" title="Registra una relación vinculando tu aplicación a un servidor">
+                <span class="icon icon-desktop icon-2x"></span>
+                <h4 class="list-group-item-heading">Servidores</h4>
+            </a>
+            <a id="sideFil12" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación a un servicio en nube">
+                <span class="icon icon-cloud icon-2x"></span>
+                <h4 class="list-group-item-heading">Servicios en la nube</h4>
+            </a>
+            <a id="sideFil02" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación a un servidor de aplicaciones">
+                <span class="icon icon-bolt icon-2x"></span>
+                <h4 class="list-group-item-heading">Servidor de aplicaciones</h4>
+            </a>
+            <a id="sideFil03" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación a un servidor web">
+                <span class="icon icon-cog icon-2x"></span>
+                <h4 class="list-group-item-heading">Servidores Web</h4>
+            </a>
+            <a id="sideFil04" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación a una base de datos relacional">
+                <span class="icon icon-tasks icon-2x"></span>
+                <h4 class="list-group-item-heading">Bases de datos relacionales</h4>
+            </a>
+            <a id="sideFil05" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación a una base de datos no relacional">
+                <span class="icon icon-inbox icon-2x"></span>
+                <h4 class="list-group-item-heading">Bases de datos no relacionales</h4>
+            </a>
+            <a id="sideFil07" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación a un componente middleware">
+                <span class="icon icon-shield icon-2x"></span>
+                <h4 class="list-group-item-heading">Middleware</h4>
+            </a>
+            <a id="sideFil08" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación a una herramienta de Data Mapping y ETL">
+                <span class="icon icon-random icon-2x"></span>
+                <h4 class="list-group-item-heading">Data Mapping y ETL</h4>
+            </a>
+            <a id="sideFil11" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación a una herramienta de despliegue">
+                <span class="icon icon-external-link icon-2x"></span>
+                <h4 class="list-group-item-heading">Deployment</h4>
+            </a>
+            <a id="sideFil06" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación un navegador web">
+                <span class="icon icon-globe icon-2x"></span>
+                <h4 class="list-group-item-heading">Navegadores web</h4>
+            </a>
+            <a id="sideFil09" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación a un lenguaje de programación o framework de desarrollo">
+                <span class="icon icon-code icon-2x"></span>
+                <h4 class="list-group-item-heading">Lenguaje de programación y Framework de desarrollo</h4>
+            </a>
+            <a id="sideFil10" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación un IDE o editor de código">
+                <span class="icon icon-code-fork icon-2x"></span>
+                <h4 class="list-group-item-heading">IDEs y Editores de Código</h4>
+            </a>
+            <a id="sideFil13" href="javascript: void(0)" class="list-group-item" title="Registra una relación vinculando tu aplicación cualquier otra tecnología">
+                <span class="icon icon-cogs icon-2x"></span>
+                <h4 class="list-group-item-heading">Otras tecnologías</h4>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-search">
+                    <fieldset class="fieldset">
+                        <legend class="legend">Datos de la relación</legend>
+                        <div class="card-search-box">
+                            <h3 id="titleForm">Equipo</h3>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form id="formAddOrEdit">
+                                        <input type="hidden" id="hdId" name="hdId" value="0" />
+                                        <input type="hidden" id="hdRelacionDetalleId" name="hdRelacionDetalleId" value="0" />
+                                        <input type="hidden" id="hdTipoRelacionId" name="hdTipoRelacionId" value="0" />
+                                        <div class="form-group tipo-equipo" style="display:none">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Tipo equipo: </label>
+                                                    <select id="ddlTipoEquipo" name="ddlTipoEquipo" class="form-control tipo-equipo"></select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label id="lblNameEquipo" class="control-label">Servidor: </label>
+                                                    <div class="form-group ui-widget equipoContainer">
+                                                        <input id="txtEquipo" name="txtEquipo" class="form-control tipo-equipo" type="text">
+                                                        <input type="hidden" id="hdEquipoId" name="hdEquipoId" class="form-control" />
+                                                        <input type="hidden" id="hdSubdominioIds" name="hdSubdominioIds" />
+                                                    </div>
+                                                    <span id="lblSuscripcion" class="lbl-custom"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-principal">
+                                            <label class="control-label">Aplicación: </label>
+                                            <div class="form-group ui-widget aplicacionContainer">
+                                                <input id="txtAplicacion" name="txtAplicacion" class="form-control form-principal" type="text">
+                                                <input type="hidden" id="hdAplicacionId" name="hdAplicacionId" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group tipo-tecnologia">
+                                            <label class="control-label">Tecnología: </label>
+                                            @*<a class="" href="javascript:irModalTecnologia()" title="Ir a tecnología">
+                                                [¿No encuentras la tecnología en el catálogo?]
+                                            </a>*@
+                                            <div class="form-group ui-widget tecnologiaContainer">
+                                                <input id="txtTecnologia" name="txtTecnologia" class="form-control tipo-tecnologia ui-autocomplete-input" type="text">
+                                                <input type="hidden" id="hdTecnologiaId" name="hdTecnologiaId" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group tipo-equipo tipo-aplicacion" style="display:none">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Ambiente: </label>
+                                                    <select id="cbAmbiente" name="cbAmbiente" class="form-control tipo-equipo tipo-aplicacion"></select>
+                                                </div>
+                                                <div class="col-md-6 tipo-funcion">
+                                                    <label class="control-label">Función: </label>
+                                                    <select id="ddlFuncion" name="ddlFuncion" class="form-control">
+                                                        <option value="-1">-- Seleccione --</option>
+                                                        <option value="1">File server</option>
+                                                        <option value="2">Base de datos</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group tipo-aplicacion" style="display:none">
+                                            <label class="control-label">Relacionar con: </label>
+                                            <div class="input-with-icon appVinculoContainer">
+                                                <input id="txtAppVinculo" name="txtAppVinculo" class="form-control input-thick pill input-with-icon-search tipo-aplicacion" type="text">
+                                                <span class="icon icon-search input-icon"></span>
+                                            </div>
+                                            <input type="hidden" name="hdAppVinculoId" id="hdAppVinculoId" value="0" />
+                                        </div>
+                                        <div class="form-group tipo-aplicacion" style="display:none">
+                                            <label class="control-label">Equipo: </label>
+                                            <select id="cbEquipoVin" name="cbEquipoVin" class="form-control tipo-aplicacion">
+                                                <option value="-1">-- Seleccione --</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group tipo-aplicacion" style="display:none">
+                                            <label class="control-label">Recurso relacionado: </label>
+                                            <textarea id="txtDetAppVin" name="txtDetAppVin" class="form-control tipo-aplicacion" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group tipo-tecnologia tipo-aplicacion">
+                                            <label class="control-label">Relevancia: </label>
+                                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="ALTA: Componente crítico de la aplicación, cualquier fallo hace imposible el funcionamiento. MEDIA: Componente importante pero no crítico, la aplicación puede ejecutar sus funcionalidades principales con limitaciones. BAJA: Componente no crítico para la aplicación, cualquier incidente no afecta el funcionamiento de la aplicación."></span>
+                                            <select id="cbRelevancia" name="cbRelevancia" class="form-control tipo-tecnologia tipo-aplicacion"></select>
+                                        </div>
+                                        <div class="form-group tipo-tecnologia data-extra">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Dominio: </label>
+                                                    <input type="text" id="txtDominio" name="txtDominio" class="form-control tipo-tecnologia" readonly />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Subdominio: </label>
+                                                    <input type="text" id="txtSubdominio" name="txtSubdominio" class="form-control tipo-tecnologia" readonly />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group tipo-tecnologia">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Estado de Estandarización: </label>
+                                                    <input type="text" id="txtTipoTecnologia" name="txtTipoTecnologia" class="form-control tipo-tecnologia" readonly />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Fecha fin de soporte: </label>
+                                                    <input type="text" id="txtFechaFinSoporte" name="txtFechaFinSoporte" class="form-control tipo-tecnologia" readonly />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group tipo-tecnologia">
+                                            <label class="control-label">Indicador de obsolescencia: </label>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <button type="button" class="btn btn-lg btn-danger btn-circle"></button>
+                                                    <label class="control-label">El dia de hoy</label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <button type="button" class="btn btn-lg btn-danger btn-circle"></button>
+                                                    <label class="control-label">Dentro de 12 meses</label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <button type="button" class="btn btn-danger btn-circle btn-xl"></button>
+                                                    <label class="control-label">Dentro de 24 meses</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group tipo-equipo tipo-servicio-nube">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="control-label" style="display:block">Relación con la aplicación: </label>
+                                                    @*<div id="divFlagRelacion" style="display:inline" class="cb-style"></div>
+                    <span id="spFlagRelacion" style="padding-left:5px;"></span>*@
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input id="rbItem01" type="radio" name="optradio" value="1" checked>
+                                                            <span id="spItem01">Relación primaria (el servidor es propio de la aplicación)</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input id="rbItem02" type="radio" name="optradio" value="0">
+                                                            <span id="spItem02">Relación secundaria (el servidor le pertenece a otra aplicación)</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6"></div>
+                                            </div>
+                                        </div>
+                                        <div class="tipo-equipo" style="display:none">
+                                            <label class="control-label">Seleccione las tecnologías que utiliza su aplicación: </label>
+                                            <table id="tblRegistroTecnologia" class="table" data-mobile-responsive="true" data-unique-id="Id" data-page-size="3000" data-page-number="1">
+                                                <thead>
+                                                    <tr>
+                                                        <th data-field="tblRegistroTecnologia" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>
+                                                        <th data-field="FlagSeleccionado" data-halign="center" data-valign="middle" data-align="left" data-checkbox="true"></th>
+                                                        <th data-field="Descripcion" data-halign="center" data-valign="middle" data-align="left">Tecnología</th>
+                                                        <th data-formatter="relevanciaFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center">Relevancia</th>
+                                                        <th data-formatter="componenteFormatter" data-field="Id" data-halign="center" data-valign="middle" data-align="center">Componente</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                            <input type="text" style="display:none" id="txtCantidadTecnologia" name="txtCantidadTecnologia" class="form-control" />
+                                        </div>
+                                        @*<div class="tipo-aprobar form-group permiso-aprobar">
+            <label class="control-label">Estado de Aprobación:</label>
+            <select id="cbEstado" name="cbEstado" class="form-control form-aprobar permiso-aprobar"></select>
+        </div>*@
+                                        <input type="hidden" id="hdEstadoId" name="hdEstadoId" class="form-control" />
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <button id="btnRegistrar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Registrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const RELACION_ID = parseInt(@IdRelacion, 10);
+
+    let TRUE_TEXT = "TRUE";
+    var objPermiso = {
+        Crear: "@ViewData.Eval("Permisos.Crear")".toString().toUpperCase() == TRUE_TEXT,
+        Editar: "@ViewData.Eval("Permisos.Editar")".toString().toUpperCase() == TRUE_TEXT,
+        Eliminar: "@ViewData.Eval("Permisos.Eliminar")".toString().toUpperCase() == TRUE_TEXT,
+        Exportar: "@ViewData.Eval("Permisos.Exportar")".toString().toUpperCase() == TRUE_TEXT,
+        Aprobar: "@ViewData.Eval("Permisos.Aprobar")".toString().toUpperCase() == TRUE_TEXT
+    };
+    var FLAG_USUARIO_APROBADOR = USUARIO.FlagAprobador;//objPermiso.Aprobar||false;
+    //CargarPermisos(objPermiso);
+
+    const TIPO_RELACION = {
+        EQUIPO: @Html.Raw((int)ETipoRelacion.Equipo),
+        TECNOLOGIA: @Html.Raw((int)ETipoRelacion.Tecnologia),
+        APLICACION: @Html.Raw((int)ETipoRelacion.Aplicacion),
+        SERVICIO_NUBE: @Html.Raw((int)ETipoRelacion.ServicioNube),
+    };
+
+</script>
+
+<script src="~/app/Relaciones/nuevaRelacion.js?v=1.1.7"></script>

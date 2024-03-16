@@ -1,0 +1,626 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Eliminación de aplicaciones";
+    ViewBag.Title2 = "Gestión de aplicaciones";
+    ViewBag.Title3 = "Eliminación de aplicaciones";
+
+    string nombreApp = (string)ViewBag.Nombre_App;
+    int paginaActual = (int)ViewBag.PaginaActual;
+    int paginaTamanio = (int)ViewBag.PaginaTamanio;
+}
+
+<style>
+    .modal-xl {
+        width: 90%;
+        max-width: 1200px;
+    }
+
+    .width-des {
+        min-width: 300px;
+    }
+
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    /* Chat containers */
+    .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    /* Darker chat container */
+    .darker {
+        border-color: #f7a033;
+        background-color: #ddd;
+    }
+
+    /* Clear floats */
+    .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    /* Style images */
+    .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+        /* Style the right image */
+        .container img.right {
+            float: right;
+            margin-left: 20px;
+            margin-right: 0;
+        }
+
+    /* Style time text */
+    .time-right {
+        float: right;
+        color: #aaa;
+    }
+
+    /* Style time text */
+    .time-left {
+        float: left;
+        color: #999;
+    }
+
+    .user-name {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .modal-dialog {
+        right: auto;
+        left: 50%;
+        width: 900px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+                                    <h5>Aplicación (código) </h5>
+                                    <input type="text" id="txtAplicacionFiltro" name="txtAplicacionFiltro" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                    <input type="hidden" name="hdAplicacionFiltroId" id="hdAplicacionFiltroId" />
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left ui-widget" data-toggle="match-height">
+                                    <h5>Estado de la aplicación</h5>
+                                    <select id="cbFilEstado" name="cbFilEstado" class="form-control">
+                                        <option value="-1" selected="selected">Todos</option>
+                                        <option value="1">En Desarrollo</option>
+                                        <option value="2">Vigente</option>
+                                        <option value="3">No Vigente</option>
+                                        @*<option value="4">Eliminada</option>*@
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-4 text-right">
+                                <h5>&nbsp;</h5>
+                                <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="RefrescarListado()">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistro" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Aplicaciones registradas</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            <th data-formatter="situacionFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Situación de registro</th>
+                            <th data-field="applicationId" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationId">Código</th>
+                            <th data-field="name" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="name">Nombre</th>
+                            <th data-field="managedBy" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="managedBy">Gestionado por</th>
+                            <th data-field="statusDetail" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="status">Estado de la aplicación</th>
+                            <th data-field="registerDate" data-formatter="dateFormat2" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="registerDate">Fecha de registro</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+
+<input type="hidden" name="hdPreviousState" id="hdPreviousState" />
+<!-- Modal no vigente-->
+<div id="modalNoVigente" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalNoVigente" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formNoVigente">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Cambiar el estado de la aplicación a <b>No Vigente</b></h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p>Al establecer el estado de tu aplicación a <strong>No Vigente</strong>, se notificará a todos los responsables e involucrados informando de este cambio.</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a este cambio de estado: </label>
+                                <textarea id="txtDescripcion" name="txtDescripcion" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnRegistrarNoVigente" class="btn btn-primary" type="button" data-loading-text="Procesando...">Cambiar estado</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Revertir Estado-->
+<div id="modalVigente" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalVigente" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="formVigente">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Revertir el estado de la aplicación</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p>Al reestablecer el estado de tu aplicación, se notificará a todos los responsables e involucrados informando de este cambio.</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="form-group">
+                                <label class="control-label">Comentarios asociados a este cambio de estado: </label>
+                                <textarea id="txtDescripcion2" name="txtDescripcion2" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnRegistrarVigente" class="btn btn-primary" type="button" data-loading-text="Procesando...">Cambiar estado</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal eliminado-->
+<div id="modalEliminar" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalEliminar" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <form id="formEliminar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Solicita la eliminación de esta aplicación</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label class="control-label" id="subtitulo"></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <textarea class="form-control" id="descripcion" disabled></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p>Para procesar tu solicitud, todos los datos son necesarios</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="control-label">Estado de relaciones en CVT: </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <a class="col-md-12" id="divStatusApp"></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+
+                                        <button id="btnVerRelaciones" type="button" class="btn btn-primary btn-width-custom" onclick="VerRelaciones()">Ver</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            <div class="col-md-1">
+                                                <div class="input-group">
+                                                    <a class="btn btn-danger btn-circle"></a>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-11">
+                                                <em>Tiene relaciones aprobadas en CVT</em>
+                                            </div>
+                                        </div>
+                                        <div class="col-md_7"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            <div class="col-md-1">
+                                                <div class="input-group">
+                                                    <a class="btn btn-success btn-circle"></a>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-11">
+                                                <em>No tiene información relacionada en CVT</em>
+                                            </div>
+                                        </div>
+                                        <div class="col-md_7"></div>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div id="formularioEliminarStatus">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="control-label">Tipo de Eliminación: </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select id="ddlTipoEliminacion" name="ddlTipoEliminacion" class="form-control">
+                                            <option value="-1" selected>-- Seleccione --</option>
+                                            <option value="1">Eliminación administrativa</option>
+                                            <option value="2">Pasó por proceso de eliminación de la aplicación</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-md-12 divProcesoEliminacion">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="control-label">Requiere Conformidad GST: </label>
+
+                                        </div>
+                                        <div class="col-md-1">
+                                            <div class="input-group" id="divFlagConformidadGST"></div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="input-group" id="divTxtConformidadGST" disabled="disabled">
+                                                <input id="txtNomArchivoConformidad" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                                <span class="input-group-btn">
+                                                    <label class="btn btn-primary file-upload-btn">
+                                                        <input id="flConformidad" class="file-upload-input inputConformidad" type="file" name="flConformidad">
+                                                        <span class="glyphicon glyphicon-folder-open"></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 divProcesoEliminacion">
+                                <div class="form-group">
+                                    <label class="control-label">Ticket de eliminación: </label>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input id="txtTicket" class="form-control" type="text" maxlength="100">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <input id="txtNomTicket" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                                <span class="input-group-btn">
+                                                    <label class="btn btn-primary file-upload-btn">
+                                                        <input id="flTicket" class="file-upload-input inputTicket" type="file" name="flTicket">
+                                                        <span class="glyphicon glyphicon-folder-open"></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 divProcesoEliminacion">
+                                <div class="form-group">
+                                    <label class="control-label">Ratificación: </label>
+                                    <div class="row">
+                                        <div class="col-md-4 divExpertoContainer">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    Ratificante
+
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <input id="txtExperto" name="txtExperto" type="text" class="form-control" maxlength="120" />
+                                                    <input type="hidden" id="hExpertoId" value="" />
+                                                    <input type="hidden" id="hExpertoMatricula" value="" />
+                                                    <input type="hidden" id="hExpertoCorreo" value="" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <input id="txtNomRatificacion" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                                <span class="input-group-btn">
+                                                    <label class="btn btn-primary file-upload-btn">
+                                                        <input id="flRatificacion" class="file-upload-input inputRatificacion" type="file" name="flRatificacion">
+                                                        <span class="glyphicon glyphicon-folder-open"></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 divEliminacionAdministrativa">
+                                <div class="form-group">
+
+                                    <div class="row">
+                                        <div class="col-md-3 divConformidadContainer">
+
+                                            <label class="control-label">Persona que brindó la conformidad: </label>
+
+
+                                        </div>
+                                        <div class="col-md-6">
+
+                                            <input id="txtConformidad" name="txtConformidad" type="text" class="form-control" maxlength="120" />
+                                            <input type="hidden" id="hConformidadId" value="" />
+                                            <input type="hidden" id="hConformidadMatricula" value="" />
+                                            <input type="hidden" id="hConformidadCorreo" value="" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 divEliminacionAdministrativa">
+                                <div class="form-group">
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="control-label">Archivo Adjunto: </label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <input id="txtArchivo" class="form-control" type="text" value="Ningun archivo seleccionado" readonly>
+                                                <span class="input-group-btn">
+                                                    <label class="btn btn-primary file-upload-btn">
+                                                        <input id="flArchivo" class="file-upload-input inputArchivo" type="file" name="flArchivo">
+                                                        <span class="glyphicon glyphicon-folder-open"></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">Comentarios asociados a este cambio de estado: </label>
+                                    <textarea id="txtDescripcionEliminar" name="txtDescripcionEliminar" rows="5" class="form-control" maxlength="1000"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnEliminar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Enviar solicitud</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalRechazarAplicacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRechazarAplicacion" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="title-md">Información detallada de los responsables de aprobación de la aplicación: <span id="spanApp"></span></h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table id="tblFlujos" class="table" cellspacing="0" data-unique-id="AppId" data-mobile-responsive="true">
+                                        <caption class="caption text-left">
+                                            <span>Solicitudes registradas para la aplicación</span>
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                                <th data-formatter="estadoFormatter" data-field="Situación de registro" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Estado de atención</th>
+                                                <th data-field="nameDetail" data-halign="center" data-valign="middle" data-align="center">Responsable</th>
+                                                <th data-field="typeRegisterDetail" data-halign="center" data-valign="middle" data-align="center">Rol asignado</th>
+                                                <th data-field="isApprovedDetail" data-halign="center" data-valign="middle" data-align="center">Situación de <br /> la solicitud</th>
+                                                <th data-field="comments" data-halign="center" data-valign="middle" data-align="center">Comentarios</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalRelaciones" class="modal fade " tabindex="-1" role="dialog" aria-labelledby="modalRelaciones" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="titulo">Relaciones de la aplicación</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <ul class="nav nav-tabs nav-justified">
+                                <li class="active"><a class="tab-panel-tecnologia" href="#appComponentes" data-toggle="tab">Relaciones de Aplicación con Componentes</a></li>
+                                <li><a class="tab-panel-tecnologia" href="#appApps" data-toggle="tab">Relaciones entre Aplicaciones</a></li>
+                                <li><a class="tab-panel-tecnologia" href="#appOthers" data-toggle="tab">Relaciones Owner de API'S</a></li>
+                                <li><a class="tab-panel-tecnologia" href="#appAzureResources" data-toggle="tab">Relaciones Recursos Azure</a></li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div class="tab-pane fade active in" id="appComponentes">
+                                    <table id="tblRelacionesComponentes" class="table" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                        <caption class="caption text-left">
+                                            <span>Relaciones de Aplicación con Componentes</span>
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                                <th data-field="TipoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TipoId" data-width="20%">Tipo de relación</th>
+                                                <th data-field="AmbienteStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Ambiente" data-width="20%">Ambiente</th>
+                                                <th data-field="Componente" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Componente" data-width="30%">Componente</th>
+                                                <th data-field="Tecnologia" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Tecnologia" data-width="30%">Tecnología</th>
+                                                <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EstadoId" data-width="20%">Estado</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <br />
+                                    <span>Para la gestión de las relaciones con componentes, ingrese  a la bandeja de aprobación</span>
+                                    <br />
+                                    <button type="button" class="btn btn-primary" id="btnIrRelacionesCompnentes">Ir a Relaciones Componentes</button>
+                                </div>
+                                <div class="tab-pane" id="appApps">
+                                    <table id="tblRelacionesAppsAplicaciones" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                        <caption class="caption text-left">
+                                            <span>Relaciones entre Aplicaciones</span>
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                                <th data-field="OrigenDestino" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="OrigenDestino" data-width="20%">Origen/Destino</th>
+                                                <th data-field="CodigoAptDestino" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="CodigoAptDestino" data-width="20%">Código <br />aplicación <br />relacionada</th>
+                                                <th data-field="NombreAptDestino" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="NombreAptDestino" data-width="50%">Aplicación <br />relacionada</th>
+                                                <th data-field="DescripcionTipoRelacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="DescripcionTipoRelacion" data-width="20%">Tipo</th>
+                                                <th data-field="EstadoStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="EstadoRelacionId" data-width="20%">Estado</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <br />
+                                    <span>Para la revisión de las relaciones con otras aplicaciones, Ingresa al módulo de dependencias de aplicaciones</span>
+                                    <br />
+                                    <button type="button" class="btn btn-primary" id="btnIrRelacionesAplicaciones">Ir a Relaciones con Aplicaciones</button>
+                                </div>
+                                <div class="tab-pane" id="appOthers">
+                                    <table id="tblRelacionesOnwerAPPIs" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                        <caption class="caption text-left">
+                                            <span>Relaciones Owner de API'S</span>
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                                <th data-field="Componente" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Nombre" data-width="30%">Nombre <br />API</th>
+                                                <th data-field="AmbienteStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Dominio" data-width="30%">Ambiente</th>
+                                                <th data-field="FlagActivoToString" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FlagActivo" data-width="20%">Estado</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <br />
+                                    <span>Para seguir el proceso de baja de API's, ingresa al siguiente link: <a href="https://confluence.devsecopsbcp.com/display/AAGDAPUB/Retirado+de+APIs" target="_blank">Baja API's</a>.</span>
+                                </div>
+                                <div class="tab-pane" id="appAzureResources">
+                                    <table id="tblRelacionesAzureResources" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                                        <caption class="caption text-left">
+                                            <span>Relaciones de recursos Azure</span>
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatter" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                                <th data-field="NombreRecursoAzure" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="nombreRecurso" data-width="25%">Nombre <br />Recurso</th>
+                                                <th data-field="TipoRecursoAzure" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="tipoRecurso" data-width="25%">Tipo <br />Recurso</th>
+                                                <th data-field="GrupoRecursoAzure" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="grupoRecurso" data-width="25%">Groupo <br />Recurso</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <br />
+                                    <span>Para seguir el proceso de baja de Recursos Azure, ingresa al siguiente link: <a href="https://confluence.devsecopsbcp.com/pages/viewpage.action?pageId=554732521" target="_blank">Baja de Servicios Cloud</a>.</span>
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+	const REGISTRO_PARCIAL = 1;
+	const REGISTRO_COMPLETO = 2;
+
+	const ESTADO_ENDESARROLLO = 1;
+	const ESTADO_VIGENTE = 2;
+	const ESTADO_NOVIGENTE = 3;
+	const ESTADO_ELIMINADA = 4;
+
+	var nombre_app = '@nombreApp';
+    var PAGINA_ACTUAL = @paginaActual;
+    var PAGINA_TAMANIO = @paginaTamanio;
+
+</script>
+<script src="~/app/RegistroPortafolio/eliminacionAplicaciones.js?v=2.1.3"></script>

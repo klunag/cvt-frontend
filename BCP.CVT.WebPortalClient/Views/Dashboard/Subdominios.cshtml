@@ -1,0 +1,197 @@
+﻿
+@{
+    ViewBag.Title1 = "Gráficos por dominios y subdominios a una fecha";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Equipos";
+    ViewBag.Title3 = "Gráficos por dominios y subdominios a una fecha";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<style>
+    #reportPie {
+        width: 100%;
+        height: 400px;
+    }
+
+    #reportPie_0 {
+        width: 100%;
+        height: 400px;
+    }
+
+    .div-report {
+        display: none;
+    }
+    .div-report-detallado {
+        display: none;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="form-group">
+                                <div class="col-xs-4 col-md-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Dominio: (*)</h5>
+                                        <select id="cbFilDominio" name="cbFilDominio" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4 col-md-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Subdominio: (*)</h5>
+                                        <select id="cbFilSubdominio" name="cbFilSubdominio" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4 col-md-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Tipo: (*)</h5>
+                                        <select id="cbFilTipoEquipo" name="cbFilTipoEquipo" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Fecha de la consulta: (*)</h5>
+                                    <div class="input-group date" id="divFechaFiltro">
+                                        <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        @*<span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Subsidiaria: (*)</h5>
+                                    <select id="cbFilDominioRed" name="cbFilDominioRed" class="form-control" multiple="multiple"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado de Estandarización: (*)</h5>
+                                    <select id="cbFilTipo" name="cbFilTipo" class="form-control" multiple="multiple"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="ActualizarGraficos()">
+        <span class="count-text">Generar Gráficos</span>
+    </a>
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarData()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar registros</span>
+    </a>
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarDataEquipos()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar equipos</span>
+    </a>
+</div>
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header">
+                <strong>Vigentes y obsoletos</strong>
+            </div>
+            <div class="card-body">
+                <div id="reportPie_0"></div>
+            </div>
+            <div class="card-header">
+                <strong>Vigentes, obsoletos y por vencer</strong>
+            </div>
+            <div class="card-body">
+                <div id="reportPie"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header">
+                <strong>Reporte detallado de tecnologías</strong>
+            </div>
+            <div class="card-body">
+                <div class="container">
+                    <ul class="list-group">
+                        <li class="list-group-item-cust list-group-item">
+                            <span class="list-group-addon btn btn-danger btn-circle"></span>
+                            La tecnología se encuentra obsoleta
+                        </li>
+                        <li class="list-group-item-cust list-group-item">
+                            <span class="list-group-addon btn btn-warning btn-circle"></span>
+                            La tecnología entrará en obsolescencia dentro de los próximos 12 meses
+                        </li>
+                        <li class="list-group-item-cust list-group-item">
+                            <span class="list-group-addon btn btn-success btn-circle"></span>
+                            La tecnología se encuentra vigente
+                        </li>
+                    </ul>
+                </div>
+                <table id="tblRegistro" class="table" data-show-columns="true" style="font-size:11px !important;">
+                    <thead>
+                        <tr>
+                            <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="TipoEquipo">Tipo de equipo</th>
+                            <th data-formatter="linkFormatterEquipo" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-width="150" data-sortable="true" data-sort-name="Nombre">Equipo</th>
+                            <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="left" data-width="200" data-sortable="true" data-sort-name="Dominio">Dominio</th>
+                            <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="left" data-width="200" data-sortable="true" data-sort-name="Subdominio">Subdominio</th>
+                            <th data-formatter="linkFormatterTecnologia" data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="center" data-width="300" data-sortable="true" data-sort-name="ClaveTecnologia">Tecnología</th>
+                            <th data-field="TipoTecnologia" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="TipoTecnologia">Estado de Estandarización</th>
+                            <th data-field="EstadoIdTecnologiaStr" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="EstadoId">Estado de Tecnología</th>
+                            <th data-field="FechaCalculoBaseToString" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="FechaCalculoBase">Fecha de fin de soporte</th>
+                            <th data-formatter="semaforoFormatter" data-field="IndicadorObsolescencia" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado actual</th>
+                            <th data-formatter="semaforoIndice1Formatter" data-field="IndicadorObsolescencia_Proyeccion1" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado a <br />12 meses</th>
+                            <th data-formatter="semaforoIndice2Formatter" data-field="IndicadorObsolescencia_Proyeccion2" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado a <br />24 meses</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hdFiltro" id="hdFiltro" value="" />
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header">
+                <strong>Reporte detallado de equipos</strong>
+            </div>
+            <div class="card-body">                
+                <table id="tblRegistroDetalle" class="table" data-show-columns="true" style="font-size:11px !important;">
+                    <thead>
+                        <tr>
+                            <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="TipoEquipo">Tipo de equipo</th>
+                            <th data-formatter="linkFormatterEquipo" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-width="150" data-sortable="true" data-sort-name="Nombre">Equipo</th>
+                            <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="left" data-width="200" data-sortable="true" data-sort-name="Dominio">Dominio</th>
+                            <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="left" data-width="200" data-sortable="true" data-sort-name="Subdominio">Subdominio</th>
+                            <th data-formatter="linkFormatterTecnologia" data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="center" data-width="300" data-sortable="true" data-sort-name="ClaveTecnologia">Tecnología</th>
+                            <th data-field="TipoTecnologia" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="TipoTecnologia">Estado de Estandarización</th>
+                            <th data-field="EstadoIdTecnologiaStr" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="EstadoId">Estado de Tecnología</th>
+                            <th data-field="FechaCalculoBaseToString" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="FechaCalculoBase">Fecha de fin de soporte</th>
+                            <th data-formatter="semaforoFormatter" data-field="IndicadorObsolescencia" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado actual</th>
+                            <th data-formatter="semaforoIndice1Formatter" data-field="IndicadorObsolescencia_Proyeccion1" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado a <br />12 meses</th>
+                            <th data-formatter="semaforoIndice2Formatter" data-field="IndicadorObsolescencia_Proyeccion2" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado a <br />24 meses</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>    
+</div>
+<script src="~/app/dashboardSubdominios.js?v=2.1.4"></script>

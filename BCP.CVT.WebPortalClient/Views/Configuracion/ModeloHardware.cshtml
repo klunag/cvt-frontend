@@ -1,0 +1,325 @@
+﻿@{
+    ViewBag.Title1 = "Componentes de infraestructura";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Componentes de infraestructura";
+}
+
+
+<div class="card" style="margin-bottom:25px;">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row form-group">
+                            <div class="col-md-6 col-xs-6 col-sm-6">
+                                <div class="input-with-icon containerFiltro">
+                                    <h5>Fabricante: </h5>
+                                    <input id="txtBusEq" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Búsqueda por fabricante" maxlength="100">
+                                    <span class="icon icon-search input-icon" style="top:22px"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 col-sm-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo equipo: </h5>
+                                    <select id="cbFilTipoEq" name="cbFilTipoEq" class="form-control">
+                                        <option value="-1">-- Todos --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Código de equipo: </h5>
+                                    <input id="txtCodigoEquipoBuscar" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Búsqueda por código de equipo" maxlength="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs form-group">
+
+                            <div class="col-xs-6 col-md-6">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Hostname: </h5>
+                                    <input id="txtHostname" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Búsqueda por hostname" maxlength="100">
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>N° Serie: </h5>
+                                    <input id="txtNroSerie" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Búsqueda por número de serie" maxlength="100">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-xs-3 col-sm-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5 style="padding-top: 12px;"></h5>
+                                    <button id="btnBusEq" class="btn btn-primary btn-width-custom" onclick="buscarEquipo()">Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <div class="col-xs-12 col-md-12">
+        @*<a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="agregarModelo()">
+            <span class="icon icon-plus"></span>
+            <span class="count-text">Nuevo</span>
+        </a>*@
+        <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarInfo()">
+            <span class="icon icon-external-link"></span>
+            <span class="count-text">Exportar</span>
+        </a>
+    </div>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Modelos de hardware</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblEquipo" class="table" data-unique-id="Id" data-mobile-responsive="true" data-detail-view="true" data-detail-formatter="detailFormatter" data-row-style="rowStyle" style="font-size:11px !important;">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>                            
+                            <th data-field="tipoEquipoNombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Tipo de Equipo</th>
+                            <th data-field="fabricante" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="fabricante">Fabricante</th>
+                            <th data-field="nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%" data-sort-name="nombre">Modelo</th>
+                            <th data-field="FechaCreacionToString" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-width="20%">Fecha Creacion</th>
+                            <th data-field="FechaFinToString" data-halign="center" data-valign="middle" data-align="left" data-sortable="false" data-width="20%">Fecha fin configurada</th>
+                            <th data-formatter="estadoFormatter" data-field="indicador" data-halign="center" data-valign="middle" data-align="center" data-width="120">Obsolescencia actual</th>
+                            <th data-formatter="estadoFormatter12" data-field="indicadorproyectado" data-halign="center" data-valign="middle" data-align="center" data-width="120">Obsolescencia a 12 meses</th>
+                            <th data-formatter="estadoFormatter24" data-field="indicadorproyectado2" data-halign="center" data-valign="middle" data-align="center" data-width="120">Obsolescencia a 24 meses</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mdAddOrEditCodigo" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" onclick="defaultAccesoDirecto()">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Configurar código del equipo</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditCodigo">
+                    <div class="row">
+                        <div class="col-md-12 col-xs-12">
+                            <div class="form-group">
+                                <label class="control-label">Código de equipo <span class="text-danger">(*)</span>: </label>
+                                <input id="txtCodigoEquipo" class="form-control field-tecnologia adBasico" type="text" name="txtCodigoEquipo">
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="hdEquipoId" id="hdEquipoId" value="0" />
+                </form>
+            </div>
+            <div class="modal-footer footerModalTecnologia">
+                <button id="btnGuardarCodigo" class="btn btn-primary btnGuardarCodigo" onclick="agregarCodigo()" type="button" data-loading-text="Procesando...">Guardar</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>        
+    </div>
+</div>
+
+    <div id="mdAddOrEditTec" tabindex="-1" role="dialog" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" onclick="defaultAccesoDirecto()">
+                        <span aria-hidden="true">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="titleFormTec"></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="formAddOrEditTec">
+                        <div class="row">
+                            <div class="col-md-12 col-xs-12">
+                                <div class="form-group adBasico">
+                                    <label class="control-label">Fabricante <span class="text-danger">(*)</span>: </label>
+                                    <input id="txtFabricanteModelo" class="form-control field-tecnologia adBasico" type="text" name="txtFabricanteModelo">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-xs-12">
+                                <div class="form-group adBasico">
+                                    <label class="control-label">Modelo <span class="text-danger">(*)</span>: </label>
+                                    <input id="txtNombreModelo" class="form-control field-tecnologia adBasico" type="text" name="txtNombreModelo">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-xs-12">
+                                <div class="form-group adBasico">
+                                    <label class="control-label">
+                                        URL de Seguridad <span class="text-danger">(*)</span>:
+                                    </label>
+                                    <input id="txtUrlSharepointModelo" class="form-control field-tecnologia adBasico" type="text" name="txtUrlSharepointModelo">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-xs-12">
+                                <div class="form-group adBasico">
+                                    <label class="control-label">URL publicación lineamientos <span class="text-danger">(*)</span>: </label>
+                                    <input id="txtUrlLineamientoModelo" class="form-control field-tecnologia adBasico" type="text" name="txtUrlLineamientoModelo">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-xs-12">
+                                <div class="form-group adBasico grupoTicketRemedyContainer">
+                                    <label class="control-label">Grupo Soporte Remedy <span class="text-danger">(*)</span>: </label>
+                                    <input id="txtRemedyModelo" class="form-control field-tecnologia adBasico" type="text" name="txtRemedyModelo">
+                                    <input type="hidden" id="hdRemedyModelo" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                <div class="form-group adBasico">
+                                    <label class="control-label">Tipo equipo <span class="text-danger">(*)</span>: </label>
+                                    <select id="cbFilTipoEqModal" name="cbFilTipoEqModal" class="form-control field-tecnologia"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <div class="form-group adBasico">
+                                    <label class="control-label">Categoría: </label>
+                                    <input id="txtCategoria" class="form-control field-tecnologia adBasico" type="text" name="txtCategoria" maxlength="50">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-xs-6">
+                                <div class="form-group adBasico">
+                                    <label class="control-label">Tipo: </label>
+                                    <input id="txtTipo" class="form-control field-tecnologia adBasico" type="text" name="txtTipo" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <div class="form-group adBasico">
+                                    <label class="control-label">Item: </label>
+                                    <input id="txtItem" class="form-control field-tecnologia adBasico" type="text" name="txtItem" maxlength="50">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-content">
+                            <div class="row adCicloVida">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Fecha de Lanzamiento : </label>
+                                        <div class="input-group date" id="divFechaFabricanteModelo">
+                                            <input type="text" id="txtFechaFabricanteModelo" name="txtFechaFabricanteModelo" class="form-control field-tecnologia" />
+                                            <span class="input-group-addon" id="txtFechaLanzamientoTecnologia-btn">
+                                                <span class="icon icon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label">
+                                            ¿Tiene fecha fin de soporte? <span class="text-danger"></span>
+                                        </label>
+                                        <div class="input-group" id="divFlagFechaFinSoporte"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="FinSoporte" class="col-sm-12 table-bordered">
+                                <div class="row"></div>
+                                <div id="FinSoporte_Si">
+                                    <div class="row adCicloVida">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label">Fecha para cálculo de obsolescencia <span class="text-danger"></span>: </label>
+                                                <select id="cbFechaCalculosTecnologia" name="cbFechaCalculosTecnologia" class="form-control field-tecnologia adCicloVida"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6 adCicloVida">
+                                            <div class="form-group">
+                                                <label class="control-label">Fecha fin Soporte extendida : </label>
+                                                <div class="input-group date" id="divFechaFinExtendidaModelo">
+                                                    <input type="text" id="txtFechaFinExtendidaModelo" name="txtFechaFinExtendidaModelo" class="form-control field-tecnologia adCicloVida" />
+                                                    <span class="input-group-addon" id="txtFechaFinExtendidaModelo-btn">
+                                                        <span class="icon icon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 adCicloVida">
+                                            <div class="form-group">
+                                                <label class="control-label">Fecha fin soporte : </label>
+                                                <div class="input-group date" id="divFechaFinSoporteModelo">
+                                                    <input type="text" id="txtFechaFinSoporteModelo" name="txtFechaFinSoporteModelo" class="form-control field-tecnologia adCicloVida" />
+                                                    <span class="input-group-addon" id="txtFechaFinSoporteModelo-btn">
+                                                        <span class="icon icon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 adCicloVida">
+                                            <div class="form-group">
+                                                <label class="control-label">Fecha interna : </label>
+                                                <div class="input-group date" id="divFechaFinInternaModelo">
+                                                    <input type="text" id="txtFechaFinInternaModelo" name="txtFechaFinInternaModelo" class="form-control field-tecnologia adCicloVida" />
+                                                    <span class="input-group-addon" id="txtFechaFinInternaModelo-btn">
+                                                        <span class="icon icon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 adCicloVida">
+                                            <div class="form-group">
+                                                <label class="control-label">Tipo Fecha Interna <span class="text-danger"></span>: </label>
+                                                <select id="cbTipoFechaInternaModelo" name="cbTipoFechaInternaModelo" class="form-control field-tecnologia adCicloVida"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group adCicloVida">
+                                        <label class="control-label">Comentarios asociados a la fecha fin de soporte <span class="text-danger"></span>: </label>
+                                        <textarea id="txtComentariosFechaFinSoporteModelo" class="form-control field-tecnologia adCicloVida" rows="4" name="txtComentariosFechaFinSoporteModelo" maxlength="1000"></textarea>
+                                    </div>
+                                </div>
+                                <div id="FinSoporte_No">
+                                    <div class="form-group">
+                                        <label class="control-label">Motivo de fecha indefinida <span class="text-danger"></span>: </label>
+                                        <select id="cbSustentoMotivoFechaFinSoporteModelo" name="cbSustentoMotivoFechaFinSoporteModelo" class="form-control field-tecnologia"></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">URL de fecha indefinida <span class="text-danger"></span>: </label>
+                                        <input type="text" id="txtSustentoUrlFechaFinSoporteModelo" class="form-control field-tecnologia" name="txtSustentoUrlFechaFinSoporteModelo" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hdModeloId" id="hdModeloId" value="0" />
+                    </form>
+                </div>
+                <div class="modal-footer footerModalTecnologia">
+                    <button id="btnGuardarTec" class="btn btn-primary btnGuardarTec" onclick="agregarEditarModelo()" type="button" data-loading-text="Procesando...">Guardar</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal Add or Edit (Tecnologia)-->
+
+    <script src="~/app/modelohardware.js"></script>

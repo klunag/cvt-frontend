@@ -1,0 +1,149 @@
+﻿
+@{
+    ViewBag.Title1 = "Backup - Infraestructura Mainframe";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Storage";
+    ViewBag.Title3 = "Backup - Infraestructura Mainframe";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+</style>
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <form id="formFiltros">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Código de aplicación: </h5>
+                                        <input type="text" name="txtCodigoAPT" id="txtCodigoAPT" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Código de interfaz de aplicación: </h5>
+                                        <input type="text" name="txtInterface" id="txtInterface" class="form-control" value="" maxlength="2" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Nombre del job: </h5>
+                                        <input type="text" name="txtJob" id="txtJob" class="form-control" value="" maxlength="80" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-md-3">
+                                    <div class="col-md-6 col-xs-6 col-sm-6 text-right">
+                                        <h5>&nbsp;</h5>
+                                        <button id="btnExportar" type="button" class="btn btn-primary btn-width-custom" onclick="ExportarInfo()">Exportar</button>
+                                    </div>
+                                    <div class="col-md-6 col-xs-6 col-sm-6 text-right">
+                                        <h5>&nbsp;</h5>
+                                        <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="Buscar()">Buscar</button>
+                                    </div>
+                                </div>
+                                    
+                                </div>
+                            </div>
+                    </form>
+
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+
+    </div>
+    <div class="row gutter-xs">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Resultado de la búsqueda</strong>
+                </div>
+                <div class="card-body">
+                    <table id="tblRegistro" class="table" data-mobile-responsive="true" data-unique-id="jobname">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="outcode" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="outcode" data-width="100">Virtualizador</th>
+                                <th data-field="jobname" data-formatter="linkFormatter" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="jobname">Nombre del job</th>
+                                <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="CodigoAPT">Código aplicación</th>
+                                <th data-field="InterfaceApp" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="InterfaceApp">Interface aplicación</th>
+                                <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Nombre">Aplicación</th>
+                                <th data-field="FrecuenciaDetalle" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Frecuencia">Frecuencia</th>
+                                <th data-formatter="totalFormatter" data-field="Tamanio" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="Tamanio" data-width="70">MB transferido</th>
+                                <th data-field="instances" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="instances" data-width="70">Ejecuciones</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MdAddOrEditModal" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm">Ejecuciones</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hdId" name="hdId" value="0" />
+                <div class="form-group">
+                    <table id="tblRegistrosDetalle" data-mobile-responsive="true" data-check-on-init="true" data-pagination="true" data-page-size="10" data-page-list="[10, 20, 50, 100, 200]" style="font-size:11px !important;">
+                        <thead>
+                            <tr>
+                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                <th data-field="outcode" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="outcode">Virtualizador</th>
+                                <th data-field="jobname" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="jobname">Nombre del job</th>
+                                <th data-field="volser" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="volser">Etiqueta del tape</th>
+                                <th data-field="dsname" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="dsname">Nombre del dataset</th>
+                                <th data-field="crtdate" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="crtdate">Fecha de creación</th>
+                                <th data-field="lfrdate" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="lfrdate">Fecha de última referencia</th>
+                                <th data-field="mbsize" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="mbsize">Tamaño en MB</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/storagebackupmainframe.js?v=2.1.0"></script>
+
+

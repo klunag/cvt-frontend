@@ -1,0 +1,719 @@
+﻿
+@{ ViewBag.Title1 = "Registro de Umbrales";
+    ViewBag.Title2 = "Consultas & Registro";
+    ViewBag.Title3 = "Gestión de Umbrales";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .nombreDom {
+        min-width: 180px;
+    }
+
+    .nombreTec {
+        min-width: 280px;
+    }
+
+    .opcTecnologia {
+        min-width: 150px;
+    }
+
+    .accesoDirecto {
+        min-width: 200px;
+    }
+
+    .tecnologia-label {
+        padding: 0px;
+    }
+
+    /*.input-with-icon-search {
+         padding-left: 26px;
+     }*/
+
+    .tec {
+        pointer-events: none;
+        opacity: 0.3;
+    }
+
+    .tooltip {
+        z-index: 2000 !important;
+    }
+
+    .ui-autocomplete {
+        max-height: 100px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px;
+    }
+
+    .multiselect-native-select .btn-group {
+        max-width: 100%;
+    }
+
+    .card-search .fieldset hr {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border: 0;
+        border-top: 1px solid #ddd;
+    }
+
+    .bg-green {
+        background-color: #8AFF8A !important;
+    }
+</style>
+
+
+<div class="view-listado">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-search">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <form id="formFiltros">
+                        <div class="card-search-box">
+                            <div class="row gutter-xs">
+                                <div class="col-md-12 col-xs-12 col-sm-12">
+                                    <h5>Pieza Cross Crítica: </h5>
+                                    <div class="input-with-icon searchContainer">
+                                        <div class=" row form-group">
+                                            <div class="col-md-6 col-xs-12 col-sm-12">
+                                                <input id="txtBusTec" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre de la App y/o API">
+                                            </div>
+                                            <div class="col-md-6 col-xs-12 col-sm-12">
+                                                <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarInfo2()">
+                                                    <span class="icon icon-external-link"></span>
+                                                    <span class="count-text">Exportar</span>
+                                                </a>
+                                                <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom" onclick="buscarTec()">Buscar</button>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="hdnBusTec" name="hdnBusTec" />
+                                        <input type="hidden" id="hdnBusTip" name="hdnBusTip" />
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                                @*<div class="col-md-6 col-xs-6 col-sm-12">
+                                        <h5>Nombre de la tecnología: </h5>
+                                        <div class="input-with-icon searchContainer">
+                                            <input id="txtBusTec" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre de la tecnología...">
+                                            <input type="hidden" id="hdnBusTec" name="hdnBusTec" />
+                                            <span class="icon icon-search input-icon"></span>
+                                        </div>
+                                    </div>*@
+                                @*<div class="col-md-6 col-xs-6 col-sm-12">
+                                        <div class="text-left" data-toggle="match-height">
+                                            <h5>Producto: </h5>
+                                            <div class="input-with-icon searchProductoContainer">
+                                                <input id="txtProductoBusTec" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Nombre del producto...">
+                                                <input type="hidden" id="hdnProductoBusTec" name="hdnProductoBusTec" />
+                                                <span class="icon icon-search input-icon"></span>
+                                            </div>
+                                        </div>
+                                    </div>*@
+                            </div>
+                        </div>
+                    </form>
+
+                </fieldset>
+            </div>
+        </div>
+        <div class="row">
+        </div>
+        <div class="row gutter-xs">
+
+            <div class="col-xs-12">
+                <input type="hidden" id="hdnIdTecnologiaSeleccionada" name="hdnIdTecnologiaSeleccionada" />
+                <input type="hidden" id="hdnIdTecnologiaComCrossActivo" name="hdnIdTecnologiaComCrossActivo" />
+                <input type="hidden" id="hdnOwernerTecnologiaSeleccionado" name="hdnOwernerTecnologiaSeleccionado" />
+                <input type="hidden" id="hdnQACrossSeleccionado" name="hdnQACrossSeleccionado" />
+                <table id="tbl-tecAprob" data-toggle="table" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-field="Id" data-valign="middle" data-align="center" data-sortable="true" data-width="200" data-visible="false">Codigo de Aplicacion </th>
+                            <th data-field="nombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="nombre" data-width="200"><span id="nomDesc">Nombre</span> </th>
+                            <th data-field="aplicacionOwner" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="aplicacionOwner" data-width="200" data-visible="false">Aplicación Owner</th>
+                            <th data-field="gestionadoPor" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="gestionadoPor" data-width="200">Gestionado Por</th>
+                            <th data-field="squad" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="squad" data-width="200">Nombre de equipo TI/Squad</th>
+                            <th data-field="ownerLiderUsuario" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="ownerLiderUsuario" data-width="200">Owner/Líder Usuario</th>
+                            <th data-field="expertoLidertecnico" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="expertoLidertecnico" data-width="200">Experto/Líder técnico </th>
+                            <th data-formatter="CheckComponenteCross" data-field="CheckComponenteCross" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Pieza <br />Cross Crítica</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%" class="opcionesStyle">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+        </div>
+
+
+        <div id="UmbralesDetalle" style="display:none;">
+            <!--<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+            <div class="row form-group pull-right">
+                <div class="col-sm-6 col-xs-6 col-md-6">
+                    <a id="bntagregarUmbral" name="bntagregarUmbral" class="btn btn-primary " href="javascript: void(0)" onclick="addUmbral()">
+                        <span class="icon icon-plus"></span>
+                        <span class="count-text">Registrar Umbral</span>
+                    </a>
+                </div>
+                <div class="col-sm-6 col-xs-6 col-md-6">
+                    <a id="bntagregarPeak" name="bntagregarPeak" class="btn btn-primary" href="javascript: void(0)" onclick="addPeak()">
+                        <span class="icon icon-plus"></span>
+                        <span class="count-text">Peak en Producción</span>
+                    </a>
+                </div>-->
+            @*<a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarInfo()">
+                    <span class="icon icon-external-link"></span>
+                    <span class="count-text">Exportar</span>
+                </a>*@
+            <!--</div>
+            </div>-->
+
+            <div class="row  gutter-xs pull-right">
+                <div class="col-sm-12 col-xs-12 col-md-12">
+                    <div class="col-sm-6 col-xs-6 col-md-6">
+                        <a id="bntagregarUmbral" name="bntagregarUmbral" class="btn btn-primary " href="javascript: void(0)" onclick="addUmbral()">
+                            <span class="icon icon-plus"></span>
+                            <span class="count-text">Registrar Umbral</span>
+                        </a>
+                    </div>
+                    <div class="col-sm-6 col-xs-6 col-md-6">
+                        <a id="bntagregarPeak" name="bntagregarPeak" class="btn btn-primary" href="javascript: void(0)" onclick="addPeak()">
+                            <span class="icon icon-plus"></span>
+                            <span class="count-text">Peak Producción</span>
+                        </a>
+                    </div>
+                    @*<a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarInfo()">
+                            <span class="icon icon-external-link"></span>
+                            <span class="count-text">Exportar</span>
+                        </a>*@
+                </div>
+            </div>
+            <div class="row">
+            </div>
+            <div class="row">
+                <div class="col-md-12" style="margin-bottom: 15px; margin-top: 15px;">
+                    <table id="tblUmbrales" data-toggle="table" class="table" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                        <caption class="caption">
+                            <span>Umbral</span>
+                            <div class="pull-right" style="display: inline;">
+                                <a id="bntagregarUmbral" name="bntHistorialUmbral" class="btn btn-primary " href="javascript: void(0)" onclick="irHistorialUmbral()">
+                                    <span class="glyphicon glyphicon-list-alt"></span>
+                                    <span class="count-text">Historial</span>
+                                </a>
+                            </div>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th data-field="TipoDescripcion" data-halign="center" data-valign="middle" data-align="left" data-width="15%">Tipo</th>
+                                <th data-field="TipoValorDescripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="DatosTI">Métrica</th>
+                                <th data-field="ValorUmbral" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Valor</th>
+                                <th data-field="ValorAspiracional" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Valor<br />Aspiracional</th>
+                                <th data-field="FlagActivoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Situación</th>
+                                <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Fecha Registro</th>
+                                <th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Fecha Modificación</th>
+                                <th data-formatter="opcionesUmbrales" data-field="opcionesUmbrales" data-halign="center" data-valign="middle" data-align="center" data-width="5%" class="opcionesStyle">Opciones</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12" style="margin-bottom: 15px; margin-top: 15px;">
+                    <table id="tblPeak" data-toggle="table" class="table" cellspacing="0" width="100%" data-unique-id="PeakId" data-mobile-responsive="true">
+                        <caption class="caption">
+                            <span>Peak en Producción</span>
+                            <div class="pull-right" style="display: inline;">
+                                <a id="bntagregarUmbral" name="bntHistorialPeak" class="btn btn-primary " href="javascript: void(0)" onclick="irHistorialPeak()">
+                                    <span class="glyphicon glyphicon-list-alt"></span>
+                                    <span class="count-text">Historial</span>
+                                </a>
+                            </div>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th data-field="Fecha" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="Fecha">Fecha</th>
+                                <th data-field="TipoValorDesc" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="TipoValorDesc">Métrica</th>
+                                <th data-field="ValorPeak" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="ValorPeak">Valor</th>
+                                <th data-field="ValorAspiracional" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Valor<br />Aspiracional</th>
+                                <th data-field="DetallePeak" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="DetallePeak">Detalle</th>
+                                <th data-field="FlagActivoDesc" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="FlagActivoDesc">Situación</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--Modal Modulo-->
+    <div id="MdAddOrEditUmbral" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg-1 modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="titleFormUmbral"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-search">
+                                <fieldset class="fieldset">
+                                    <h4 id="subtitleformAddOrEditUmbral"></h4>
+                                    <div class="row">
+                                    </div>
+                                    <div class="card-search-box">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <form id="formAddOrEditUmbral">
+                                                    <div class="form-group tipo-equipo">
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label class="control-label">Tipo de Umbral: </label>
+                                                                <select id="ddlTipos" name="ddlTipos" class="form-control tipo-equipo"></select>
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                <label class="control-label">Métrica: </label>
+                                                                <select id="ddlTipoValor" name="ddlTipoValor" class="form-control tipo-equipo"></select>
+
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <label class="control-label">Valor: </label>
+                                                                <div class="form-group ui-widget aplicacionContainer">
+                                                                    <input id="txtValorUmbral" name="txtValorUmbral" class="form-control form-principal validarnumericos" type="text">
+
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group form-principal">
+                                                        <div class="row">
+                                                            <div>
+                                                                <div class="col-md-3">
+                                                                    <label class="control-label">Evidencia : </label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="input-group">
+                                                                        <input id="txtArchivo" class="form-control" type="text">
+                                                                        <span class="input-group-btn">
+                                                                            <label class="btn btn-primary file-upload-btn">
+                                                                                <input id="flArchivo" class="file-upload-input inputArchivo" type="file" name="flArchivo">
+                                                                                <span class="glyphicon glyphicon-folder-open"></span>
+                                                                            </label>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <input type="hidden" id="hdUmbralId" name="hdUmbralId" />
+                                                                    <input type="hidden" id="hdDesProducto" name="hdDesProducto" />
+                                                                    <a id="btnDescargar" class="btn btn-primary btn-width-custom" style="display:none;" onclick="javascript:DescargarArchivo();">
+                                                                        <span class="icon icon-arrow-down"></span>
+                                                                        <span class="count-text">Descargar</span>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="row">
+                                                    </div>
+                                                    <hr />
+
+
+                                                    <div class="panel-group" id="accordion-filtro" role="tablist" aria-multiselectable="true">
+                                                        <div class="panel panel-default" style="overflow: inherit;">
+                                                            <a class="panel-heading collapsed" role="tab" id="heading-filtro" data-toggle="collapse" data-parent="#accordion-filtro" href="#collapse-filtro" aria-expanded="true" aria-controls="collapse-filtro" style="display: flex">
+                                                                <h4 id="ff" class="panel-title">
+                                                                    <span class="glyphicon glyphicon-chevron-down "></span>
+                                                                    Driver que soporta el umbral configurado
+                                                                </h4>
+
+                                                            </a>
+                                                            <div id="collapse-filtro" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-filtro">
+
+                                                                <div class="form-group form-principal">
+                                                                    <div class="row">
+                                                                        <div class="col-md-4">
+                                                                            <label class="control-label">Nombre: </label>
+                                                                            <select id="ddlDriver" name="ddlDriver" class="form-control tipo-equipo"></select>
+                                                                        </div>
+                                                                        <div class="col-md-4 tipo-equipo tipo-funcion">
+                                                                            <label class="control-label" style="display:block">Unidad de medida: </label>
+                                                                            <select id="ddlUMedida" name="ddlUMedida" class="form-control tipo-equipo"></select>
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <label class="control-label">Valor: </label>
+                                                                            <div class="form-group ui-widget aplicacionContainer">
+                                                                                <input id="txtValorMedida" name="txtValorMedida" class="form-control form-principal" type="text">
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <label for="btnAgregarDriver">&nbsp; </label>
+                                                                            <div class="form-group ui-widget aplicacionContainer">
+                                                                                <button id="btnAgregarDriver" type="button" class="btn btn-primary btn-width-custom" onclick="guardarAddRelacionDriver()">Agregar</button>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-group form-principal">
+                                                                    <label class="control-label">Relación de Drivers: </label>
+                                                                    <table id="tblRegistroRelacionDriver" class="table" data-mobile-responsive="true" data-unique-id="Id" data-page-size="3000" data-page-number="1">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="20">#</th>
+                                                                                <th data-field="DriverNombre" data-halign="center" data-valign="middle" data-align="left">Nombre</th>
+                                                                                <th data-field="UnidadMedidaNombre" data-halign="center" data-valign="middle" data-align="left">Unidad de medida</th>
+                                                                                <th data-field="Valor" data-halign="center" data-valign="middle" data-align="left">Valor</th>
+                                                                                <th data-formatter="opcionesDrivers" data-field="opcionesUmbrales" data-halign="center" data-valign="middle" data-align="center" data-width="5%" class="opcionesStyle">Opciones</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                    </table>
+                                                                    <input type="text" style="display:none" id="txtCantidadRelacionDriver" name="txtCantidadRelacionDriver" class="form-control" />
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnRegEq" class="btn btn-primary" onclick="guardarAddRelacion()" type="button" data-loading-text="Procesando...">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="MdVerEvidenciaUmbral" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg-1 modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="titleFormVerEvidenciaUmbral"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-search">
+                                <fieldset class="fieldset">
+                                    <h4 id="subtitleformVerEvidenciaUmbral"></h4>
+                                    <div class="row">
+                                    </div>
+                                    <div class="card-search-box">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <form id="formVerEvidenciaUmbral">
+                                                    <div class="form-group tipo-equipo">
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label class="control-label">Tipo de Umbral: </label>
+                                                                <select id="ddlTiposVer" name="ddlTiposVer" class="form-control tipo-equipo"></select>
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                <label class="control-label">Nombre: </label>
+                                                                <select id="ddlTipoValorVer" name="ddlTipoValorVer" class="form-control tipo-equipo"></select>
+
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <label class="control-label">Valor: </label>
+                                                                <div class="form-group ui-widget aplicacionContainer">
+                                                                    <input id="txtValorUmbralVer" name="txtValorUmbralVer" class="form-control form-principal" type="text">
+
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group form-principal">
+                                                        <div class="row">
+                                                            <div>
+                                                                <div class="col-md-3">
+                                                                    <label class="control-label">Evidencia : </label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="input-group disabled">
+                                                                        <input id="txtArchivoVer" class="form-control" type="text">
+                                                                        <span class="input-group-btn">
+                                                                            <label class="btn btn-primary file-upload-btn">
+                                                                                <input id="flArchivoVer" class="file-upload-input inputArchivoVer" type="file" name="flArchivoVer">
+                                                                                <span class="glyphicon glyphicon-folder-open"></span>
+                                                                            </label>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <a id="btnDescargarVer" class="btn btn-primary btn-width-custom" style="display:none;" onclick="javascript:DescargarArchivo();">
+                                                                        <span class="icon icon-arrow-down"></span>
+                                                                        <span class="count-text">Descargar</span>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                    </div>
+                                                    <hr />
+                                                    <div class="row">
+                                                    </div>
+                                                    <h4 id="titleForm">Driver que soporta el umbral configurado:</h4>
+                                                    <div class="form-group form-principal">
+                                                        <label class="control-label">Relación de Drivers: </label>
+                                                        <table id="tblRegistroRelacionDriverVer" class="table" data-mobile-responsive="true" data-unique-id="Id" data-page-size="3000" data-page-number="1">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="20">#</th>
+                                                                    <th data-field="DriverNombre" data-halign="center" data-valign="middle" data-align="left">Nombre</th>
+                                                                    <th data-field="UnidadMedidaNombre" data-halign="center" data-valign="middle" data-align="left">Unidad de medida</th>
+                                                                    <th data-field="Valor" data-halign="center" data-valign="middle" data-align="left">Valor</th>
+
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalActulizarComCross" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalActulizarComCross" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form id="formActulizarComCross">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h5 class="modal-title" id="title-md">Activación de pieza cross crítica</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">¿Está seguro de marcar  como "pieza cross crítica"?: </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button id="btnActulizarComCross" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalActulizarComCross2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalActulizarComCross2" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form id="formActulizarComCross2">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h5 class="modal-title" id="title-md">Desactivación de pieza cross crítica</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">Esta pieza cross crítica ya cuenta con Umbrales, ¿Esta seguro que desea cambiar de estado pieza cross crítica a inactivo?: </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button id="btnActulizarComCross2" class="btn btn-primary" type="button" data-loading-text="Procesando...">Confirmar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!--Modal Modulo Peak-->
+    <div id="MdAddOrEditPeak" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg-1 modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">PEAK EN PRODUCCIÓN</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-search">
+                                <fieldset class="fieldset">
+                                    <h4 id="subtitleformAddPeakUmbral"></h4>
+                                    <div class="row">
+                                    </div>
+                                    <div class="card-search-box">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <form id="formAddPeakUmbral">
+                                                    <div class="form-group tipo-equipo">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label class="control-label">Unidad medida Umbral: </label>
+                                                                <select id="ddlTipoUndMedida" name="ddlTipoUndMedida" class="form-control tipo-equipo"></select>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <label class="control-label">Valor: </label>
+                                                                <div class="form-group ui-widget aplicacionContainer">
+                                                                    <input id="txtValorPeak" name="txtValorPeak" class="form-control form-principal validarnumericos" type="text">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3"> </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <label class="control-label">Comentario/Detalle </label>
+                                                                <textarea class="form-control" rows="10" id="txtDescripcionPeak" name="txtDescripcionPeak"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnRegPeak" class="btn btn-primary" onclick="guardarAddPeak()" type="button" data-loading-text="Procesando...">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalHistorialPeak" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalHistorialPeak" aria-hidden="true">
+        <div class="modal-dialog modal-lg-1 " role="document">
+            <form id="formEli5">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h5 class="modal-title" id="titulo">Historial de Peak en Producción</h5>
+                    </div>
+                    <div class="modal-body">
+
+                        <table id="tblHistorialPeak" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                            <caption class="caption text-left">
+                                <span>Peak en Producción</span>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-field="Fecha" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="Fecha">Fecha </th>
+                                    <th data-field="TipoValorDesc" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="TipoValorDesc">Tipo de métrica </th>
+                                    <th data-field="ValorPeak" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="ValorPeak">Valor</th>
+                                    <th data-field="ValorAspiracional" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Valor<br />Aspiracional</th>
+                                    <th data-field="DetallePeak" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="DetallePeak">Detalle</th>
+                                    <th data-field="FlagActivoDesc" data-halign="center" data-valign="middle" data-align="center" data-width="25%" data-sort-name="FlagActivoDesc">Situación</th>
+                                </tr>
+                            </thead>
+                        </table>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div id="modalHistorialUmbral" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalHistorialUmbral" aria-hidden="true">
+        <div class="modal-dialog modal-lg-1" role="document">
+            <form id="formEli5">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h5 class="modal-title" id="titulo">Historial Umbral</h5>
+                    </div>
+                    <div class="modal-body">
+
+                        <table id="tblHistorialUmbral" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                            <caption class="caption text-left">
+                                <span>Umbral</span>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th data-field="TipoDescripcion" data-halign="center" data-valign="middle" data-align="left" data-width="15%">Tipo</th>
+                                    <th data-field="TipoValorDescripcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="DatosTI">Nombre</th>
+                                    <th data-field="ValorUmbral" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Valor</th>
+                                    <th data-field="ValorAspiracional" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Valor<br />Aspiracional</th>
+                                    <th data-field="FlagActivoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Situación</th>
+                                    <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Fecha Registro</th>
+                                    <th data-field="FechaModificacionFormato" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Brecha">Fecha Modificación</th>
+                                    @*<th data-formatter="opcionesUmbrales" data-field="opcionesUmbrales" data-halign="center" data-valign="middle" data-align="center" data-width="5%" class="opcionesStyle">Opciones</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <script src="~/app/GestionUmbrales/consultasRegistros.js?v=0.0.772221123"></script>

@@ -1,0 +1,365 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    string subtitle = (string)ViewBag.SubtitleView;
+    int _idBandeja = (int)ViewBag.AprobadorId;
+    ViewBag.Title1 = "Gestión de Aplicaciones";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = string.Format("Gestión de Aplicaciones - Bandeja de {0}", subtitle);
+}
+
+@using BCP.CVT.Cross
+
+<style>
+    .bloq-element {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    /* Chat containers */
+    .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    /* Darker chat container */
+    .darker {
+        border-color: #f7a033;
+        background-color: #ddd;
+    }
+
+    /* Clear floats */
+    .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    /* Style images */
+    .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+        /* Style the right image */
+        .container img.right {
+            float: right;
+            margin-left: 20px;
+            margin-right: 0;
+        }
+
+    /* Style time text */
+    .time-right {
+        float: right;
+        color: #aaa;
+    }
+
+    /* Style time text */
+    .time-left {
+        float: left;
+        color: #999;
+    }
+
+    .user-name {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .table{
+        font-size:11px !important;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="form-group row gutter-xs">
+                            @*<div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo de solicitud: </h5>
+                                    <select id="ddlTipoFiltro" name="ddlTipoFiltro" class="form-control"></select>
+                                </div>
+                            </div>*@
+                            <div class="col-xs-3 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado de solicitud: </h5>
+                                    <select id="ddlEstadoFiltro" name="ddlEstadoFiltro" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-4">
+                                <h5>Fecha Desde: </h5>
+                                <div class="input-group date" id="divFechaDesde">
+                                    <input type="text" id="txtFilFechaDesde" name="txtFilFechaDesde" class="form-control" value="@DateTime.Now.AddDays(-30).ToString("dd/MM/yyyy")" />
+                                    <span class="input-group-addon">
+                                        <span class="icon icon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-4">
+                                <h5>Fecha Hasta: </h5>
+                                <div class="input-group date" id="divFechaHasta">
+                                    <input type="text" id="txtFilFechaHasta" name="txtFilFechaHasta" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                    <span class="input-group-addon">
+                                        <span class="icon icon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row gutter-xs">
+                            <div class="col-md-12">
+                                <div class="text-right">
+                                    <a id="btnBuscar" class="btn btn-primary" href="javascript: void(0)" title="Buscar">
+                                        <span class="icon icon-search"></span>
+                                        <span class="count-text">Buscar</span>
+                                    </a>
+                                    <a id="btnExportar" class="btn btn-primary" href="javascript: void(0)" title="Exportar">
+                                        <span class="icon icon-file-excel-o"></span>
+                                        <span class="count-text">Exportar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+@*<div class="row panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a id="btnExportar" class="btn btn-primary" href="javascript: void(0)" title="Exportar">
+        <span class="icon icon-file-excel-o"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>*@
+
+<div class="row gutter-xs" style="margin-top:20px;">
+    <div class="col-xs-12">
+        <div class="card">
+            @*<div class="card-header">
+                <strong>Registro de solicitudes de aplicaciones</strong>
+            </div>*@
+            <div class="card-body">
+                <table id="tbl-solicitudes" class="table" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Registro de solicitudes de aplicaciones</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            @*<th data-field="Id" data-halign="center" data-valign="middle" data-align="center" data-width="10%">Solicitud</th>*@
+                            <th data-field="CodigoAplicacion" data-halign="center" data-valign="middle" data-align="left">Código aplicación</th>
+                            <th data-field="NombreAplicacion" data-formatter="nameAppFormatter" data-halign="center" data-valign="middle" data-align="left">Aplicación</th>
+                            <th data-field="TipoSolicitudToString" data-halign="center" data-valign="middle" data-align="left">Tipo de solicitud</th>
+                            <th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="center">Tipo activo información</th>
+                            <th data-field="ClasificacionTecnica" data-halign="center" data-valign="middle" data-align="left">Clasificación <br />técnica</th>
+                            <th data-field="SubclasificacionTecnica" data-halign="center" data-valign="middle" data-align="left">Subclasificación<br />técnica</th>
+                            <th data-field="AreaBian" data-halign="center" data-valign="middle" data-align="left">Área de negocio<br />BIAN</th>
+                            <th data-field="DominioBian" data-halign="center" data-valign="middle" data-align="left">Dominio de negocio<br />BIAN</th>
+                            <th data-field="PlataformaBCP" data-halign="center" data-valign="middle" data-align="left">Plataforma BCP</th>
+                            <th data-field="JefaturaATI" data-halign="center" data-valign="middle" data-align="left">Jefatura ATI</th>
+                            <th data-field="ArquitectoTI" data-halign="center" data-valign="middle" data-align="left">Arquitecto TI</th>
+                            <th data-field="ModeloEntrega" data-halign="center" data-valign="middle" data-align="left">Modelo de entrega</th>
+
+                            <th data-field="LiderUsuario_PO" data-halign="center" data-valign="middle" data-align="left">Lider usuario / PO</th>
+                            <th data-field="UsuarioAutorizador_PO" data-halign="center" data-valign="middle" data-align="left">Usuario autorizador / PO</th>
+                            <th data-field="Experto_Especialista" data-halign="center" data-valign="middle" data-align="left">Experto especialista</th>
+                            <th data-field="JefeEquipo_PO" data-halign="center" data-valign="middle" data-align="left">Jefe de equipo / PO</th>
+                            <th data-field="TTL" data-halign="center" data-valign="middle" data-align="left">TTL</th>
+                            <th data-field="GestionadoPor" data-halign="center" data-valign="middle" data-align="left">Gestionado por</th>
+                            <th data-field="GerenciaCentral" data-halign="center" data-valign="middle" data-align="left">Gerencia Central</th>
+                            <th data-field="Division" data-halign="center" data-valign="middle" data-align="left">División</th>
+                            <th data-field="Area" data-halign="center" data-valign="middle" data-align="left">Área</th>
+                            <th data-field="Unidad" data-halign="center" data-valign="middle" data-align="left">Unidad</th>
+                            <th data-formatter="estadoFakeFormatter" data-field="EstadoSolicitudToString" data-halign="center" data-valign="middle" data-align="center">Estado de la solicitud para<br /> el portafolio</th>
+                            <th data-field="EstadoAprobacionBandejaStr" data-halign="center" data-valign="middle" data-align="center">Estado de la solicitud<br />@subtitle </th>
+                            <th data-field="FechaCreacionFormato" data-halign="center" data-valign="middle" data-align="center">Fecha de registro</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal cambiar estado -->
+<div id="mdCambioEstado" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Cambiar Estado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formCambioEstado">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Estado actual:
+                        </label>
+                        <input id="txtEstadoActual" name="txtEstadoActual" class="form-control" type="text" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            Nuevo Estado:
+                        </label>
+                        <select id="ddlEstadoSolicitud" name="ddlEstadoSolicitud" class="form-control">
+                            <option value="-1">-- Seleccione --</option>
+                            <option value="1">Aprobar</option>
+                            <option value="2">Observar</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnCambioEstado" type="button" class="btn btn-primary" onclick="guardarCambioEstado()" data-loading-text="Procesando..." title="Guardar estado">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--End Modal cambiar estado -->
+<!--Modal comentarios -->
+<div id="mdComentarios" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleMd">Comentarios y Observaciones</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formComentarios">
+                    <div class="form-group divComments">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--End Modal comentarios -->
+<!--Modal Add or Edit Info-->
+<div id="mdRegistro" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="title-md">Información de la aplicación</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEditRegistro">
+                    <input type="hidden" name="hdRegistroId" id="hdRegistroId" value="0" />
+                    <input type="hidden" name="hdSolicitudId" id="hdSolicitudId" value="0" />
+                    <div class="form-group all bdj1 bdj2 bdj3">
+                        <label class="control-label">Código APT: </label>
+                        <input type="text" id="txtCodigoAPT" name="txtCodigoAPT" class="form-control all bdj1 bdj2 bdj3" disabled>
+                    </div>
+                    <div class="form-group all bdj1 bdj2 bdj3">
+                        <label class="control-label">Descripción: </label>
+                        <textarea id="txtDesApp" name="txtDesApp" rows="4" class="form-control all bdj1 bdj2 bdj3" disabled></textarea>
+                    </div>
+                    <div class="form-group all bdj3">
+                        <label class="control-label">Modelo entrega: </label>
+                        <select id="ddlME" name="ddlME" class="form-control all bdj3"></select>
+                    </div>
+                    <div class="form-group all bdj2">
+                        <label class="control-label">Clasificación técnica: </label>
+                        <select id="ddlCT" name="ddlCT" class="form-control all bdj2"></select>
+                    </div>
+                    <div class="form-group all bdj2">
+                        <label class="control-label">Subclasificación técnica: </label>
+                        <input id="txtST" class="form-control all bdj2" type="text" name="txtST" maxlength="100">
+                    </div>
+                    <div class="form-group all bdj1">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group all bdj1">
+                                    <label class="control-label">Área de negocio BIAN: </label>
+                                    <select id="ddlAreaBian" name="ddlAreaBian" class="form-control all bdj1">
+                                        <option value="-1">-- Seleccione --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group all bdj1">
+                                    <label class="control-label">Dominio de Negocio BIAN: </label>
+                                    <select id="ddlDominioBian" name="ddlDominioBian" class="form-control all bdj1">
+                                        <option value="-1">-- Seleccione --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group all bdj1">
+                                    <label class="control-label">Jefatura equipo ATI: </label>
+                                    <select id="ddlJefaturaAti" name="ddlJefaturaAti" class="form-control all bdj1">
+                                        <option value="-1">-- Seleccione --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group all bdj1">
+                                    <label class="control-label">Arquitecto TI: </label>
+                                    <select id="ddlArquitectoTi" name="ddlArquitectoTi" class="form-control all bdj1">
+                                        <option value="-1">-- Seleccione --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group all bdj1">
+                                    <label class="control-label">Plataforma de negocio BCP: </label>
+                                    <select id="ddlPlataforma" name="ddlPlataforma" class="form-control all bdj1">
+                                        <option value="-1">-- Seleccione --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegistrar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Add or Edit Info-->
+
+<script>
+    const id_bandeja = @_idBandeja;
+    const BANDEJA_APROBACION = {
+        Administrador: @Html.Raw((int)EBandejaAprobadorAplicacion.Administrador),
+        ArquitecturaTI: @Html.Raw((int)EBandejaAprobadorAplicacion.ArquitecturaTI),
+        ClasificacionTecnica: @Html.Raw((int)EBandejaAprobadorAplicacion.ClasificacionTecnica),
+        DevSecOps: @Html.Raw((int)EBandejaAprobadorAplicacion.DevSecOps),
+        PO: @Html.Raw((int)EBandejaAprobadorAplicacion.PO),
+        TTL: @Html.Raw((int)EBandejaAprobadorAplicacion.TTL),
+        GestorUserIT: @Html.Raw((int)EBandejaAprobadorAplicacion.GestorUserIT)
+    };
+</script>
+
+<script src="~/app/bandejaAprobacionEstandar.js?v=1.3.5"></script>

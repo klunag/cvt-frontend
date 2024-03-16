@@ -1,0 +1,263 @@
+﻿@{
+    ViewBag.Title1 = "Reporte de variación del portafolio";
+    ViewBag.Title2 = "Reportes portafolio";
+    ViewBag.Title3 = "Reporte de variación del portafolio";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+}
+@using BCP.CVT.Cross
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+<script src="//www.amcharts.com/lib/4/lang/es_ES.js"></script>
+
+
+<style>
+    .btn-width-custom {
+        width: 112px;
+    }
+
+    .btn-group {
+        width: 100% !important;
+    }
+
+    .multiselect-container {
+        position: absolute;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+    }
+
+    div.col-xs-4.col-md-4:nth-child(n) {
+        margin-right: 7%;
+    }
+
+    select {
+        text-align: center;
+        /*appearance: none;*/
+    }
+
+   #tableAplicaciones {
+        margin-top: 5%;
+        display: none;
+    }
+    .div-report  { 
+        display: none;
+    }
+    #report1, #report2, #report3 {
+        width: 100%;
+        height: 380px;
+    }
+
+    #report4 {
+        width: 100%;
+        height: 425px;
+    }
+
+    .table {
+        font-size: 11px !important;
+    }
+
+    .div-report h4{
+        font-size:14px;
+    }
+
+    .card-header-title {
+        display: inline-block;
+        width: 80%;
+    }
+
+    .card .card-body .alerta {
+        font-size: 13px;
+        color: red;
+        font-weight: 300;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Tipo de activo de información: </h5>
+                                    <select id="ddlTipoActivo" name="ddlTipoActivo" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Gestionado por: </h5>
+                                    <select id="cbFiltroGestionadoPor" name="cbFiltroGestionadoPor" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Estado de la aplicación: </h5>
+                                    <select id="cbFiltroEstado" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Frecuencia: </h5>
+                                    <select id="cbFiltroFrecuencia" name="cbFiltroFrecuencia" class="form-control">
+                                        <option value="-1" selected="selected">Seleccione</option>
+                                        <option value="7" data-desc="Semana" >Semanal</option>
+                                        <option value="15" data-desc="Quincena">Quincenal</option>
+                                        <option value="30" data-desc="Mes">Mensual</option>
+                                        <option value="60" data-desc="Bimestre">Bimestral</option>
+                                        <option value="90" data-desc="Trimestre">Trimestral</option>
+                                        <option value="180" data-desc="Semestre">Semestral</option>
+                                        <option value="365" data-desc="Año">Anual</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3" style="margin-top: 3%">
+                                <div class="text-left col-md-6" data-toggle="match-height" style="padding:0;">
+                                    <h5>Tipo de Búsqueda</h5>
+                                </div>
+                                <div class="input-group col-md-6" id="divCbTipoBusqueda" style="padding: 0;"></div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 tipoBusquedaFecha">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Desde:</h5>
+                                    <div class="input-group date" id="divFechaFiltroDesde">
+                                        <input type="text" id="FechaFiltroDesde" name="FechaFiltroDesde" class="form-control tipoBusquedaFecha" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        <span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5 id="titleTpBusqueda">Hasta:</h5>
+                                    <div class="input-group date" id="divFechaFiltroHasta">
+                                        <input type="text" id="FechaFiltroHasta" name="FechaFiltroHasta" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        <span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 tipoBusquedaPeriodo">
+                                <div class="text-left" data-toggle="match-height" role="form" id="FormFiltroPeriodo">
+                                    <h5>Periodo: </h5>
+                                    <input id="txtPeriodo" name="txtPeriodo" class="form-control tipoBusquedaPeriodo" type="text" onKeypress="if (!(/^[0-9]+$/.test(String.fromCharCode(event.keyCode)))) event.returnValue = false;" value="0" maxlength="2">
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-right">
+                                    <h5>&nbsp;</h5>
+                                    <a id="btnBuscar" class="btn btn-primary btn-width-custom" href="javascript: void(0)">
+                                        <span class="icon icon-search"></span>
+                                        <span class="count-text">Ver reporte</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs" style="margin-top:3%">
+    <div class="col-xs-6 div-report">
+        <div class="card">
+           <div class="card-header">
+                <div class="card-header-title">
+                    <h4 style="color:#ee8809; font-weight:bold;">Evolución de creación de aplicaciones</h4>
+                </div>
+
+                <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                    <a id="btnExportarReporte1" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                        <span class="count-text">Exportar</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div id="report1"></div>
+                <div id="report1_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 div-report">
+        <div class="card">
+            <div class="card-header-title">
+                <h4 style="color:#ee8809; font-weight:bold;">Evolución de eliminación de aplicaciones</h4>
+            </div>
+            <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                <a id="btnExportarReporte2" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                    <span class="count-text">Exportar</span>
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="report2"></div>
+                <div id="report2_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div> 
+</div>
+<div class="row gutter-xs">
+  
+    <div class="col-xs-12 div-report div-report-3">
+        <div class="card">
+            <div class="card-header-title">
+                <h4 style="color:#ee8809; font-weight:bold;">Aplicaciones nuevas y eliminadas por periodo de tiempo</h4>
+            </div>
+            <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                <a id="btnExportarReporte3" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                    <span class="count-text">Exportar</span>
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="report3"></div>
+                <div id="report3_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report  div-report-4">
+        <div class="card">
+            <div class="card-header-title">
+                <h4 style="color:#ee8809; font-weight:bold;">Estados por periodo de tiempo</h4>
+            </div>
+            <div style=" display:flex; float: right; font-size: 14px" class="div-exportReport">
+                <a id="btnExportarReporte4" class="btn btn-sm btn-primary" href="javascript: void(0)">
+                    <span class="count-text">Exportar</span>
+                </a>
+            </div>
+            <div class="card-body">
+                <div id="report4"></div>
+                <div id="report4_alerta" class="alerta">Los criterios de búsqueda no han arrojado resultados.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+
+<div id="ReportDistribuciones">
+</div>
+
+<script>
+    const REPORTE_SOLICITUDES_CREADAS = @Html.Raw((int)ETipoExportarReportePortafolioVariacion.SolicitudesCreadas);
+    const REPORTE_SOLICITUDES_ELIMINADAS = @Html.Raw((int)ETipoExportarReportePortafolioVariacion.SolicitudesEliminadas);
+    const REPORTE_SOLICITUDES_CREADAS_ELIMINADAS = @Html.Raw((int)ETipoExportarReportePortafolioVariacion.SolicitudesCreadasEliminadas);
+    const REPORTE_SOLICITUDES_ESTADO = @Html.Raw((int)ETipoExportarReportePortafolioVariacion.SolicitudesXEstado);
+    const REPORTE_DISTRIBUCION_X_GERENCIA = @Html.Raw((int)ETipoExportarReportePortafolioVariacion.DistribucionesXGerencia);
+</script>
+<script src="~/app/ReportePortafolio/reportePortafolioVariacion.js?v=1.0.2"></script>

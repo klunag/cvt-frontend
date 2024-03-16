@@ -1,0 +1,249 @@
+﻿
+@{
+    ViewBag.Title1 = "Actualización masiva";
+    ViewBag.Title2 = "Relaciones y formatos";
+    ViewBag.Title3 = "Actualización masiva";
+}
+
+@using BCP.CVT.Cross
+
+<div class="row">
+    <div class="col-md-6">
+        <label class="control-label">Seleccione la aplicacion o el grupo de aplicaciones que necesitas vincular a un activo</label>
+        <div class="input-with-icon AppFilterContainer">
+            <input id="txtAppFilter" name="txtAppFilter" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Código de aplicación">
+            <span class="icon icon-search input-icon"></span>
+        </div>
+        <input type="hidden" id="hdAppFilterId" name="hdAppFilterId" value="0" />
+    </div>
+    <div class="col-md-3">
+        <div>&nbsp;</div>
+        <button id="btnAdd" class="btn btn-primary" type="button" data-loading-text="Procesando..." title="Agregar">
+            <span class="icon icon-plus"></span>
+        </button>
+        <button id="btnShowFilter" class="btn btn-primary" type="button" data-loading-text="Procesando..." title="Mostrar filtros">
+            <span class="icon icon-arrow-up"></span> Filtro masivo
+        </button>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+<div class="row gutter-xs" style="margin-top:15px;">
+    <form id="formAddOrEdit">
+        <div class="col-md-3">
+            <table id="tblAppSide" 
+                   class="table" 
+                   data-mobile-responsive="true" 
+                   data-unique-id="Id"
+                   data-pagination="true"
+                   data-page-size="10" 
+                   data-page-number="1"
+                   data-show-header="false">
+                <thead>
+                    <tr>
+                        @*<th data-field="tblRegistroTecnologia" data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="30">#</th>*@
+                        <th data-formatter="nombreFormatter" data-halign="center" data-valign="middle" data-align="left">Aplicaciones</th>
+                        <th data-formatter="accionesFormatter" data-halign="center" data-valign="middle" data-align="left">&nbsp;</th>
+                    </tr>
+                </thead>
+            </table>
+            <input type="hidden" name="hdTableRule" id="hdTableRule" value="" />
+        </div>
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-search">
+                        <fieldset class="fieldset">
+                            <legend class="legend">Datos de la relación</legend>
+                            <div class="card-search-box">
+                                <h3 id="titleForm">Selecciona la tecnología que necesitas relacionar masivamente</h3>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        @*<form id="formAddOrEdit">*@
+                                        <input type="hidden" id="hdId" name="hdId" value="0" />
+                                        <input type="hidden" id="hdRelacionDetalleId" name="hdRelacionDetalleId" value="0" />
+                                        <input type="hidden" id="hdTipoRelacionId" name="hdTipoRelacionId" value="0" />
+
+                                        <input type="hidden" id="hdTipoAplicacion" name="hdTipoAplicacion" value="" />
+                                        <input type="hidden" id="hdEstadoAplicacion" name="hdEstadoAplicacion" value="" />
+                                        <div class="form-group tipo-tecnologia">
+                                            <label class="control-label">Tecnología: </label>
+                                            <div class="form-group ui-widget tecnologiaContainer">
+                                                <input id="txtTecnologia" name="txtTecnologia" class="form-control tipo-tecnologia ui-autocomplete-input" type="text">
+                                                <input type="hidden" id="hdTecnologiaId" name="hdTecnologiaId" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group tipo-tecnologia">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Dominio: </label>
+                                                    <input type="text" id="txtDominio" name="txtDominio" class="form-control tipo-tecnologia" readonly />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Subdominio: </label>
+                                                    <input type="text" id="txtSubdominio" name="txtSubdominio" class="form-control tipo-tecnologia" readonly />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group tipo-tecnologia">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Estado de Estandarización: </label>
+                                                    <input type="text" id="txtTipoTecnologia" name="txtTipoTecnologia" class="form-control tipo-tecnologia" readonly />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    @*<label class="control-label">Fecha fin de soporte: </label>
+                                                    <input type="text" id="txtFechaFinSoporte" name="txtFechaFinSoporte" class="form-control tipo-tecnologia" readonly />*@
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @*<div class="form-group tipo-tecnologia">
+                                            <label class="control-label">Indicador de obsolescencia: </label>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <button type="button" class="btn btn-lg btn-danger btn-circle"></button>
+                                                    <label class="control-label">El dia de hoy</label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <button type="button" class="btn btn-lg btn-danger btn-circle"></button>
+                                                    <label class="control-label">Dentro de 12 meses</label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <button type="button" class="btn btn-danger btn-circle btn-xl"></button>
+                                                    <label class="control-label">Dentro de 24 meses</label>
+                                                </div>
+                                            </div>
+                                        </div>*@
+                                        <input type="hidden" id="hdEstadoId" name="hdEstadoId" class="form-control" />
+                                        @*</form>*@
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 text-right">
+                                        <button id="btnSave" class="btn btn-primary" type="button" data-loading-text="Procesando...">Registrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="FilterModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title">Filtro de búsqueda avanzada</h5>
+            </div>
+            <div class="modal-body">
+                <form id="FilterForm">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Tipo de activo</label>
+                                    <input type="text" id="txtTipoActivoFilter" name="txtTipoActivoFilter" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Gestionado por</label>
+                                    <input type="text" id="txtGestionadoPorFilter" name="txtGestionadoPorFilter" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Estado de la aplicación</label>
+                                    <input type="text" id="txtEstadoAppFilter" name="txtEstadoAppFilter" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Jefe de Equipo/PO</label>
+                                    <input type="text" id="txtJefeEquipoFilter" name="txtJefeEquipoFilter" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Lider usuario</label>
+                                    <input type="text" id="txtLiderUsuarioFilter" name="txtLiderUsuarioFilter" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">TTL</label>
+                                    <input type="text" id="txtTTLFilter" name="txtTTLFilter" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group text-right">
+                                    <button id="btnSearch" class="btn btn-primary" type="button" data-loading-text="Procesando..." title="Agregar">
+                                        <span class="icon icon-search"></span> Buscar
+                                    </button>
+                                    <button id="btnAddAll" class="btn btn-primary" type="button" data-loading-text="Procesando..." title="Mostrar filtros">
+                                        <span class="icon icon-plus"></span> Agregar todos
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <table id="tblAppFilter" class="table" data-unique-id="WorkerId" data-mobile-responsive="true">
+                                        <thead>
+                                            <tr>
+                                                <th data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                                <th data-field="NombreCompleto" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                                                <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Código</th>
+                                                <th data-field="Estado" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Estado</th>
+                                                <th data-field="TipoActivo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Tipo activo</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    let TRUE_TEXT = "TRUE";
+    var objPermiso = {
+        Crear: "@ViewData.Eval("Permisos.Crear")".toString().toUpperCase() == TRUE_TEXT,
+        Editar: "@ViewData.Eval("Permisos.Editar")".toString().toUpperCase() == TRUE_TEXT,
+        Eliminar: "@ViewData.Eval("Permisos.Eliminar")".toString().toUpperCase() == TRUE_TEXT,
+        Exportar: "@ViewData.Eval("Permisos.Exportar")".toString().toUpperCase() == TRUE_TEXT,
+        Aprobar: "@ViewData.Eval("Permisos.Aprobar")".toString().toUpperCase() == TRUE_TEXT
+    };
+    //CargarPermisos(objPermiso);
+
+    const TIPO_RELACION = {
+        EQUIPO: @Html.Raw((int)ETipoRelacion.Equipo),
+        TECNOLOGIA: @Html.Raw((int)ETipoRelacion.Tecnologia),
+        APLICACION: @Html.Raw((int)ETipoRelacion.Aplicacion),
+        SERVICIO_NUBE: @Html.Raw((int)ETipoRelacion.ServicioNube),
+    };
+
+</script>
+
+<script src="~/app/Relaciones/actualizarRelacion.js?v=1.0.1"></script>

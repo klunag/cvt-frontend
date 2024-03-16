@@ -1,0 +1,402 @@
+﻿@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Gestión de Aplicaciones";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Gestión de Aplicaciones - Catálogo de Aplicaciones";
+
+    int PaginaActual = (int)ViewBag.PaginaActual;
+    int PaginaTamanio = (int)ViewBag.PaginaTamanio;
+}
+@using BCP.CVT.Cross
+<style>
+    .opcionesStyle {
+        width: 600px;
+    }
+
+    .table {
+        font-size: 11px !important;
+    }
+</style>
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Gerencia: </h5>
+                                <select id="cbFiltroGerencia" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>División: </h5>
+                                <select id="cbFiltroDivision" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Unidad: </h5>
+                                <select id="cbFiltroUnidad" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Área: </h5>
+                                <select id="cbFiltroArea" class="form-control"></select>
+                            </div>
+                        </div>
+                        @*<div class="col-xs-3 col-md-2">
+                                <button class="btn btn-primary btn-width-custom">Buscar</button>
+                            </div>*@
+                    </div>
+                    <div class="row gutter-xs">
+                        @*<div class="col-xs-3 col-md-3 appContainer">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Aplicación (código): </h5>
+                                    <input type="text" value="" maxlength="100" autocomplete="off" id="txtAplicacion" name="txtAplicacion" class="form-control" />
+                                    <input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 tribuContainer">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Jefe de equipo/Experto aplicación User IT</h5>
+                                    <input type="text" value="" maxlength="100" autocomplete="off" id="txtLiderTribu" name="txtLiderTribu" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 usuarioContainer">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Líder usuario/Owner</h5>
+                                    <input type="text" value="" maxlength="100" autocomplete="off" id="txtProduct" name="txtProduct" class="form-control" />
+                                </div>
+                            </div>*@
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Estado de la aplicación: </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                                <select id="cbFiltroEstado" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Clasificación técnica: </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                                <select id="ddlClasificacionTecnica" name="ddlClasificacionTecnica" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Subclasificación técnica: </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                                <select id="ddlSubclasificacionTecnica" name="ddlSubclasificacionTecnica" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+                                <h5>Aplicación (código): </h5>
+                                <input type="text" id="txtAplicacion" name="txtAplicacion" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                <input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Tipo de activo de información: </h5>
+                                <select id="ddlTipoActivo" name="ddlTipoActivo" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="text-right">
+                                <a id="btnBuscar" class="btn btn-primary" href="javascript: void(0)" title="Buscar aplicaciones">
+                                    <span class="icon icon-search"></span>
+                                    <span class="count-text">Buscar</span>
+                                </a>
+                                <a id="btnUpdate" class="btn btn-primary" href="javascript: void(0)" title="Actualizar aplicaciones">
+                                    <span class="icon icon-upload"></span>
+                                    <span class="count-text">Actualizar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="row gutter-xs" style="margin-top:15px;">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistro" class="table" data-mobile-responsive="true" data-unique-id="Id">
+                    <caption class="caption text-left">
+                        <span>Catálogo de Aplicaciones</span>
+                    </caption>
+                    @*<thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="3">#</th>
+                            <th data-formatter="opcionesFormatter" data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="center" data-width="3">Acciones</th>
+                            <th data-field="CodigoAPTStr" data-halign="center" data-valign="middle" data-align="left" data-width="5">Código</th>
+                            <th data-field="Nombre" data-formatter="nameAppFormatter" data-halign="center" data-valign="middle" data-align="left" data-width="5">Aplicación</th>
+                            <th data-formatter="descripcionFormatter" data-field="DescripcionAplicacion" data-halign="center" data-valign="middle" data-align="left">Descripción</th>
+                            <th data-field="TipoActivoInformacion" data-halign="center" data-valign="middle" data-align="left" data-width="5">Tipo activo información</th>
+                            <th data-field="EstadoAplicacion" data-halign="center" data-valign="middle" data-align="center" data-width="5">Estado<br /> aplicación</th>
+                            <th data-field="AplicacionDetalle.MotivoCreacion" data-halign="center" data-valign="middle" data-align="center" data-width="5">Motivo<br /> creación</th>
+                            <th data-field="AplicacionDetalle.FechaSolicitudStr" data-halign="center" data-valign="middle" data-align="center" data-width="5">Fecha<br /> registro</th>
+                            <th data-field="AplicacionDetalle.PersonaSolicitud" data-halign="center" data-valign="middle" data-align="center" data-width="5">Persona<br /> solicitante</th>
+                            <th data-field="CategoriaTecnologica" data-halign="center" data-valign="middle" data-align="center" data-width="5">Categoría<br /> tecnológica</th>
+                            <th data-field="AplicacionDetalle.ModeloEntrega" data-halign="center" data-valign="middle" data-align="center" data-width="5">Modelo<br /> entrega</th>
+                            <!--10-->
+                            <th data-field="FechaCreacionAplicacionStr" data-halign="center" data-valign="middle" data-align="center" data-width="5">Fecha<br /> creación</th>
+                            <th data-field="AplicacionDetalle.CodigoInterfaz" data-halign="center" data-valign="middle" data-align="center" data-width="5">Código<br /> interfaz</th>
+                            <th data-field="GerenciaCentral" data-halign="center" data-valign="middle" data-align="center" data-width="5">Gerencia<br /> central</th>
+                            <th data-field="Division" data-halign="center" data-valign="middle" data-align="center" data-width="5">División</th>
+                            <th data-field="Area" data-halign="center" data-valign="middle" data-align="center" data-width="5">Área</th>
+                            <th data-field="Unidad" data-halign="center" data-valign="middle" data-align="center" data-width="5">Unidad</th>
+                            <th data-field="AreaBIAN" data-halign="center" data-valign="middle" data-align="center" data-width="5">Area<br /> BIAN</th>
+                            <th data-field="DominioBIAN" data-halign="center" data-valign="middle" data-align="center" data-width="5">Dominio<br /> BIAN</th>
+                            <th data-field="AplicacionDetalle.PlataformaBCP" data-halign="center" data-valign="middle" data-align="center" data-width="5">Plataforma<br /> BCP</th>
+                            <th data-field="JefaturaATI" data-halign="center" data-valign="middle" data-align="center" data-width="5">Jefatura ATI</th>
+                            <!--20-->
+                            <th data-field="ArquitectoTI" data-halign="center" data-valign="middle" data-align="left" data-width="5">Arquitecto TI</th>
+                            <th data-field="GestionadoPor" data-halign="center" data-valign="middle" data-align="left" data-width="5">Gestionado por</th>
+                            <th data-field="Owner_LiderUsuario_ProductOwner" data-halign="center" data-valign="middle" data-align="left" data-width="5">Lider usuario<br /> / PO</th>
+                            <th data-field="Gestor_UsuarioAutorizador_ProductOwner" data-halign="center" data-valign="middle" data-align="left" data-width="5">Gestor/Usuario autorizador<br /> / PO</th>
+                            <th data-field="Experto_Especialista" data-halign="center" data-valign="middle" data-align="left" data-width="5">Experto de la<br /> aplicación</th>
+                            <th data-field="JefeEquipo_ExpertoAplicacionUserIT_ProductOwner" data-halign="center" data-valign="middle" data-align="left" data-width="5">Jefe de equipo<br /> / PO</th>
+                            <th data-field="BrokerSistemas" data-halign="center" data-valign="middle" data-align="left" data-width="5">Broker de<br /> sistemas</th>
+                            <th data-field="TribeTechnicalLead" data-halign="center" data-valign="middle" data-align="left" data-width="5">TTL</th>
+                            <th data-field="NombreEquipo_Squad" data-halign="center" data-valign="middle" data-align="left" data-width="5">Nombre equipo / SQUAD</th>
+                            <!--30-->
+                            <th data-field="EntidadResponsable" data-halign="center" data-valign="middle" data-align="left" data-width="5">Entidad<br /> responsable</th>
+                            <th data-field="AplicacionDetalle.EntidadUso" data-halign="center" data-valign="middle" data-align="left" data-width="5">Entidades<br /> usuarias</th>
+                            <th data-field="AplicacionDetalle.TipoDesarrollo" data-halign="center" data-valign="middle" data-align="left" data-width="5">Tipo<br /> desarrollo</th>
+                            <th data-field="AplicacionDetalle.Proveedor" data-halign="center" data-valign="middle" data-align="left" data-width="5">Proveedor<br /> desarrollo</th>
+                            <th data-field="AplicacionDetalle.Ubicacion" data-halign="center" data-valign="middle" data-align="left" data-width="5">Ubicación</th>
+                            <th data-field="AplicacionDetalle.Infraestructura" data-halign="center" data-valign="middle" data-align="left" data-width="5">Infraestructura<br />de la aplicación</th>
+                            <th data-field="AplicacionDetalle.Contingencia" data-halign="center" data-valign="middle" data-align="left" data-width="5">Contingencia</th>
+                            <th data-field="AplicacionDetalle.MetodoAutenticacion" data-halign="center" data-valign="middle" data-align="left" data-width="5">Método<br /> autenticación</th>
+                            <th data-field="AplicacionDetalle.MetodoAutorizacion" data-halign="center" data-valign="middle" data-align="left" data-width="5">Método<br /> autorización</th>
+                            <th data-field="AplicacionDetalle.AmbienteInstalacion" data-halign="center" data-valign="middle" data-align="left" data-width="5">Ambientes donde se debe<br />instalar la aplicación</th>
+                            <!--40-->
+                            <th data-field="AplicacionDetalle.FlagOORStr" data-halign="center" data-valign="middle" data-align="left" data-width="5">¿Está en OOR?</th>
+                            <th data-field="AplicacionDetalle.FlagRatificaOORStr" data-halign="center" data-valign="middle" data-align="left" data-width="5">¿Ratifica en OOR?</th>
+                            <th data-field="AplicacionDetalle.AplicacionReemplazo" data-halign="center" data-valign="middle" data-align="left" data-width="5">Aplicación(es) que<br />es reemplazada</th>
+                            <th data-field="ClasificacionTecnica" data-halign="center" data-valign="middle" data-align="left" data-width="5">Clasificación<br />técnica</th>
+                            <th data-field="SubclasificacionTecnica" data-halign="center" data-valign="middle" data-align="left" data-width="5">Subclasificación<br />técnica</th>
+                            <th data-field="AplicacionDetalle.RutaRepositorio" data-halign="center" data-valign="middle" data-align="left" data-width="5">Ruta del<br />repositorio</th>
+                            <th data-field="AplicacionDetalle.GrupoTicketRemedy" data-halign="center" data-valign="middle" data-align="left" data-width="5">Grupo Ticket<br />Remedy</th>
+                            <th data-field="AplicacionDetalle.InterfazApp" data-halign="center" data-valign="middle" data-align="left" data-width="5">Nombre de interfaces</th>
+                            <th data-field="AplicacionDetalle.CompatibilidadWindows" data-halign="center" data-valign="middle" data-align="left" data-width="5">Compatible con<br />Windows 7</th>
+                            <th data-field="AplicacionDetalle.CompatibilidadNavegador" data-halign="center" data-valign="middle" data-align="left" data-width="5">Compatible con<br />navegador</th>
+                            <!--50-->
+                            <th data-field="AplicacionDetalle.ProcesoClave" data-halign="center" data-valign="middle" data-align="left" data-width="5">Proceso Clave ó Proceso del <br />producto/servicio de Negocio o Apoyo</th>
+                            <th data-field="AplicacionDetalle.SWBase_SO" data-halign="center" data-valign="middle" data-align="left" data-width="5">SW Base - Sistema <br />Operativo</th>
+                            <th data-field="AplicacionDetalle.SWBase_HP" data-halign="center" data-valign="middle" data-align="left" data-width="5">SW Base - Herramienta de <br />Programación</th>
+                            <th data-field="AplicacionDetalle.SWBase_BD" data-halign="center" data-valign="middle" data-align="left" data-width="5">SW Base - Lenguaje de <br />Programación</th>
+                            <th data-field="AplicacionDetalle.SWBase_LP" data-halign="center" data-valign="middle" data-align="left" data-width="5">SW Base - Gestor de Base <br />de Datos</th>
+                            <th data-field="AplicacionDetalle.SWBase_Framework" data-halign="center" data-valign="middle" data-align="left" data-width="5">SW Base - Framework</th>
+                            <th data-field="AplicacionDetalle.RET" data-halign="center" data-valign="middle" data-align="left" data-width="5">Resumen estándares <br />tecnológicos</th>
+                            <th data-field="AplicacionDetalle.GestorAplicacionCTR" data-halign="center" data-valign="middle" data-align="left" data-width="5">Gestor de <br />aplicaciones</th>
+                            <th data-field="AplicacionDetalle.ConsultorCTR" data-halign="center" data-valign="middle" data-align="left" data-width="5">Consultor</th>
+                            <th data-field="AplicacionDetalle.InstaladaDesarrollo" data-halign="center" data-valign="middle" data-align="left" data-width="5">Instalada en <br />Desarrollo</th>
+                            <!--60-->
+                            <th data-field="AplicacionDetalle.InstaladaCertificacion" data-halign="center" data-valign="middle" data-align="left" data-width="5">Instalada en <br />Certificación</th>
+                            <th data-field="AplicacionDetalle.InstaladaProduccion" data-halign="center" data-valign="middle" data-align="left" data-width="5">Instalada en <br />Producción</th>
+                            <th data-field="AplicacionDetalle.CriticidadAplicacionBIA" data-halign="center" data-valign="middle" data-align="left" data-width="5">Criticidad de <br />Aplicación según BIA</th>
+                            <th data-field="AplicacionDetalle.ProductoMasRepresentativo" data-halign="center" data-valign="middle" data-align="left" data-width="5">Producto / Servicio más representativo <br />que soporte la aplicación</th>
+                            <th data-field="AplicacionDetalle.MenorRTO" data-halign="center" data-valign="middle" data-align="left" data-width="5">Menor RTO de los productos <br />soportados (hrs)</th>
+                            <th data-field="AplicacionDetalle.MayorGradoInterrupcion" data-halign="center" data-valign="middle" data-align="left" data-width="5">Mayor Grado de interrupción (%) <br />respecto a los productos que soporta</th>
+                            <th data-field="CriticidadToString" data-halign="center" data-valign="middle" data-align="left" data-width="5">Criticidad</th>
+                            <th data-field="AplicacionDetalle.RoadmapPlanificado" data-halign="center" data-valign="middle" data-align="left" data-width="5">Roadmap <br />planificado</th>
+                            <th data-field="AplicacionDetalle.DetalleEstrategia" data-halign="center" data-valign="middle" data-align="left" data-width="5">Detalle de estrategia de <br />roadmap planificado</th>
+                            <th data-field="AplicacionDetalle.EstadoRoadmap" data-halign="center" data-valign="middle" data-align="left" data-width="5">Estado de roadmap</th>
+                            <!--70-->
+                            <th data-field="AplicacionDetalle.EtapaAtencion" data-halign="center" data-valign="middle" data-align="left" data-width="5">Etapa de atención <br />de roadmap</th>
+                            <th data-field="AplicacionDetalle.RoadmapEjecutado" data-halign="center" data-valign="middle" data-align="left" data-width="5">Roadmap Ejecutado</th>
+                            <th data-field="AplicacionDetalle.FechaInicioRoadmap" data-halign="center" data-valign="middle" data-align="left" data-width="5">Fecha Inicio roadmap <br />ejecutado</th>
+                            <th data-field="AplicacionDetalle.FechaFinRoadmap" data-halign="center" data-valign="middle" data-align="left" data-width="5">Fecha Fin roadmap <br />ejecutado</th>
+                            <th data-field="AplicacionDetalle.CodigoAppReemplazo" data-halign="center" data-valign="middle" data-align="left" data-width="5">Código(s) de aplicación(es) <br />reemplazada(s)</th>
+                            <!--75-->
+                        </tr>
+                    </thead>*@
+                </table>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hdFiltro" id="hdFiltro" value="" />
+</div>
+
+<!--Modal Editar Responsables (Aplicacion)-->
+<div id="MdAddOrEditModal" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formRegistro">
+                    <input type="hidden" id="hdId" name="hdId" value="0" />
+                    <div class="form-group">
+                        <label class="control-label">
+                            Tipo:
+                        </label>
+                        <select id="ddlTipo" name="ddlTipo" class="form-control inputMatricula"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            Matrícula del responsable:
+                        </label>
+                        <div class="input-group">
+                            <input id="txtMatricula" name="txtMatricula" class="form-control inputMatricula" type="text">
+                            <span class="input-group-btn">
+                                <button id="txtAddResponsable" class="btn btn-primary" onclick="addItem()" type="button" title="Agregar">Agregar Responsable</button>
+                            </span>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <table id="tblApExp" class="table" data-mobile-responsive="true" data-unique-id="Matricula">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                    <th data-field="Matricula" data-halign="center" data-valign="middle" data-align="left">Matricula</th>
+                                    <th data-field="Nombres" data-halign="center" data-valign="middle" data-align="left">Nombres</th>
+                                    <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="left">Estado</th>
+                                    <th data-field="TipoExpertoToString" data-halign="center" data-valign="middle" data-align="left">Tipo</th>
+                                    <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="left">Creado por</th>
+                                    <th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="left">Fecha creación</th>
+                                    <th data-formatter="opcionesFormatterApExp" data-field="Id" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <input type="text" id="msjValid" name="msjValid" class="form-control guardarExperto" style="display:none;" />
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <button id="btnGuardarRegistro" type="button" class="btn btn-primary" onclick="GuardarRegistro()" data-loading-text="Procesando..." title="Guardar responsables">Guardar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Editar Responsables (Aplicacion)-->
+<!--Modal Actualizar (Gestion Aplicacion)-->
+<div id="mdImportar" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleFormImp"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formImportar">
+                    <div class="form-group">
+                        <a id="btnDescarApps" href="javascript:void(0)" title="Descargar aplicaciones">
+                            [Descargar aplicaciones]
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            Archivo excel:
+                            <span class="icon icon-question-circle-o" data-toggle="tooltip" data-placement="right" title="La aplicación carga los registros que se encuentren en la primera hoja del archivo MS Excel."></span>
+                        </label>
+                        <div class="input-group">
+                            <input id="txtArchivo" name="txtArchivo" class="form-control" type="text" value="Ningún archivo seleccionado" readonly>
+                            <span class="input-group-btn">
+                                <label class="btn btn-primary file-upload-btn">
+                                    <input id="flArchivo" name="flArchivo" class="file-upload-input inputfile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    <span class="glyphicon glyphicon-folder-open"></span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnActualizar" class="btn btn-primary" type="button" data-loading-text="Procesando...">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Actualizar (Gestion Aplicacion)-->
+<!--Modal Results (Gestion Aplicacion)-->
+<div id="mdResults" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Resultados de la actualización masiva</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formResults">
+                    <div class="form-group">
+                        <p id="pDetalleCarga"></p>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="control-label">Registros procesados: </label>
+                                <input type="text" id="txtTotal" name="txtTotal" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="control-label">Registros actualizados: </label>
+                                <input type="text" id="txtTotalUpdate" name="txtTotalUpdate" class="form-control" disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group error-div">
+                        <label class="control-label">Errores encontrados: </label>
+                    </div>
+                    <div class="form-group error-div">
+                        <table id="tblResults" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-field="TipoErrorIdStr" data-halign="center" data-valign="middle" data-align="center" data-width="15%">Tipo error</th>
+                                    <th data-field="Detalle" data-halign="center" data-valign="middle" data-align="center">Evidencia, detalle o entidad</th>
+                                    <th data-field="FilaExcel" data-halign="center" data-valign="middle" data-align="center" data-width="4%">Fila en archivo excel</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="error-div">
+                        <a id="btnExportarValidacionCargaMasiva">Descargar Validaciones</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Results (Gestion Aplicacion)-->
+<script>
+    var ULTIMO_REGISTRO_PAGINACION = @PaginaTamanio;
+    var ULTIMO_PAGE_NUMBER = @PaginaActual;
+
+    const TABLA_PROCEDENCIA_ID = {
+        CVT_APLICACION: @Html.Raw((int)ETablaProcedenciaAplicacion.Aplicacion),
+        APP_APLICACIONDETALLE: @Html.Raw((int)ETablaProcedenciaAplicacion.AplicacionDetalle),
+        DATA_APLICACION: @Html.Raw((int)ETablaProcedenciaAplicacion.AplicacionData),
+        APP_INFOCAMPOAPLICACION: @Html.Raw((int)ETablaProcedenciaAplicacion.InfoCampoPortafolio)
+    };
+</script>
+<script src="~/app/catalogoAplicacion.js?v=1.1.1"></script>

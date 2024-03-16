@@ -1,0 +1,67 @@
+﻿
+@{
+    ViewBag.Title1 = "Estado IP";
+    ViewBag.Title2 = "Dashboard Obsolescencia - Equipos";
+    ViewBag.Title3 = "Estado IP";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<style>
+    .fondoVerdeLeve {
+        background-color: #91C337 !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoAmarillo {
+        background-color: #FFDD5B !important;
+        text-align: center;
+        width: 10%;
+    }
+
+    .fondoVerdeFuerte {
+        background-color: #22A71C !important;
+        color: #ffffff !important;
+        text-align: center;
+        width: 10%;
+    }
+</style>
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="ExportarInfo()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span>
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Detallado del análisis</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistro" class="table" style="font-size:11px !important;">
+                    <thead>
+                        <tr>
+                            <th data-field="IP" data-halign="center" data-valign="middle" data-align="left" data-width="100">IP</th>
+                            <th data-field="MAC" data-halign="center" data-valign="middle" data-align="center" data-width="100">MAC</th>
+                            <th data-field="EquipoReporte" data-halign="center" data-valign="middle" data-align="center" data-width="100">Equipo según reporte IP</th>
+                            <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center" data-width="100">Equipo según CVT</th>
+                            <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="center" data-width="100">Tipo de equipo CVT</th>                            
+                            <th data-field="ExisteCVT" data-formatter="existeFormatter" data-halign="center" data-valign="middle" data-align="center" data-width="100">IP existe en CVT</th>                            
+                            <th data-field="CoincideCVT" data-formatter="coincideFormatter" data-halign="center" data-valign="middle" data-align="center" data-width="100">IP correctamente asociada <br/> en CVT/Reporte</th>
+                            <th data-field="Prefix" data-halign="center" data-valign="middle" data-align="center" data-width="100">Prefix</th>
+                            <th data-field="NamePrefix" data-halign="center" data-valign="middle" data-align="center" data-width="100">Name Prefix</th>
+                            <th data-field="Fuente" data-halign="center" data-valign="middle" data-align="center" data-width="100">Fuente</th>
+                            <th data-field="CMDB" data-halign="center" data-valign="middle" data-align="center" data-width="100">ADDM Scan</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/estadoip.js?v=2.1.0"></script>

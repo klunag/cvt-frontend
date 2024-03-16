@@ -1,0 +1,269 @@
+﻿@{
+	Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+	ViewBag.Title1 = "Envíanos una consulta";
+	ViewBag.Title2 = "Consultas al Portafolio";
+	ViewBag.Title3 = "Envíanos una consulta";
+}
+
+@using BCP.CVT.Cross
+
+<style>
+	.bloq-element {
+		pointer-events: none;
+		opacity: 0.7;
+	}
+
+	nav a {
+		display: inline-block;
+		margin-right: -4px;
+	}
+	/*.table {
+		font-size: 11px !important;
+	}*/
+	.p {
+		margin-top: -30px;
+	}
+
+	.button {
+		margin-bottom: 33px;
+		margin-left: 200px
+	}
+
+	.StyleTipoConsulta {
+		margin-left: -162px
+	}
+</style>
+
+<div class="card">
+	<div class="card-body">
+		<div class="card-search">
+			<fieldset class="fieldset">
+				<legend class="legend">Filtro de búsqueda</legend>
+				<div class="card-search-box">
+					<form action="javascript:void(0);">
+						<div class="form-group row">
+
+							<div class="col-md-3 col-xs-5 col-sm-5 p">
+								<div class="text-left ui-widget" data-toggle="match-height">
+									<h5>Tipo de Consulta</h5>
+									<select id="cbFilTipoConsulta" name="cbFilTipoConsulta" class="form-control">
+										<option value="-1" selected="selected">Todas</option>
+										<option value="1">Consulta general</option>
+										<option value="2">Consulta de roles de una aplicación</option>
+										<option value="3">Consulta sobre el proceso</option>
+										<option value="4">Consulta por información histórica</option>
+										<option value="5">Comentarios</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-3 col-xs-5 col-sm-5 p">
+								<div class="text-left ui-widget" data-toggle="match-height">
+									<h5>Estado</h5>
+									<select id="cbRespondida" name="cbRespondida" class="form-control">
+										<option value="-1" selected="selected">Todas</option>
+										<option value="1">Respondida</option>
+										<option value="2">Sin Responder</option>
+									</select>
+								</div>
+							</div>
+
+
+
+							<div class="col-md-3 col-xs-2 col-sm-2 button">
+								<button id="btnBusCon" class="btn btn-primary btn-width-custom" onclick="buscarConsultas()">Buscar</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+	<a id="btnNuevo" class="btn btn-primary btn-width-custom" href="javascript: void(0)" title="Nuevo registro">
+		<span class="icon icon-plus"></span>
+		<span class="count-text">Nuevo</span>
+	</a>
+</div>
+
+<div class="row gutter-xs">
+	<div class="col-xs-12">
+		<div class="card">
+			<div class="card-body">
+				<table id="tbl-consultas" class="table" data-unique-id="WorkerId" data-mobile-responsive="true">
+					<caption class="caption text-left">
+						<span>Consultas</span>
+					</caption>
+					<thead>
+						<tr>
+							<th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="10">#</th>
+							<th data-formatter="linkFormatter2" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+							<th data-field="FechaConsultaF" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaConsultaF">Fecha de consulta</th>
+							<th data-field="TipoConsultaName" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="TipoConsultaName">Tipo de consulta</th>
+							<th data-field="applicationId" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="applicationId">Aplicación relacionada</th>
+							<th data-field="Consulta" data-halign="center" data-width="400" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="Consulta">Consulta</th>
+							<th data-field="RespondidoName" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="RespondidoName">Estado Consulta</th>
+							<th data-field="FechaRespuestaF" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="FechaRespuestaF">Fecha de respuesta</th>
+							<th data-field="RespuestaPortafolio" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-sort-name="RespuestaPortafolio">Respuesta portafolio</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--Modal Add or Edit (Consultas)-->
+<div id="MdAddOrEditCon" tabindex="-1" role="dialog" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title" id="titleFormCon">Nueva Consulta</h4>
+			</div>
+			<div class="modal-body">
+				<form id="formAddOrEditRG">
+
+
+					<div class="form-group">
+						<div class="row">
+
+							<div class="col-md-4">
+								<b>
+									Tipo de Consulta
+								</b>
+							</div>
+							<div class="col-md-5 StyleTipoConsulta">
+								<select id="ddlTipoConsulta" name="ddlTipoConsulta" class="form-control">
+								</select>
+							</div>
+							<div class="col-md-1"></div>
+
+
+						</div>
+
+						<div class="row">
+
+							<div class="col-md-2">
+								<b>
+									Código de aplicación
+								</b>
+							</div>
+							<div class="col-md-5 containerAplicacion">
+								<input id="txtCodigoApp" name="txtCodigoApp" type="text" class="form-control" maxlength="200" />
+								<input type="hidden" id="hCodigo" name="hCodigo" value="" />
+							</div>
+							<div class="col-md-1"></div>
+
+						</div>
+						<div class="row">
+
+							<div class="col-md-2">
+								<b>
+									Comentario
+								</b>
+							</div>
+							<div class="col-md-10">
+								<textarea class="form-control" rows="10" id="txtComentario" name="txtComentario"></textarea>
+							</div>
+
+						</div>
+					</div>
+
+
+
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				<button id="btnRegRG" class="btn btn-primary" onclick="guardarAddOrEditRG()" type="button" data-loading-text="Procesando...">Registrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<input type="hidden" value="0" id="hdConsultaId" name="hdConsultaId" />
+<!--Modal Edit (Consultas)-->
+<div id="MdAddOrEditCon2" tabindex="-1" role="dialog" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title" id="titleFormCon">Modificar Consulta</h4>
+			</div>
+			<div class="modal-body">
+				<form id="formAddOrEditRG2">
+
+
+					<div class="form-group">
+						<div class="row">
+
+							<div class="col-md-4">
+								<b>
+									Tipo de Consulta
+								</b>
+							</div>
+							<div class="col-md-5 StyleTipoConsulta">
+								<select id="ddlTipoConsulta2" name="ddlTipoConsulta2" class="form-control" disabled>
+								</select>
+							</div>
+							<div class="col-md-1"></div>
+
+
+						</div>
+
+						<div class="row">
+
+							<div class="col-md-2">
+								<b>
+									Código de aplicación
+								</b>
+							</div>
+							<div class="col-md-5 containerAplicacion">
+								<input id="txtCodigoApp2" name="txtCodigoApp2" type="text" class="form-control" maxlength="200" disabled />
+								<input type="hidden" id="hCodigo2" name="hCodigo2" value="" />
+							</div>
+							<div class="col-md-1"></div>
+
+						</div>
+						<div class="row">
+
+							<div class="col-md-2">
+								<b>
+									Comentario
+								</b>
+							</div>
+							<div class="col-md-10">																
+								<textarea class="form-control" rows="10" id="txtComentario2" name="txtComentario2"></textarea>
+							</div>
+
+						</div>
+					</div>
+
+
+
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				<button id="btnRegRG2" class="btn btn-primary" onclick="guardarAddOrEditRG2()" type="button" data-loading-text="Procesando...">Registrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<script>
+
+</script>
+<script src="~/app/ConsultasPortafolio/consultas.js?v=1.0.4"></script>
+
+

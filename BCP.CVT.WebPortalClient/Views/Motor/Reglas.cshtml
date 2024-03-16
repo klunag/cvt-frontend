@@ -1,0 +1,230 @@
+﻿@{
+    ViewBag.Title1 = "Reglas";
+    ViewBag.Title2 = "Configuración";
+    ViewBag.Title3 = "Reglas";
+}
+@using BCP.CVT.Cross
+
+<link href="https://s3-us-west-2.amazonaws.com/colors-css/2.2.0/colors.min.css" rel="stylesheet">
+<link href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css" rel="stylesheet">
+
+<style>
+    .opcionesStyle {
+        min-width: 120px;
+    }
+    /*.bg-orange {
+        background-color: #FF851B !important;
+    }*/
+    .bg-rojo {
+        background-color: #ffbdab !important;
+    }
+
+    .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
+        background-color: transparent;
+    }
+</style>
+<div class="card" style="margin-bottom:25px;">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <form action="javascript:void(0);">
+                        <div class="row form-group">
+                            <div class="col-md-9 col-xs-9 searchProducto">
+                                @*<label>Producto: </label>*@
+                                <div class="input-with-icon">
+                                    <input type="hidden" name="hdProductoId" id="hdProductoId" value="0" />
+                                    <input id="txtBusNombreProducto" class="form-control input-thick pill input-with-icon-search" type="text" placeholder="Producto..." onkeydown="ValidaEnters(event)">
+                                    <span class="icon icon-search input-icon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-xs-3 col-sm-3">
+                                <button id="btnBusEq" class="btn btn-primary btn-width-custom" onclick="buscarRegla()">Buscar</button>
+                                <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="AddRegla()">
+                                    <span class="icon icon-plus"></span>
+                                    <span class="count-text">Nuevo</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs form-group">
+                            <div class="col-xs-3 col-md-3 containerFiltroProceso">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Proceso: </label>
+                                    <div class="input-with-icon">
+                                        <input type="hidden" value="" id="hProceso" name="hProceso" />
+                                        <input type="text" name="txtProceso" id="txtProceso" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 containerFiltroPuerto">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Puerto: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtPuerto" id="txtPuerto" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="" id="hPuerto" name="hPuerto" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3 containerFiltroProtocolo">
+                                <div class="text-left" data-toggle="match-height">
+                                    <label>Protocolo: </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" name="txtProtocolo" id="txtProtocolo" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                        <span class="icon icon-search input-icon"></span>
+                                        <input type="hidden" value="" id="hProtocolo" name="hProtocolo" />
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                           
+
+                            <div class="col-xs-3 col-md-3">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de las reglas configuradas</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblEquipo" class="table" data-unique-id="Id" data-mobile-responsive="true" data-detail-view="false" data-detail-formatter="detailFormatter" data-row-style="rowStyle" style="font-size:11px !important;">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-field="Proceso" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%">Proceso</th>
+                            <th data-field="ProcesoTipoStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%">Procesar regla en</th>
+                            <th data-field="Puerto" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="15%" data-sort-name="Puerto">Puerto</th>
+                            <th data-field="Protocolo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%" data-sort-name="Protocolo">Protocolo</th>
+                            <th data-field="ProductoCodigo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="5%" data-sort-name="ProductoCodigo">Cod Producto</th>
+                            <th data-field="Producto" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="15%" data-sort-name="Producto">Producto</th>
+                            <th data-field="Funcion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="5%" data-sort-name="Funcion">Función</th>
+                            <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%" data-sort-name="UsuarioCreacion">Creado por</th>
+                            <th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%" data-sort-name="FechaCreacionStr">Fecha Creacion</th>
+                            <th data-field="Estado" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="5%" data-sort-name="Estado">Estado</th>
+                            <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="8%" class="opcionesStyle">Opciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal Nuevo Add or Edit-->
+<div id="MdAddOrEdit" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="titleForm"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formAddOrEdit">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        
+                                        <div class="row">
+                                            <div class="col-xs-12 col-md-12 containerProductoNew">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <label>Producto: </label>
+                                                    <div class="input-with-icon">
+                                                        <input type="hidden" value="" id="cboProducto" name="cboProducto" />
+                                                        <input type="text" name="txtProductoNombre" id="txtProductoNombre" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-6 col-md-6 containerProcesoNew">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <label>Proceso: </label>
+                                                    <div class="input-with-icon">
+                                                        <input type="hidden" value="" id="cboProceso" name="cboProceso" />
+                                                        <input type="text" name="txtProcesoNew" id="txtProcesoNew" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                                        <span class="icon icon-search input-icon"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-6 col-md-6">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <label>Procesar regla en:</label>
+                                                    <select id="cboProcesoTipo" name="cboProcesoTipo" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-6 col-md-6 containerProtocoloNew">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <label>Protocolo: </label>
+                                                    <div class="input-with-icon">
+                                                        <input type="text" name="txtProtocoloNew" id="txtProtocoloNew" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                                        <span class="icon icon-search input-icon"></span>
+                                                        <input type="hidden" value="0" id="cboProtocolo" name="cboProtocolo" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-6 col-md-6 containerPuertoNew" id="divPuerto">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <label>Puerto: </label>
+                                                    <div class="input-with-icon">
+                                                        <input type="text" name="txtPuertoNew" id="txtPuertoNew" class="form-control input-thick pill input-with-icon-search" value="" maxlength="80" />
+                                                        <span class="icon icon-search input-icon"></span>
+                                                        <input type="hidden" value="0" id="cboPuerto" name="cboPuerto" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-6 col-md-6">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <label>Función: </label>
+                                                    <select id="cboFuncion" name="cboFuncion" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnRegEq" class="btn btn-primary" onclick="guardarAddOrEditEquipo()" type="button" data-loading-text="Procesando...">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Nuevo Add or Edit-->
+<script>
+    const DESCUBRIMIENTO = {
+        AUTOMATICO: @Html.Raw((int)EDescubrimiento.Automaticamente),
+        MANUAL_CVT: @Html.Raw((int)EDescubrimiento.Manual),
+        MANUAL_REMEDY: @Html.Raw((int)EDescubrimiento.Remedy)
+    };
+</script>
+
+<script src="~/app/Motor/reglas.js?v=1.0.1"></script>

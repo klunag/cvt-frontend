@@ -1,0 +1,141 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.Title1 = "Clasificación de aplicaciones BCP por Área BIAN";
+    ViewBag.Title2 = "Reportes";
+    ViewBag.Title3 = "Clasificación de aplicaciones BCP por Área BIAN";
+}
+
+<style>
+    .opcionesStyle {
+        width: 500px;
+    }
+
+    .fondoAzul {
+        background-color: #013A81 !important;
+        color: #ffffff !important;
+        font-weight: bold;
+    }
+
+    /*.centerBold {
+        text-align: center;
+        font-weight: bold;
+    }*/
+
+    .fondoGris {
+        background-color: #CCCCCC !important;
+        color: #013A81 !important;
+    }
+
+    .fondoBlanco {
+        background-color: #F2F2F2 !important;
+        color: #013A81 !important;
+    }
+</style>
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset" style="padding-block-start: 0 !important; padding-block-end: 0 !important;">
+                <legend class="legend" style="margin-bottom: 0 !important;">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-1 col-md-1">
+                            <h5>Gerencia: </h5>
+                        </div>
+                        <div class="col-xs-5 col-md-5">
+                            <div class="text-left" data-toggle="match-height">
+                                <select id="cbFiltroGerencia" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-1 col-md-1">
+                            <h5>Estado de aplicación: </h5>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">                                
+                                <select id="cbFiltroEstado" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-2 col-md-2" data-toggle="match-height">
+                            <div class="text-right">
+                                <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="RefrescarListado()">
+                                    <span class="count-text">Buscar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<!--AREA BIAN-->
+<div class="row gutter-xs" style="margin-top:20px;">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="tblRegistro" class="table table-striped table-nowrap table-bordered" cellspacing="0" width="100%" data-mobile-responsive="true">
+                    <caption class="caption text-left">
+                        <span>Registros configurados</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-halign="center" data-valign="middle" data-align="center" data-field="Categoria" rowspan="2" class="fondoAzul">Capa Funcional</th>
+                            <th colspan="5" data-halign="center" data-valign="middle">Áreas BIAN BCP</th>
+                        </tr>
+                        <tr>
+                            <th data-formatter="linkFormatter" data-events="operateEvents" data-field="BankingProducts" data-halign="center" data-valign="middle" data-align="center" data-width="16%" >BANKING PRODUCTS</th>
+                            <th data-formatter="linkFormatter" data-events="operateEvents" data-field="BiceFinal" data-halign="center" data-valign="middle" data-align="center" data-width="16%">BICE</th>
+                            <th data-formatter="linkFormatter" data-events="operateEvents" data-field="BusinessDirectionFinal" data-halign="center" data-valign="middle" data-align="center" data-width="16%">BUSINESS DIRECTION</th>
+                            <th data-formatter="linkFormatter" data-events="operateEvents" data-field="BusinessIntegration" data-halign="center" data-valign="middle" data-align="center" data-width="16%">BUSINESS INTEGRATION</th>
+                            <th data-formatter="linkFormatter" data-events="operateEvents" data-field="BusinessSupport" data-halign="center" data-valign="middle" data-align="center" data-width="16%">BUSINESS SUPPORT</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <p>
+            <strong>Consideraciones</strong><br />
+            - Solo se han considerado las aplicaciones vigentes BCP <br />
+            - No se consideran los valores NO APLICA y en blanco para las Áreas BIAN <br />            
+        </p>
+    </div>
+</div>
+
+<div id="mdDetalleAplicacion" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Detalle de aplicaciones</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formDetalleAplicacion">                    
+                    <div class="form-group">
+                        <table id="tblDetalleAplicacion" data-locale="es-SP" class="table" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                    <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%">Código APT</th>
+                                    <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center" data-sortable="true">Nombre</th>
+                                    <th data-field="EstadoAplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%">Estado de aplicación</th>                                    
+                                    <th data-field="CapaFuncional" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="10%">Capa Funcional</th>
+                                    <th data-field="AreaBIAN" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Área BIAN</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/reporteBIAN.js"></script>

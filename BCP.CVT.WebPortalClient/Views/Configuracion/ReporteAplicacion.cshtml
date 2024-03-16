@@ -1,0 +1,190 @@
+﻿@{
+    ViewBag.Title1 = "Relación de aplicaciones importadas";
+    ViewBag.Title2 = "Portafolio";
+    ViewBag.Title3 = "Reporte de aplicaciones";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <legend class="legend">Filtro de búsqueda</legend>
+                <div class="card-search-box">
+                    <div class="row gutter-xs">
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Gerencia: </h5>
+                                <select id="cbFiltroGerencia" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>División: </h5>
+                                <select id="cbFiltroDivision" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Unidad: </h5>
+                                <select id="cbFiltroUnidad" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Área: </h5>
+                                <select id="cbFiltroArea" class="form-control"></select>
+                            </div>
+                        </div>
+                        @*<div class="col-xs-3 col-md-2">
+                                <button class="btn btn-primary btn-width-custom">Buscar</button>
+                            </div>*@
+                    </div>
+                    <div class="row gutter-xs">
+                        @*<div class="col-xs-3 col-md-3 appContainer">
+            <div class="text-left" data-toggle="match-height">
+                <h5>Aplicación (código): </h5>
+                <input type="text" value="" maxlength="100" autocomplete="off" id="txtAplicacion" name="txtAplicacion" class="form-control" />
+                <input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+            </div>
+        </div>
+        <div class="col-xs-3 col-md-3 tribuContainer">
+            <div class="text-left" data-toggle="match-height">
+                <h5>Jefe de equipo/Experto aplicación User IT</h5>
+                <input type="text" value="" maxlength="100" autocomplete="off" id="txtLiderTribu" name="txtLiderTribu" class="form-control" />
+            </div>
+        </div>
+        <div class="col-xs-3 col-md-3 usuarioContainer">
+            <div class="text-left" data-toggle="match-height">
+                <h5>Líder usuario/Owner</h5>
+                <input type="text" value="" maxlength="100" autocomplete="off" id="txtProduct" name="txtProduct" class="form-control" />
+            </div>
+        </div>*@
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Estado de la aplicación: </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                                <select id="cbFiltroEstado" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Clasificación técnica: </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                                <select id="ddlClasificacionTecnica" name="ddlClasificacionTecnica" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left" data-toggle="match-height">
+                                <h5>Subclasificación técnica: </h5>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </h5>
+                                <select id="ddlSubclasificacionTecnica" name="ddlSubclasificacionTecnica" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-md-3">
+                            <div class="text-left ui-widget containerAplicacion" data-toggle="match-height">
+                                <h5>Aplicación (código): </h5>
+                                <input type="text" id="txtAplicacion" name="txtAplicacion" value="" maxlength="100" autocomplete="on" class="form-control ui-autocomplete-input" />
+                                <input type="hidden" name="hdAplicacionId" id="hdAplicacionId" value="0" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gutter-xs">
+                        <div class="col-md-12">
+                            <div class="text-right">
+                                <a class="btn btn-primary btn-width-custom" href="javascript: void(0)" onclick="RefrescarListado()">
+                                    <span class="count-text">Buscar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a id="btnExportar" class="btn btn-primary btn-width-custom" href="javascript: void(0)">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar</span> 
+    </a>
+</div>
+
+<div class="row gutter-xs">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Registros de Aplicaciones</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistro" class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%" data-unique-id="Id" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Editar Responsables (Aplicacion)-->
+<div id="MdAddOrEditModal" tabindex="-1" role="dialog" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="titleForm"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formRegistro">
+                    <input type="hidden" id="hdId" name="hdId" value="0" />
+                    <div class="form-group">
+                        <label class="control-label">
+                            Tipo:
+                        </label>
+                        <select id="ddlTipo" name="ddlTipo" class="form-control inputMatricula"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            Matrícula del responsable:
+                        </label>
+                        <div class="input-group">
+                            <input id="txtMatricula" name="txtMatricula" class="form-control inputMatricula" type="text">
+                            <span class="input-group-btn">
+                                <button id="txtAddResponsable" class="btn btn-primary" onclick="addItem()" type="button">Agregar Responsable</button>
+                            </span>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <table id="tblApExp" class="table" data-mobile-responsive="true" data-unique-id="Matricula">
+                            <thead>
+                                <tr>
+                                    <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="30">#</th>
+                                    <th data-field="Matricula" data-halign="center" data-valign="middle" data-align="left">Matricula</th>
+                                    <th data-field="Nombres" data-halign="center" data-valign="middle" data-align="left">Nombres</th>
+                                    <th data-field="ActivoDetalle" data-halign="center" data-valign="middle" data-align="left">Estado</th>
+                                    <th data-field="TipoExpertoToString" data-halign="center" data-valign="middle" data-align="left">Tipo</th>
+                                    <th data-field="UsuarioCreacion" data-halign="center" data-valign="middle" data-align="left">Creado por</th>
+                                    <th data-field="FechaCreacionStr" data-halign="center" data-valign="middle" data-align="left">Fecha creación</th>
+                                    <th data-formatter="opcionesFormatterApExp" data-field="Id" data-halign="center" data-valign="middle" data-align="center">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <input type="text" id="msjValid" name="msjValid" class="form-control guardarExperto" style="display:none;" />
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <button id="btnGuardarRegistro" type="button" class="btn btn-primary" onclick="GuardarRegistro()" data-loading-text="Procesando...">Guardar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Editar Responsables (Aplicacion)-->
+
+<script src="~/app/reporteAplicacionData.js?v=1.1.0"></script>

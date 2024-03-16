@@ -1,0 +1,131 @@
+﻿@{
+    ViewBag.Title1 = "Relación de tecnologías vencidas o por vencer";
+    ViewBag.Title2 = "Portafolio";
+    ViewBag.Title3 = "Reporte de tecnologías";
+}
+
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <form id="formFiltros">
+                <fieldset class="fieldset">
+                    <legend class="legend">Filtro de búsqueda</legend>
+                    <div class="card-search-box">
+                        <div class="row gutter-xs">
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Dominio: </h5>
+                                    <select id="ddlDominio" name="ddlDominio" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-md-3">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Subdominio: </h5>
+                                    <select id="ddlSubdominio" name="ddlSubdominio" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <div class="text-left" data-toggle="match-height containerFiltroTecnologia">
+                                    <h5>Tecnología: </h5>
+                                    <div class="input-with-icon famfilContainer">
+                                        <input type="text" id="txtClave" name="txtClave" value="" maxlength="100" autocomplete="off" class="form-control input-with-icon-search" />
+                                        <span class="icon icon-search input-icon"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-md-12">
+                                <div class="text-right">
+                                    <button id="btnBuscar" type="button" class="btn btn-primary btn-width-custom">Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+
+@*<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+        <a class="btn btn-primary" href="javascript: void(0)" onclick="ActualizarGraficos()">
+            <span class="count-text">Generar</span>
+        </a>
+        <a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarData()">
+            <span class="icon icon-external-link"></span>
+            <span class="count-text">Exportar registros</span>
+        </a>
+    </div>*@
+
+<div id="divReportes" style="margin-top:15px;">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">
+                <strong>Tecnologías vencidas y por vencer</strong>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">
+                <strong>Tecnologías sin fecha fin</strong>
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="tab1">
+            <div class="row gutter-xs">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="tblTecnologiasPorVencer" data-locale="es-SP" class="table table-striped table-nowrap dataTable" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true" data-row-style="rowStyle" style="font-size:11px !important;">
+                                <caption class="caption">
+                                    <span id="title-table">Tecnologías por vencer en N meses</span>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                        <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="8%">Dominio</th>
+                                        <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Subdominio</th>
+                                        <th data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Clave</th>
+                                        <th data-field="FechaFinStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaFin" data-width="10%">Fecha fin</th>
+                                        <th data-field="TotalAplicaciones" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TotalAplicaciones" data-width="10%">Nro. aplicaciones <br /> impactadas</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="tab2">
+            <div class="row gutter-xs">
+                <div class="col-xs-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="tblTecnologiasVencidas" data-locale="es-SP" class="table table-striped table-nowrap dataTable" cellspacing="0" data-unique-id="Id" data-mobile-responsive="true" data-row-style="rowStyle" style="font-size:11px !important;">
+                                <caption class="caption">
+                                    <span id="title-table">Tecnologías sin fecha fin usadas por las aplicaciones</span>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th data-formatter="rowNumFormatterServerAlt" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                        <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-width="8%">Dominio</th>
+                                        <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Subdominio</th>
+                                        <th data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Clave</th>
+                                        <th data-field="FechaFinStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaFin" data-width="10%">Fecha fin</th>
+                                        <th data-field="TotalAplicaciones" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="TotalAplicaciones" data-width="10%">Nro. aplicaciones <br /> impactadas</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/app/reporteTecnologiaVencidaPorVencer.js"></script>

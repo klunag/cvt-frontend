@@ -1,0 +1,357 @@
+﻿@{
+    ViewBag.Title1 = "Gestion Etiquetado";
+    ViewBag.Title2 = "Guardicore";
+    ViewBag.Title3 = "Gestion Etiquetado";
+}
+
+<style>
+
+    #exTab2 h3 {
+        color: white;
+        background-color: #f7a033;
+        padding: 5px 15px;
+    }
+
+    #exTab1 .nav-pills > li > a {
+        border-radius: 0;
+    }
+
+    #exTab3 .nav-pills > li > a {
+        border-radius: 4px 4px 0 0;
+    }
+
+    #exTab3 .tab-content {
+        background-color: #FFFFFF;
+        padding: 5px 15px;
+    }
+
+    .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+        color: #fff;
+        background-color: #ee8809;
+    }
+</style>
+
+<div id="exTab3" class="container" style="max-width: 100% !important;">
+    <ul class="nav nav-pills">
+        <li class="active">
+            <a href="#1b" data-toggle="tab">Etiquetas Generales</a>
+        </li>
+        <li>
+            <a href="#2b" data-toggle="tab">Etiqueta por Tecnologia</a>
+        </li>
+    </ul>
+</div>
+
+<div class="tab-content clearfix">
+    <div class="tab-pane active" id="1b">
+        <div class="row gutter-xs">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-search">
+                            <fieldset class="fieldset">
+                                <legend class="legend">Filtro de búsqueda</legend>
+                                <div class="card-search-box">
+                                    <div class="row gutter-xs">
+                                        <div class="col-xs-3 col-md-4">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Etiqueta: </h5>
+                                                <input type="text" id="txtEtiqueta" name="txtEtiqueta" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-4">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Palabra Clave: </h5>
+                                                <input type="text" id="txtClave" name="txtClave" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-4">
+                                            <div class="text-right">
+                                                <h5>&nbsp;</h5>
+                                                <a id="btnListar" class="btn btn-primary" onclick="RefrescarListado()">
+                                                    <span class="count-text">Buscar</span>
+                                                </a>
+                                                <a id="btnRegistrar" class="btn btn-primary" onclick="registrar()">
+                                                    <span class="count-text">Registrar</span>
+                                                </a>
+                                                <a id="btnExportarTab1" class="btn btn-primary" onclick="ExportarTab1()">
+                                                    <span class="count-text">Exportar</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row gutter-xs">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table id="tblEtiqueta"
+                               class="table"
+                               data-unique-id="Id"
+                               data-mobile-responsive="true">
+                            @*<caption class="caption text-left">
+                                    <span>Registros de URLs</span>
+                                </caption>*@
+                            <thead>
+                                <tr>
+                                    <th data-formatter="opcionesFormatter" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opciones</th>
+                                    <th data-field="etiqueta" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="15%">Etiqueta</th>
+                                    <th data-field="clave" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="15%">Palabra Clave</th>
+                                    <th data-field="comentario" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Comentario</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane" id="2b">
+        <div class="row gutter-xs">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-search">
+                            <fieldset class="fieldset">
+                                <legend class="legend">Filtro de búsqueda</legend>
+                                <div class="card-search-box">
+                                    <div class="row gutter-xs">
+                                        <div class="col-xs-3 col-md-4">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Etiqueta: </h5>
+                                                <input type="text" id="txtEtiquetaTab2" name="txtEtiquetaTab2" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-4">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Comodin: </h5>
+                                                <input type="text" id="txtComodinTab2" name="txtComodinTab2" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-4">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Prioridad: </h5>
+                                                <input type="number" id="txtPrioridadTab2" name="txtPrioridadTab2" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-3 col-md-4">
+                                            <div class="text-left" data-toggle="match-height">
+                                                <h5>Tipo: </h5>
+                                                <select name="cbTipoPrincipal" id="cbTipoPrincipal" class="form-control format-relevancia bloq-element">
+                                                    <option value="0">--TODOS--</option>
+                                                    <option value="1">De 2 a 6 Aplicaciones</option>
+                                                    <option value="2">De 7 a Mas Aplicaciones</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-9 col-md-8">
+                                            <div class="text-right">
+                                                <h5>&nbsp;</h5>
+                                                <a id="btnExportar2" class="btn btn-primary" onclick="RefrescarListadoTab2()">
+                                                    <span class="count-text">Buscar</span>
+                                                </a>
+                                                <a id="btnRegistrar" class="btn btn-primary" onclick="registrarTab2()">
+                                                    <span class="count-text">Registrar</span>
+                                                </a>
+                                                <a id="btnExportarTab2" class="btn btn-primary" onclick="ExportarTab2()">
+                                                    <span class="count-text">Exportar</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row gutter-xs">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table id="tblEtiqueta2"
+                               class="table"
+                               data-unique-id="Id"
+                               data-mobile-responsive="true">
+                            @*<caption class="caption text-left">
+                                    <span>Registros de Aplicaciones</span>
+                                </caption>*@
+                            <thead>
+                                <tr>
+                                    <th data-formatter="opcionesFormatterTab2" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Opcion</th>
+                                    <th data-field="etiqueta" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Etiqueta</th>
+                                    <th data-field="comodin" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Comodin</th>
+                                    <th data-field="nombreTipoAplicacionRelacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Tipo</th>
+                                    <th data-field="prioridad" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Prioridad</th>
+                                    <th data-field="comentario" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Comentario</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdRegistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="exampleModalLabel">Registrar</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="formRegistroModal">
+                        <div class="form-group">
+                            <label for="txtEtiquetaModal">Etiqueta <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="txtEtiquetaModal">
+                        </div>
+                        <div class="form-group">
+                            <label for="txtClaveModal">Palabra Clave <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="txtClaveModal">
+                        </div>
+                        <div class="form-group">
+                            <label for="txtComentario">Comentario</label>
+                            <textarea class="form-control" id="txtComentario" rows="4"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnGuardarRegistro" type="button" class="btn btn-primary" onclick="GuardarRegistro()" data-loading-text="Procesando...">Registrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdRegistroTab2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="exampleModalLabel">Registrar</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="formRegistroModal">
+                        <div class="form-group">
+                            <label for="txtEtiquetaModalTab2">Etiqueta <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="txtEtiquetaModalTab2">
+                        </div>
+                        <div class="form-group">
+                            <label for="txtComodinModalTab2">Comodin <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="txtComodinModalTab2">
+                        </div>
+                        <div class="form-group">
+                            <label for="txtPrioridadModalTab2">Prioridad <span style="color: red">*</span></label>
+                            <input type="number" class="form-control" id="txtPrioridadModalTab2">
+                        </div>
+                        <div class="form-group">
+                            <h5>Tipo: </h5>
+                            <select name="cbTipo" id="cbTipo" class="form-control format-relevancia bloq-element">
+                                <option value="0">Seleciona un Tipo</option>
+                                <option value="1">De 2 a 6 Aplicaciones</option>
+                                <option value="2">De 7 a Mas Aplicaciones</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtComentarioModalTab2">Comentario</label>
+                            <textarea class="form-control" id="txtComentarioModalTab2" rows="4"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnGuardarRegistro" type="button" class="btn btn-primary" onclick="GuardarRegistroTab2()" data-loading-text="Procesando...">Registrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdEditar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="exampleModalLabel">Editar</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="formRegistroModal">
+                        <input type="hidden" id="txtEditarId" />
+                        <div class="form-group">
+                            <label for="txtEtiquetaModal">Etiqueta <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="txtEtiquetaModalEditar">
+                        </div>
+                        <div class="form-group">
+                            <label for="txtClaveModal">Palabra Clave <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="txtClaveModalEditar">
+                        </div>
+                        <div class="form-group">
+                            <label for="txtComentarioEditar">Comentario</label>
+                            <textarea class="form-control" id="txtComentarioEditar" rows="4"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnGuardarRegistro" type="button" class="btn btn-primary" onclick="ActualizarRegistro()" data-loading-text="Procesando...">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdEditarTab2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" id="exampleModalLabel">Editar</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="formRegistroModal">
+                        <input type="hidden" id="txtEditarModalEditarTab2" />
+                        <div class="form-group">
+                            <label for="txtEtiquetaModalEditarTab2">Etiqueta <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="txtEtiquetaModalEditarTab2">
+                        </div>
+                        <div class="form-group">
+                            <label for="txtComodinModalEditarTab2">Comodin <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="txtComodinModalEditarTab2">
+                        </div>
+                        <div class="form-group">
+                            <label for="txtPrioridadModalEditarTab2">Prioridad <span style="color: red">*</span></label>
+                            <input type="number" class="form-control" id="txtPrioridadModalEditarTab2">
+                        </div>
+                        <div class="form-group">
+                            <h5>Tipo: </h5>
+                            <select name="cbTipoEditar" id="cbTipoEditar" class="form-control format-relevancia bloq-element">
+                                <option value="0">Seleciona un Tipo</option>
+                                <option value="1">De 2 a 6 Aplicaciones</option>
+                                <option value="2">De 7 a Mas Aplicaciones</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtComentarioModalEditarTab2">Comentario</label>
+                            <textarea class="form-control" id="txtComentarioModalEditarTab2" rows="4"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnGuardarRegistro" type="button" class="btn btn-primary" onclick="ActualizarRegistroTab2()" data-loading-text="Procesando...">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/app/Guardicore/gestionetiquetado.js"></script>

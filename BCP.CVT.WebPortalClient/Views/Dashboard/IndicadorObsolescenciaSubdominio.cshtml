@@ -1,0 +1,137 @@
+﻿@using BCP.CVT.WebPortalClient.Models;
+@{
+    var proyecciones = MetodosUtiles.ObtenerProyecciones();
+}
+@{
+    ViewBag.Title1 = "Indicador Evolución Subdominio";
+    ViewBag.Title2 = "Indicadores gerenciales";
+    ViewBag.Title3 = "Indicador Evolución Subdominio";
+}
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+
+<script src="~/Scripts/amcharts4/core.js"></script>
+<script src="~/Scripts/amcharts4/charts.js"></script>
+<script src="~/Scripts/amcharts4/themes/animated.js"></script>
+
+<style>
+    #report {
+        width: 100%;
+        height: 400px;
+    }
+
+    /*.div-report {
+        display: none;
+    }*/
+</style>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-search">
+            <fieldset class="fieldset">
+                <div class="card-search-box">
+                    <form id="formFiltros">
+                        <div class="row gutter-xs">
+                            <div class="form-group">
+                                <div class="col-xs-4 col-md-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Dominio: (*)</h5>
+                                        <select id="cbFilDominio" name="cbFilDominio" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4 col-md-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Subdominio: (*)</h5>
+                                        <select id="cbFilSubdominio" name="cbFilSubdominio" class="form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4 col-md-4">
+                                    <div class="text-left" data-toggle="match-height">
+                                        <h5>Tipo de equipo: </h5>
+                                        <select id="cbFilTipoEquipo" name="cbFilTipoEquipo" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gutter-xs">
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Subsidiaria (a nivel de equipos): (*)</h5>
+                                    <select id="cbFilDominioRed" name="cbFilDominioRed" class="form-control" multiple="multiple"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-md-4">
+                                <div class="text-left" data-toggle="match-height">
+                                    <h5>Fecha de la consulta: (*)</h5>
+                                    <div class="input-group date" id="divFechaFiltro">
+                                        <input type="text" id="FechaFiltro" name="FechaFiltro" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                        <span class="input-group-addon">
+                                            <span class="icon icon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="panel panel-body text-right" style="background-color: transparent;" data-toggle="match-height">
+    <a class="btn btn-primary" href="javascript: void(0)" onclick="ActualizarGraficos()">
+        <span class="count-text">Generar Gráficos</span>
+    </a>
+    @*<a class="btn btn-primary" href="javascript: void(0)" onclick="ExportarData()">
+        <span class="icon icon-external-link"></span>
+        <span class="count-text">Exportar registros</span>
+    </a>*@
+</div>
+<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header">
+                <strong>Evolución</strong>
+            </div>
+            <div class="card-body">
+                <div id="report"></div>
+            </div>
+        </div>
+    </div>
+</div>
+@*<div class="row gutter-xs">
+    <div class="col-xs-12 div-report">
+        <div class="card">
+            <div class="card-header">
+                <strong>Reporte detallado de equipos</strong>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistro" class="table" data-show-columns="true" style="font-size:11px !important;">
+                    <thead>
+                        <tr>
+                            <th data-field="TipoEquipo" data-halign="center" data-valign="middle" data-align="left" data-width="100" data-sortable="true" data-sort-name="TipoEquipo">Tipo de equipo</th>
+                            <th data-formatter="linkFormatterEquipo" data-field="Nombre" data-halign="center" data-valign="middle" data-align="left" data-width="150" data-sortable="true" data-sort-name="Nombre">Equipo</th>
+                            <th data-field="Dominio" data-halign="center" data-valign="middle" data-align="left" data-width="200" data-sortable="true" data-sort-name="Dominio">Dominio</th>
+                            <th data-field="Subdominio" data-halign="center" data-valign="middle" data-align="left" data-width="200" data-sortable="true" data-sort-name="Subdominio">Subdominio</th>
+                            <th data-formatter="linkFormatterTecnologia" data-field="ClaveTecnologia" data-halign="center" data-valign="middle" data-align="center" data-width="300" data-sortable="true" data-sort-name="ClaveTecnologia">Tecnología</th>
+                            <th data-field="FechaCalculoBaseToString" data-halign="center" data-valign="middle" data-align="center" data-width="100" data-sortable="true" data-sort-name="FechaCalculoBase">Fecha de fin de soporte</th>
+                            <th data-formatter="semaforoFormatter" data-field="IndicadorObsolescencia" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado actual</th>
+                            <th data-formatter="semaforoIndice1Formatter" data-field="IndicadorObsolescencia_Proyeccion1" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado a <br />@proyecciones.MesProyeccion1 meses</th>
+                            <th data-formatter="semaforoIndice2Formatter" data-field="IndicadorObsolescencia_Proyeccion2" data-halign="center" data-valign="middle" data-align="center" data-width="60">Estado a <br />@proyecciones.MesProyeccion2 meses</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="hdFiltro" id="hdFiltro" value="" />
+</div>*@
+
+<script>
+    var ID_SUBDOMINIO_SO = "@BCP.CVT.Cross.Utilitarios.SUBDOMINIO_SO";
+    var ID_SUBDOMINIO_NONRELATIONAL = "@BCP.CVT.Cross.Utilitarios.SUBDOMINIO_BD_NONRELATIONAL";
+    var ID_SUBDOMINIO_BDRELATIONAL = "@BCP.CVT.Cross.Utilitarios.SUBDOMINIO_BD_RELATIONAL";
+    var ARR_INDICADOR_OBS = "@BCP.CVT.Cross.Utilitarios.SUBDOMINIO_INDICADOR_OBS";
+</script>
+
+<script src="~/app/dashboardIndicadorSubdominio.js?v=2.1.0"></script>

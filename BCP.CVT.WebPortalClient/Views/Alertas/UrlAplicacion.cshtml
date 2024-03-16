@@ -1,0 +1,439 @@
+﻿
+@{
+    ViewBag.Title1 = "Gestión de URLs";
+    ViewBag.Title2 = "Alertas";
+    ViewBag.Title3 = "UrlAplicacion";
+}
+
+<style>
+
+    #exTab2 h3 {
+        color: white;
+        background-color: #f7a033;
+        padding: 5px 15px;
+    }
+
+    /* remove border radius for the tab */
+
+    #exTab1 .nav-pills > li > a {
+        border-radius: 0;
+    }
+
+    /* change border radius for the tab , apply corners on top*/
+
+    #exTab3 .nav-pills > li > a {
+        border-radius: 4px 4px 0 0;
+    }
+
+    #exTab3 .tab-content {
+        /*color: white;*/
+        /*background-color: #012d74;*/
+        background-color: #FFFFFF;
+        padding: 5px 15px;
+    }
+
+    /*.table {
+        font-size: 11px !important;
+    }*/
+
+    .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+        color: #fff;
+        background-color: #ee8809;
+    }
+</style>
+
+@*<div class="container">
+        <h2>Example 3 </h2>
+    </div>*@
+<div id="exTab3" class="container" style="max-width: 100% !important;">
+    <ul class="nav nav-pills">
+        <li class="active">
+            <a href="#1b" data-toggle="tab">URLs asignadas a la aplicación</a>
+        </li>
+        <li>
+            <a href="#2b" data-toggle="tab">URLs huérfanas</a>
+        </li>
+        <li>
+            <a href="#3b" data-toggle="tab">URLs desactivadas</a>
+        </li>
+        @*<li>
+            <a href="#4b" data-toggle="tab">URLs en equipos desactivados</a>
+        </li>*@
+    </ul>
+
+    <div class="tab-content clearfix">
+        <div class="tab-pane active" id="1b">
+            <div class="row gutter-xs">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-search">
+                                <fieldset class="fieldset">
+                                    <legend class="legend">Filtro de búsqueda</legend>
+                                    <div class="card-search-box">
+                                        <div class="row gutter-xs">
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Equipo: </h5>
+                                                    <input type="text" id="txtFilEquipo" name="txtFilEquipo" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-3 col-md-4">
+												<div class="text-left" data-toggle="match-height">
+													<h5>Aplicación: </h5>
+													<input type="text" id="txtFilAplicacion" name="txtFilAplicacion" class="form-control" />
+													<input type="hidden" value="" id="hAplicacion" name="hAplicacion" />
+												</div>
+                                            </div>
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Fuente: </h5>
+                                                    <select id="ddlFilFuente" name="ddlFilFuente" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row gutter-xs">
+                                            <div class="col-md-12">
+                                                <div class="text-right">
+                                                    <h5>&nbsp;</h5>
+                                                    <a id="btnBuscar" class="btn btn-primary" href="javascript: void(0)">
+                                                        <span class="icon icon-search"></span>
+                                                        <span class="count-text">Buscar</span>
+                                                    </a>
+                                                    <a id="btnExportar" class="btn btn-primary btn-width-custom" href="javascript: void(0)">
+                                                        <span class="icon icon-download"></span>
+                                                        <span class="count-text">Exportar</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="tblUrlAplicacion"
+                                   class="table"
+                                   data-detail-view="true"
+                                   data-detail-formatter="detailFormatter"
+                                   data-unique-id="Id"
+                                   data-mobile-responsive="true">
+                                <caption class="caption text-left">
+                                    <span>Registros de URLs</span>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                        <th data-formatter="opciones" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Desactivación</th>
+                                        <th data-field="Url" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">URL</th>
+                                        <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%">Código APT</th>
+                                        <th data-field="NombreAplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="30%">Nombre</th>
+                                        <th data-field="UrlFuenteIdStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="10%">Fuente</th>
+                                        <th data-field="FechaCreacionFormat" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                                        <th data-field="FechaUltimaActualizacionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaUltimaActualizacion" data-width="10%">Fecha última <br /> actualización</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="2b">
+            <div class="row gutter-xs">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-search">
+                                <fieldset class="fieldset">
+                                    <legend class="legend">Filtro de búsqueda</legend>
+                                    <div class="card-search-box">
+                                        <div class="row gutter-xs">
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Equipo: </h5>
+                                                    <input type="text" id="txtFilEquipo2" name="txtFilEquipo2" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>URL: </h5>
+                                                    <input type="text" id="txtFilURL" name="txtFilURL" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Fuente: </h5>
+                                                    <select id="ddlFilFuente2" name="ddlFilFuente2" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row gutter-xs">
+                                            @*<div class="col-xs-3 col-md-3">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Tipo de activo de información: </h5>
+                                                    <select id="ddlTipoActivo" name="ddlTipoActivo" class="form-control"></select>
+                                                </div>
+                                            </div>*@
+                                            <div class="col-md-12">
+                                                <div class="text-right">
+                                                    <h5>&nbsp;</h5>
+                                                    <a id="btnBuscar2" class="btn btn-primary" href="javascript: void(0)">
+                                                        <span class="icon icon-search"></span>
+                                                        <span class="count-text">Buscar</span>
+                                                    </a>
+                                                    <a id="btnExportar2" class="btn btn-primary" href="javascript: void(0)">
+                                                        <span class="icon icon-download"></span>
+                                                        <span class="count-text">Exportar</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="tblUrlAplicacion2"
+                                   class="table"
+                                   data-detail-view="true"
+                                   data-detail-formatter="detailFormatter"
+                                   data-unique-id="Id"
+                                   data-mobile-responsive="true">
+                                <caption class="caption text-left">
+                                    <span>Registros de Aplicaciones</span>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                        <th data-formatter="opcionesTab2" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                                        <th data-field="Url" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">URL</th>
+                                        <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Código APT</th>
+                                        @*<th data-field="NombreEquipo" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Equipo</th>*@
+                                        <th data-field="NombreAplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                                        <th data-field="UrlFuenteIdStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Fuente</th>
+                                        <th data-field="FechaCreacionFormat" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                                        <th data-field="FechaUltimaActualizacionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaUltimaActualizacion" data-width="10%">Fecha última <br /> actualización</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="3b">
+            <div class="row gutter-xs">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-search">
+                                <fieldset class="fieldset">
+                                    <legend class="legend">Filtro de búsqueda</legend>
+                                    <div class="card-search-box">
+                                        <div class="row gutter-xs">
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Equipo: </h5>
+                                                    <input type="text" id="txtFilEquipo3" name="txtFilEquipo3" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Fecha ultima actualización: </h5>
+                                                    <div class="input-group date" id="dpFecConsulta-btn3">
+                                                        <span class="input-group-addon">
+                                                            <span class="icon icon-calendar"></span>
+                                                        </span>
+                                                        <input type="text" id="txtFilFecha3" name="txtFilFecha3" class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Fuente: </h5>
+                                                    <select id="ddlFilFuente3" name="ddlFilFuente3" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row gutter-xs">
+                                            <div class="col-md-12">
+                                                <div class="text-right">
+                                                    <h5>&nbsp;</h5>
+                                                    <a id="btnBuscar3" class="btn btn-primary" href="javascript: void(0)">
+                                                        <span class="icon icon-search"></span>
+                                                        <span class="count-text">Buscar</span>
+                                                    </a>
+                                                    <a id="btnExportar3" class="btn btn-primary" href="javascript: void(0)">
+                                                        <span class="icon icon-download"></span>
+                                                        <span class="count-text">Exportar</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="tblUrlAplicacion3"
+                                   class="table"
+                                   data-detail-view="true"
+                                   data-detail-formatter="detailFormatter"
+                                   data-unique-id="Id"
+                                   data-mobile-responsive="true">
+                                <caption class="caption text-left">
+                                    <span>Registros de URLs</span>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                        <th data-field="Url" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">URL</th>
+                                        <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Código APT</th>                                        
+                                        <th data-field="NombreAplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                                        <th data-field="UrlFuenteIdStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Fuente</th>
+                                        <th data-field="Comentario" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Comentario</th>
+                                        <th data-field="FechaCreacionFormat" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                                        <th data-field="FechaUltimaActualizacionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaUltimaActualizacion" data-width="10%">Fecha última <br /> actualización</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*<div class="tab-pane" id="4b">
+            <div class="row gutter-xs">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-search">
+                                <fieldset class="fieldset">
+                                    <legend class="legend">Filtro de búsqueda</legend>
+                                    <div class="card-search-box">
+                                        <div class="row gutter-xs">
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Equipo: </h5>
+                                                    <input type="text" id="txtFilEquipo4" name="txtFilEquipo4" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Aplicación: </h5>
+                                                    <input type="text" id="txtFilAplicacion4" name="txtFilAplicacion4" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="text-left" data-toggle="match-height">
+                                                    <h5>Fuente: </h5>
+                                                    <select id="ddlFilFuente4" name="ddlFilFuente4" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row gutter-xs">
+                                            <div class="col-md-12">
+                                                <div class="text-right">
+                                                    <h5>&nbsp;</h5>
+                                                    <a id="btnBuscar4" class="btn btn-primary" href="javascript: void(0)">
+                                                        <span class="icon icon-search"></span>
+                                                        <span class="count-text">Buscar</span>
+                                                    </a>
+                                                    <a id="btnExportar4" class="btn btn-primary" href="javascript: void(0)">
+                                                        <span class="icon icon-download"></span>
+                                                        <span class="count-text">Exportar</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gutter-xs">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="tblUrlAplicacion4"
+                                   class="table"
+                                   data-detail-view="true"
+                                   data-detail-formatter="detailFormatter"
+                                   data-unique-id="Id"
+                                   data-mobile-responsive="true">
+                                <caption class="caption text-left">
+                                    <span>Registros de URLs</span>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                                        <th data-field="Url" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">URL</th>
+                                        <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Código APT</th>                                        
+                                        <th data-field="NombreAplicacion" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Nombre</th>
+                                        <th data-field="UrlFuenteIdStr" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Fuente</th>
+                                        <th data-field="Comentario" data-halign="center" data-valign="middle" data-align="left" data-sortable="true" data-width="20%">Comentario</th>
+                                        <th data-field="FechaCreacionFormat" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaCreacion" data-width="10%">Fecha de registro</th>
+                                        <th data-field="FechaUltimaActualizacionStr" data-halign="center" data-valign="middle" data-align="center" data-sortable="true" data-sort-name="FechaUltimaActualizacion" data-width="10%">Fecha última <br /> actualización</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@       
+    </div>
+</div>
+
+<div id="mdAppsCandidatas" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Aplicaciones candidatas</h4>
+            </div>
+            <div class="modal-body">
+                <table id="tblAppsCandidatas" data-locale="es-SP" class="table" data-unique-id="Id" data-mobile-responsive="true">
+                    <thead>
+                        <tr>
+                            <th data-formatter="rowNumFormatterServer" data-valign="middle" data-align="center" data-width="2%">#</th>
+                            <th data-formatter="opcionesAppsCandidatas" data-field="Opciones" data-halign="center" data-valign="middle" data-align="center" data-width="5%">Acciones</th>
+                            <th data-field="CodigoAPT" data-halign="center" data-valign="middle" data-align="center">Codigo APT</th>
+                            <th data-field="Nombre" data-halign="center" data-valign="middle" data-align="center">Aplicación</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/app/Alertas/urlAplicacion.js?v=1.0.1"></script>
